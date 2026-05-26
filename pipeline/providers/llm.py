@@ -75,19 +75,41 @@ class LLMRouter:
                 if reasoning_effort and p.get("supports_reasoning_effort"):
                     kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
                 resp = client.chat.completions.create(**kwargs)
-                msg = resp.choices[0].message
+                choice = resp.choices[0]
+                msg = choice.message
                 content = (msg.content or "").strip()
+                finish = getattr(choice, "finish_reason", None)
+
                 if not content:
+                    # gpt-oss reasoning models put their thinking in
+                    # `reasoning_content`. Sometimes (rarely) the actual answer
+                    # also leaks there. Only treat it as the answer if it
+                    # *looks* like the kind of output we asked for —
+                    # otherwise it's just truncated thinking.
                     extra = getattr(msg, "model_extra", None) or {}
                     for key in ("reasoning_content", "reasoning", "thinking"):
                         cand = extra.get(key)
-                        if isinstance(cand, str) and cand.strip():
-                            content = cand.strip()
-                            LOG.info("  (used %s field as content)", key)
-                            break
+                        if not (isinstance(cand, str) and cand.strip()):
+                            continue
+                        cand = cand.strip()
+                        if json_mode and not _looks_like_json(cand):
+                            LOG.warning(
+                                "  %s present but does not look like JSON "
+                                "(finish_reason=%s, %d chars) — likely truncated reasoning, "
+                                "falling through to next provider",
+                                key, finish, len(cand),
+                            )
+                            continue
+                        content = cand
+                        LOG.info("  (used %s field as content)", key)
+                        break
+
                 if not content:
-                    finish = getattr(resp.choices[0], "finish_reason", None)
-                    raise RuntimeError(f"Empty response (finish_reason={finish})")
+                    raise RuntimeError(
+                        f"Empty response (finish_reason={finish}). "
+                        f"Likely the model ran out of tokens during reasoning. "
+                        f"Try lower reasoning_effort or higher max_tokens."
+                    )
                 return content
             except Exception as e:  # noqa: BLE001
                 LOG.warning("LLM provider %s failed: %s", p["name"], e)
@@ -116,6 +138,14 @@ class LLMRouter:
 
 
 # ---------- robust JSON extraction ----------
+
+def _looks_like_json(s: str) -> bool:
+    """Cheap test: does this string contain a JSON object (vs prose)?"""
+    s = s.lstrip()
+    # Strip optional code fence
+    s = re.sub(r"^```(?:json)?\s*", "", s)
+    return s.startswith("{") or s.startswith("[")
+
 
 def _parse_json(text: str) -> dict[str, Any]:
     """Strict json.loads → strip code fences → first {…} block → repair-truncated."""
