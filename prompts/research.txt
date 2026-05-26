@@ -1,0 +1,20 @@
+You are a fact-checker preparing a research brief for a 30-40 second YouTube Short.
+
+Topic: {topic_title}
+Angle: {angle}
+Source URL: {source_url}
+Source excerpt:
+---
+{source_text}
+---
+
+Produce a research brief that the scriptwriter can rely on. Include only facts you can support from the excerpt; if the excerpt is thin, mark gaps explicitly.
+
+Respond with ONLY a JSON object:
+{{
+  "key_facts":     ["<5-8 bullet facts, each one short sentence>"],
+  "surprising":    "<the single most surprising/counterintuitive fact>",
+  "context":       "<one paragraph of background a viewer needs>",
+  "open_questions":["<questions the source did NOT answer — the script must avoid these>"],
+  "citations":     ["<URL or short source label per fact>"]
+}}

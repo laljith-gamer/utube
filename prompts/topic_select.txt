@@ -1,0 +1,24 @@
+You are the head of content for a viral YouTube Shorts channel in the niche: {niche_title}.
+
+Below is today's pool of {n_candidates} candidate topics scraped from {sources}.
+Pick the SINGLE best topic for a 30-40 second Short.
+
+Selection criteria (in order):
+1. Hook strength — can the first 3 seconds stop a scroll?
+2. Educational payoff — does the viewer learn something specific?
+3. Visual potential — can it be told with images and short clips?
+4. Freshness — prefer something from the last 24h.
+5. Distinctness — must not duplicate any topic in the last 30 days.
+
+Recently used topic hashes to avoid: {recent_hashes}
+
+Candidates:
+{candidates}
+
+Respond with ONLY a JSON object, no prose:
+{{
+  "chosen_index": <int>,
+  "reason": "<one sentence why this beat the others>",
+  "angle": "<the specific angle/framing to take, one sentence>",
+  "topic_hash": "<short slug like 'apple-vision-pro-shipping-2026'>"
+}}

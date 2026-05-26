@@ -1,0 +1,21 @@
+# Single workflow runs daily at 00:00 UTC and produces all 5 videos in parallel.
+# Each video is uploaded with publishAt = the slot's schedule_utc time.
+
+cron_utc: "0 0 * * *"
+publish_strategy: scheduled    # "scheduled" uses publishAt; "immediate" makes them public on upload
+privacy_status_for_scheduled: private  # required by YouTube when using publishAt
+
+# Topic dedup window — don't pick a topic whose hash matches one used in the last N days
+dedup_days: 30
+
+# Per-stage timeouts (seconds)
+timeouts:
+  discover: 60
+  research: 90
+  script: 120
+  tts: 180
+  visuals: 600
+  captions: 120
+  thumbnail: 90
+  assemble: 240
+  upload: 300

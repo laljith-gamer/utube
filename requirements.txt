@@ -1,0 +1,30 @@
+# Core
+requests>=2.31.0
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+tenacity>=8.2.3
+pydantic>=2.5.0
+
+# LLM clients (OpenAI-compatible works for NIM, Cerebras, Groq, OpenRouter)
+openai>=1.40.0
+
+# TTS
+edge-tts>=6.1.12
+
+# Audio / Video
+faster-whisper>=1.0.3
+ffmpeg-python>=0.2.0
+moviepy>=1.0.3
+
+# Images
+Pillow>=10.2.0
+
+# YouTube upload
+google-api-python-client>=2.118.0
+google-auth>=2.27.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+
+# Reddit (no auth) and feed parsing
+feedparser>=6.0.11
+beautifulsoup4>=4.12.3
