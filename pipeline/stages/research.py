@@ -1,17 +1,21 @@
-"""Pick best topic + enrich with research brief via LLM."""
+"""Topic selection + research brief — token budgets and reasoning effort from pipeline.yaml."""
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
 
+from ..config import get_config, goal_summary
 from ..providers.llm import LLMRouter
 from ..utils import repo_root, topic_hash
 
 LOG = logging.getLogger("utube.research")
+
+
+def _research_cfg() -> dict:
+    return get_config().get_path("research", {}) or {}
 
 
 def select_topic(
@@ -25,6 +29,8 @@ def select_topic(
     if not candidates:
         raise RuntimeError("No candidates to choose from")
 
+    cfg = get_config()
+    rcfg = _research_cfg().get("topic_select", {}) or {}
     template = (repo_root() / "prompts" / "topic_select.txt").read_text(encoding="utf-8")
 
     rendered = "\n".join(
@@ -32,18 +38,22 @@ def select_topic(
         for i, c in enumerate(candidates)
     )
     prompt = template.format(
+        goal=goal_summary(),
         niche_title=niche_title,
         n_candidates=len(candidates),
         sources=sources_label,
         recent_hashes=", ".join(recent_hashes[-30:]) or "(none)",
         candidates=rendered,
+        target_duration=cfg.get_path("video.target_duration_sec", 35),
+        format_label=cfg.get_path("channel.format", "shorts"),
+        hook_max_seconds=cfg.get_path("script.hook_max_seconds", 3),
     )
 
     out = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=500,
-        temperature=0.5,
-        reasoning_effort="medium",
+        max_tokens=int(rcfg.get("max_tokens", 2000)),
+        temperature=float(rcfg.get("temperature", 0.5)),
+        reasoning_effort=rcfg.get("reasoning_effort"),
     )
 
     idx = int(out.get("chosen_index", 0))
@@ -56,8 +66,9 @@ def select_topic(
     return chosen
 
 
-def fetch_source_text(url: str, *, max_chars: int = 6000) -> str:
-    """Fetch and reduce a source page to readable text. Resilient to failures."""
+def fetch_source_text(url: str, *, max_chars: int | None = None) -> str:
+    if max_chars is None:
+        max_chars = int(_research_cfg().get("source_text_max_chars", 6000))
     if not url:
         return ""
     try:
@@ -71,7 +82,6 @@ def fetch_source_text(url: str, *, max_chars: int = 6000) -> str:
         soup = BeautifulSoup(r.text, "html.parser")
         for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
             tag.decompose()
-        # Prefer <article>, then <main>, then body
         node = soup.find("article") or soup.find("main") or soup.body or soup
         text = " ".join(node.get_text(separator=" ").split())
         return text[:max_chars]
@@ -81,6 +91,8 @@ def fetch_source_text(url: str, *, max_chars: int = 6000) -> str:
 
 
 def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
+    cfg = get_config()
+    bcfg = _research_cfg().get("brief", {}) or {}
     template = (repo_root() / "prompts" / "research.txt").read_text(encoding="utf-8")
 
     source_url = topic.get("external_url") or topic.get("url", "")
@@ -91,16 +103,20 @@ def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
             source_text = fetched
 
     prompt = template.format(
+        goal=goal_summary(),
         topic_title=topic.get("title", ""),
         angle=topic.get("angle", ""),
         source_url=source_url,
         source_text=source_text or "(no source text available)",
+        target_duration=cfg.get_path("video.target_duration_sec", 35),
+        format_label=cfg.get_path("channel.format", "shorts"),
     )
 
     brief = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=1000,
-        temperature=0.4,
+        max_tokens=int(bcfg.get("max_tokens", 2500)),
+        temperature=float(bcfg.get("temperature", 0.4)),
+        reasoning_effort=bcfg.get("reasoning_effort"),
     )
     LOG.info("Research brief: %d facts, %d gaps",
              len(brief.get("key_facts", [])), len(brief.get("open_questions", [])))

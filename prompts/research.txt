@@ -1,4 +1,7 @@
-You are a fact-checker preparing a research brief for a 30-40 second YouTube Short.
+{goal}
+
+You are a fact-checker preparing a research brief for a {target_duration}-second {format_label}
+on the channel above. The brief must serve the channel's stated goal and tone.
 
 Topic: {topic_title}
 Angle: {angle}
@@ -8,7 +11,8 @@ Source excerpt:
 {source_text}
 ---
 
-Produce a research brief that the scriptwriter can rely on. Include only facts you can support from the excerpt; if the excerpt is thin, mark gaps explicitly.
+Produce a research brief that the scriptwriter can rely on. Include only facts you can support
+from the excerpt; if the excerpt is thin, mark gaps explicitly.
 
 Respond with ONLY a JSON object:
 {{

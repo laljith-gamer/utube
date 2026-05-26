@@ -1,7 +1,7 @@
-"""Top-level orchestrator: produces (and optionally uploads) videos for one or more niche slots.
+"""Top-level orchestrator. ALL configuration via config/*.yaml — no constants here.
 
 Modes:
-  - python -m pipeline.orchestrator                        # all 5 slots, full pipeline
+  - python -m pipeline.orchestrator                        # all niche slots, full pipeline
   - python -m pipeline.orchestrator --slot tech_news       # one slot only
   - python -m pipeline.orchestrator --no-upload            # build but skip upload
   - python -m pipeline.orchestrator --slot tech_news --no-upload --skip-svd
@@ -9,15 +9,13 @@ Modes:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import yaml
-
+from .config import get_config
 from .ledger import Ledger
 from .providers.image import ImageRouter
 from .providers.llm import LLMRouter
@@ -31,31 +29,12 @@ from .utils import env_bool, repo_root, run_date, run_dir, setup_logging, slugif
 LOG = logging.getLogger("utube.orchestrator")
 
 
-# ---------- config loaders ----------
-
-def load_niches() -> dict:
-    return yaml.safe_load((repo_root() / "config" / "niches.yaml").read_text(encoding="utf-8"))
-
-
-def load_schedule() -> dict:
-    return yaml.safe_load((repo_root() / "config" / "schedule.yaml").read_text(encoding="utf-8"))
-
-
-# ---------- per-slot pipeline ----------
-
-def produce_one(
-    slot: dict,
-    *,
-    upload: bool,
-    skip_svd: bool,
-    ledger: Ledger,
-    schedule: dict,
-    video_cfg: dict,
-) -> dict:
+def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> dict:
+    cfg = get_config()
     slot_id = slot["id"]
     out = run_dir(slot_id)
     LOG.info("=" * 72)
-    LOG.info("SLOT %s — %s", slot_id, slot["title"])
+    LOG.info("SLOT %s — %s", slot_id, slot.get("title", ""))
     LOG.info("Output dir: %s", out)
     LOG.info("=" * 72)
 
@@ -66,10 +45,9 @@ def produce_one(
     stock = StockRouter()
 
     result: dict = {"slot": slot_id, "ok": False, "out_dir": str(out)}
-
     try:
         # 1. Discover
-        candidates = discover.discover_for_niche(slot, limit=25)
+        candidates = discover.discover_for_niche(slot)
         write_json(out / "candidates.json", candidates)
         if not candidates:
             raise RuntimeError("No candidates discovered for this niche")
@@ -78,9 +56,9 @@ def produce_one(
         topic = research.select_topic(
             llm,
             candidates,
-            niche_title=slot["title"],
+            niche_title=slot.get("title", slot_id),
             sources_label=", ".join(s.get("type", "") for s in slot.get("sources", [])),
-            recent_hashes=ledger.recent_hashes(slot_id, days=schedule.get("dedup_days", 30)),
+            recent_hashes=ledger.recent_hashes(slot_id, days=int(cfg.get_path("dedup_days", 30))),
         )
         write_json(out / "topic.json", topic)
         ledger.record_topic(slot_id, topic["topic_hash"])
@@ -89,28 +67,17 @@ def produce_one(
         write_json(out / "research.json", brief)
 
         # 3. Script
-        sc = script.generate_script(
-            llm,
-            slot=slot,
-            topic={**topic, "research": brief},
-            research=brief,
-            target_duration=video_cfg.get("target_duration_sec", 35),
-            num_scenes=video_cfg.get("num_scenes", 7),
-        )
+        sc = script.generate_script(llm, slot=slot, topic=topic, research=brief)
         write_json(out / "script.json", sc)
 
         # 4. Audio
         audio_summary = audio.synthesize_narration(tts, script=sc, slot=slot, out_dir=out)
 
         # 5. Visuals
-        n_svd = 0 if skip_svd else video_cfg.get("use_svd_for_n_scenes", 4)
-        vis = visuals.generate_visuals(
-            image=img, video=vid, stock=stock,
-            script=sc, out_dir=out,
-            width=video_cfg.get("width", 1080),
-            height=video_cfg.get("height", 1920),
-            use_svd_for_n_scenes=n_svd,
-        )
+        if skip_svd:
+            # Disable SVD by zeroing its allocation just for this run
+            cfg["video"] = {**cfg.get("video", {}), "use_svd_for_n_scenes": 0}
+        vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
         write_json(out / "visuals.json", vis)
 
         # 6. Captions
@@ -135,10 +102,6 @@ def produce_one(
             srt_path=srt,
             out_dir=out,
             output_path=video_out,
-            width=video_cfg.get("width", 1080),
-            height=video_cfg.get("height", 1920),
-            fps=video_cfg.get("fps", 30),
-            caption_style=video_cfg.get("caption_style"),
             music_path=_pick_music(slot.get("music_mood")),
         )
         result["video_path"] = str(video_out)
@@ -147,7 +110,7 @@ def produce_one(
         result["description"] = sc.get("description")
         result["hashtags"] = sc.get("hashtags", [])
 
-        # 9. Upload (with publishAt = today's slot UTC time)
+        # 9. Upload
         if upload:
             publish_at = _publish_at_for_slot(slot.get("schedule_utc"))
             tags = [h.lstrip("#") for h in sc.get("hashtags", [])][:30]
@@ -158,7 +121,7 @@ def produce_one(
                 tags=tags,
                 publish_at_iso=publish_at,
                 thumbnail_path=thumb_path,
-                privacy_status=schedule.get("privacy_status_for_scheduled", "private"),
+                privacy_status=cfg.get_path("privacy_status_for_scheduled", "private"),
             )
             result["upload"] = up
         else:
@@ -205,42 +168,33 @@ def _pick_music(mood: str | None) -> Path | None:
 def main(argv: list[str] | None = None) -> int:
     setup_logging(level="INFO")
     parser = argparse.ArgumentParser(description="utube — produce daily videos")
-    parser.add_argument("--slot", help="Run only one slot id (e.g. tech_news). Omit to run all 5.")
+    parser.add_argument("--slot", help="Run only one slot id (e.g. tech_news). Omit to run all.")
     parser.add_argument("--no-upload", action="store_true", help="Skip YouTube upload")
     parser.add_argument("--skip-svd", action="store_true", help="Skip SVD animation (Ken Burns only)")
     args = parser.parse_args(argv)
 
     upload = not args.no_upload and not env_bool("DRY_RUN")
 
-    niches = load_niches()
-    schedule = load_schedule()
-    video_cfg = niches.get("video", {})
-    slots = niches["slots"]
+    cfg = get_config()
+    slots = cfg.get("slots", []) or []
     if args.slot:
         slots = [s for s in slots if s["id"] == args.slot]
         if not slots:
             LOG.error("Unknown --slot %r. Available: %s",
-                      args.slot, [s["id"] for s in niches["slots"]])
+                      args.slot, [s["id"] for s in cfg.get("slots", [])])
             return 2
 
-    ledger_path = repo_root() / "ledger.json"
-    ledger = Ledger.load(ledger_path)
+    ledger = Ledger.load(repo_root() / "ledger.json")
 
     LOG.info("Run date: %s", run_date())
+    LOG.info("Channel: %s", cfg.get_path("channel.name", "?"))
     LOG.info("Slots to run: %s", [s["id"] for s in slots])
     LOG.info("Upload: %s", upload)
 
     results = []
     for slot in slots:
-        results.append(produce_one(
-            slot,
-            upload=upload,
-            skip_svd=args.skip_svd,
-            ledger=ledger,
-            schedule=schedule,
-            video_cfg=video_cfg,
-        ))
-        ledger.save()  # persist after every slot
+        results.append(produce_one(slot, upload=upload, skip_svd=args.skip_svd, ledger=ledger))
+        ledger.save()
 
     write_json(repo_root() / "runs" / run_date() / "batch_summary.json", results)
 

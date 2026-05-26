@@ -1,5 +1,7 @@
-# 5 niche lanes — one slot = one daily video
-# Each slot has its own sources, voice, style, schedule, and color palette.
+# 5 niche lanes — one slot = one daily video.
+# Per-slot voice/style/sources only. Global video format specs live in
+# config/pipeline.yaml > video, so the same channel can be retuned without
+# touching every niche.
 
 slots:
   - id: did_you_know
@@ -80,20 +82,3 @@ slots:
     palette: ["#06FFA5", "#011627"]
     schedule_utc: "21:00"
     music_mood: epic
-
-# Global video specs (Shorts)
-video:
-  width: 1080
-  height: 1920
-  fps: 30
-  target_duration_sec: 35
-  min_duration_sec: 28
-  max_duration_sec: 45
-  num_scenes: 7        # 6-8 typical
-  use_svd_for_n_scenes: 4   # remaining scenes use Ken Burns or stock
-  caption_style:
-    fontsize: 72
-    fontcolor: "white"
-    bordercolor: "black"
-    borderw: 4
-    box: false
