@@ -1,0 +1,39 @@
+You are writing a 30-40 second YouTube Short for the niche: {niche_title}.
+Voice persona: {voice_style}.
+Visual style: {visual_style}.
+
+Topic: {topic_title}
+Angle: {angle}
+
+Research brief:
+{research_brief}
+
+Hard rules:
+- Total narration target: {target_duration} seconds (~{target_words} words at 150 wpm).
+- Exactly {num_scenes} scenes.
+- First 3 seconds = a stop-the-scroll hook (no "hey guys", no slow intro).
+- Each scene must be visualizable with a still image OR a short 4-second motion clip.
+- End with a question or CTA that makes people comment.
+- Title <= 60 chars, no clickbait lies. Description includes 1 source URL.
+- Hashtags: 5-8, mixing #shorts plus topical tags.
+- Thumbnail text: 3-4 punchy words max.
+
+Respond with ONLY this JSON shape, no prose:
+{{
+  "hook": "<first 3-second hook line>",
+  "scenes": [
+    {{
+      "narration":     "<one sentence, spoken>",
+      "duration_sec":  <int 3-7>,
+      "visual_prompt": "<detailed SDXL prompt, photorealistic or matching style>",
+      "broll_keywords":["<3-5 keywords for stock fallback>"],
+      "use_motion":    <true|false>
+    }}
+  ],
+  "cta": "<final line that drives a comment or follow>",
+  "title":            "<= 60 chars",
+  "description":      "<2-3 sentences + source URL + #hashtags>",
+  "hashtags":         ["#shorts", "#..."],
+  "thumbnail_prompt": "<SDXL prompt for the thumbnail background>",
+  "thumbnail_text":   "<3-4 word punch>"
+}}

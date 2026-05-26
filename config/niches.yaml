@@ -1,0 +1,99 @@
+# 5 niche lanes — one slot = one daily video
+# Each slot has its own sources, voice, style, schedule, and color palette.
+
+slots:
+  - id: did_you_know
+    title: "Did You Know? Tech Facts"
+    sources:
+      - type: wikipedia_otd
+      - type: reddit
+        subreddits: [todayilearned, technology]
+        time_filter: day
+      - type: github_trending
+    voice: en-US-AvaMultilingualNeural
+    voice_style: friendly
+    style: cozy_reveal
+    palette: ["#FFB347", "#2B2D42"]
+    schedule_utc: "04:00"
+    music_mood: chill
+
+  - id: tech_news
+    title: "Tech News of the Day"
+    sources:
+      - type: hackernews
+        front_page: true
+      - type: rss
+        urls:
+          - https://techcrunch.com/feed/
+          - https://www.theverge.com/rss/index.xml
+    voice: en-US-GuyNeural
+    voice_style: newscast
+    style: fast_news_ticker
+    palette: ["#E63946", "#1D3557"]
+    schedule_utc: "09:00"
+    music_mood: corporate_upbeat
+
+  - id: ai_breakthrough
+    title: "AI Breakthrough"
+    sources:
+      - type: reddit
+        subreddits: [MachineLearning, LocalLLaMA, singularity]
+        time_filter: day
+      - type: rss
+        urls:
+          - https://huggingface.co/blog/feed.xml
+    voice: en-US-AriaNeural
+    voice_style: curious
+    style: clean_futuristic
+    palette: ["#7B61FF", "#0F0F23"]
+    schedule_utc: "13:00"
+    music_mood: futuristic
+
+  - id: cybersecurity
+    title: "Cybersecurity Bite"
+    sources:
+      - type: reddit
+        subreddits: [netsec, cybersecurity]
+        time_filter: day
+      - type: rss
+        urls:
+          - https://feeds.feedburner.com/TheHackersNews
+    voice: en-US-DavisNeural
+    voice_style: serious
+    style: dark_suspense
+    palette: ["#00FF41", "#0D0208"]
+    schedule_utc: "17:00"
+    music_mood: tense
+
+  - id: viral_science
+    title: "Viral Science / Future Tech"
+    sources:
+      - type: reddit
+        subreddits: [Futurology, Damnthatsinteresting, science]
+        time_filter: day
+      - type: rss
+        urls:
+          - https://www.arstechnica.com/feed/
+    voice: en-US-JennyNeural
+    voice_style: cinematic
+    style: cinematic_dramatic
+    palette: ["#06FFA5", "#011627"]
+    schedule_utc: "21:00"
+    music_mood: epic
+
+# Global video specs (Shorts)
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  target_duration_sec: 35
+  min_duration_sec: 28
+  max_duration_sec: 45
+  num_scenes: 7        # 6-8 typical
+  use_svd_for_n_scenes: 4   # remaining scenes use Ken Burns or stock
+  caption_style:
+    fontsize: 72
+    fontcolor: "white"
+    bordercolor: "black"
+    borderw: 4
+    box: false
