@@ -1,12 +1,7 @@
-"""LLM provider router.
+"""LLM provider router — fully driven by config/providers.yaml > llm.
 
-Primary:  NVIDIA NIM   (gpt-oss-120b)
-Fallback: Cerebras     (gpt-oss-120b, 14,400 RPD free)
-Fallback: Groq         (gpt-oss-120b or llama-3.3-70b)
-Fallback: OpenRouter   (free models)
-
-All four expose an OpenAI-compatible API, so we use the openai SDK
-with different base_urls.
+No URLs, model names, or token floors are hardcoded here. Edit the YAML to
+add/reorder providers, swap models, or retune reasoning budgets.
 """
 from __future__ import annotations
 
@@ -14,66 +9,39 @@ import json
 import logging
 import re
 import time
-from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
 from openai import OpenAI
 
+from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.llm")
 
 
-@dataclass
-class LLMProviderConfig:
-    name: str
-    base_url: str
-    api_key_env: str
-    model: str
-
-    @property
-    def api_key(self) -> str:
-        return env(self.api_key_env)
-
-    @property
-    def configured(self) -> bool:
-        return bool(self.api_key)
-
-
-PROVIDERS: list[LLMProviderConfig] = [
-    LLMProviderConfig(
-        name="nvidia_nim",
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key_env="NVIDIA_NIM_API_KEY",
-        model="openai/gpt-oss-120b",
-    ),
-    LLMProviderConfig(
-        name="cerebras",
-        base_url="https://api.cerebras.ai/v1",
-        api_key_env="CEREBRAS_API_KEY",
-        model="gpt-oss-120b",
-    ),
-    LLMProviderConfig(
-        name="groq",
-        base_url="https://api.groq.com/openai/v1",
-        api_key_env="GROQ_API_KEY",
-        model="openai/gpt-oss-120b",
-    ),
-    LLMProviderConfig(
-        name="openrouter",
-        base_url="https://openrouter.ai/api/v1",
-        api_key_env="OPENROUTER_API_KEY",
-        model="meta-llama/llama-3.3-70b-instruct:free",
-    ),
-]
-
-
 class LLMRouter:
-    """Tries each configured provider until one succeeds."""
+    """Tries each provider in `llm.chain` until one succeeds."""
 
-    def __init__(self, providers: Iterable[LLMProviderConfig] | None = None):
-        self.providers = list(providers) if providers else PROVIDERS
-        self.active = [p for p in self.providers if p.configured]
+    def __init__(self) -> None:
+        cfg = get_config()
+        self.cfg = cfg.get_path("llm", {}) or {}
+        chain = self.cfg.get("chain", [])
+        providers_block = self.cfg.get("providers", {}) or {}
+        self.timeout = self.cfg.get("request_timeout_sec", 120)
+        self.token_floor = self.cfg.get("reasoning_token_floor", {}) or {}
+        self.retry_pause = self.cfg.get("retry_on_rate_limit_seconds", 2)
+
+        self.active: list[dict[str, Any]] = []
+        for name in chain:
+            p = providers_block.get(name)
+            if not p:
+                LOG.warning("LLM provider %r in chain but not defined in providers", name)
+                continue
+            key = env(p.get("api_key_env", ""))
+            if not key:
+                continue
+            self.active.append({"name": name, "api_key": key, **p})
+
         if not self.active:
             LOG.warning("No LLM providers configured. Set at least one *_API_KEY.")
 
@@ -86,38 +54,35 @@ class LLMRouter:
         json_mode: bool = False,
         reasoning_effort: str | None = None,
     ) -> str:
-        # gpt-oss reasoning consumes tokens against max_tokens before any answer
-        # is emitted. Ensure plenty of headroom so we don't get empty/truncated output.
+        # Reasoning models burn tokens internally; bump max_tokens to a safe floor.
         if reasoning_effort:
-            min_budget = {"low": 1500, "medium": 4000, "high": 6000}.get(reasoning_effort, 4000)
+            min_budget = self.token_floor.get(reasoning_effort, 4000)
             max_tokens = max(max_tokens, min_budget)
 
         last_err: Exception | None = None
         for p in self.active:
             try:
-                LOG.info("LLM call → %s (%s)", p.name, p.model)
-                client = OpenAI(api_key=p.api_key, base_url=p.base_url, timeout=120.0)
+                LOG.info("LLM call → %s (%s)", p["name"], p["model"])
+                client = OpenAI(api_key=p["api_key"], base_url=p["base_url"], timeout=self.timeout)
                 kwargs: dict[str, Any] = {
-                    "model": p.model,
+                    "model": p["model"],
                     "messages": messages,
                     "max_tokens": max_tokens,
                     "temperature": temperature,
                 }
                 if json_mode:
                     kwargs["response_format"] = {"type": "json_object"}
-                if reasoning_effort and "gpt-oss" in p.model:
+                if reasoning_effort and p.get("supports_reasoning_effort"):
                     kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
                 resp = client.chat.completions.create(**kwargs)
                 msg = resp.choices[0].message
                 content = (msg.content or "").strip()
                 if not content:
-                    # gpt-oss on some providers puts the answer in reasoning_content;
-                    # OpenAI SDK surfaces unknown fields via model_extra.
                     extra = getattr(msg, "model_extra", None) or {}
                     for key in ("reasoning_content", "reasoning", "thinking"):
-                        candidate = extra.get(key)
-                        if isinstance(candidate, str) and candidate.strip():
-                            content = candidate.strip()
+                        cand = extra.get(key)
+                        if isinstance(cand, str) and cand.strip():
+                            content = cand.strip()
                             LOG.info("  (used %s field as content)", key)
                             break
                 if not content:
@@ -125,11 +90,10 @@ class LLMRouter:
                     raise RuntimeError(f"Empty response (finish_reason={finish})")
                 return content
             except Exception as e:  # noqa: BLE001
-                LOG.warning("LLM provider %s failed: %s", p.name, e)
+                LOG.warning("LLM provider %s failed: %s", p["name"], e)
                 last_err = e
-                # If 429 or quota, brief pause before next provider
                 if "429" in str(e) or "rate" in str(e).lower():
-                    time.sleep(2)
+                    time.sleep(self.retry_pause)
                 continue
         raise RuntimeError(f"All LLM providers failed. Last error: {last_err}")
 
@@ -141,7 +105,6 @@ class LLMRouter:
         temperature: float = 0.7,
         reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
-        """Return parsed JSON, with robust fallback to regex extraction."""
         text = self.chat(
             messages,
             max_tokens=max_tokens,
@@ -152,28 +115,26 @@ class LLMRouter:
         return _parse_json(text)
 
 
+# ---------- robust JSON extraction ----------
+
 def _parse_json(text: str) -> dict[str, Any]:
-    """Try strict json.loads, then strip code fences, then regex, then a truncation repair."""
+    """Strict json.loads → strip code fences → first {…} block → repair-truncated."""
     text = text.strip()
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-    # Strip ``` fences
     fenced = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
     try:
         return json.loads(fenced)
     except json.JSONDecodeError:
         pass
-    # Find first {...} block
     m = re.search(r"\{.*\}", text, flags=re.DOTALL)
     if m:
         try:
             return json.loads(m.group(0))
         except json.JSONDecodeError:
             pass
-    # Last resort: try to repair a truncated JSON object by closing
-    # any unterminated string and any open braces/brackets.
     m = re.search(r"\{.*", text, flags=re.DOTALL)
     if m:
         repaired = _try_repair_truncated(m.group(0))
@@ -186,8 +147,6 @@ def _parse_json(text: str) -> dict[str, Any]:
 
 
 def _try_repair_truncated(s: str) -> str | None:
-    """Best-effort: close an unterminated string, then close open braces/brackets."""
-    # Walk the string tracking string state and brace/bracket depth
     in_str = False
     escape = False
     stack: list[str] = []
@@ -209,13 +168,12 @@ def _try_repair_truncated(s: str) -> str | None:
             if stack and stack[-1] == ch:
                 stack.pop()
             else:
-                return None  # malformed beyond simple truncation
+                return None
     repaired = s
     if in_str:
         repaired += '"'
-    # If we end mid key (e.g. ..."key": ) drop the trailing ", ?key?" before closing
     repaired = re.sub(r",\s*$", "", repaired)
-    repaired = re.sub(r":\s*$", ': null', repaired)
+    repaired = re.sub(r":\s*$", ": null", repaired)
     while stack:
         repaired += stack.pop()
     return repaired

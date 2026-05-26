@@ -1,19 +1,16 @@
-"""TTS provider router.
-
-Primary:  edge-tts  (unlimited, no key)
-Fallback: NVIDIA NIM Magpie TTS (premium voices, trial credits)
-
-Returns MP3 bytes.
-"""
+"""TTS router — config-driven (edge-tts primary, NIM Magpie premium)."""
 from __future__ import annotations
 
 import asyncio
+import base64
 import logging
 import tempfile
 from pathlib import Path
+from typing import Any
 
 import requests
 
+from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.tts")
@@ -21,41 +18,57 @@ LOG = logging.getLogger("utube.tts")
 
 class TTSRouter:
     def __init__(self) -> None:
-        self.nim_key = env("NVIDIA_NIM_API_KEY")
+        cfg = get_config()
+        self.cfg = cfg.get_path("tts", {}) or {}
+        self.chain: list[str] = self.cfg.get("chain", []) or []
+        self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
+        self.timeout = self.cfg.get("request_timeout_sec", 120)
+        self.default_rate = self.cfg.get("default_rate", "+0%")
+        self.default_pitch = self.cfg.get("default_pitch", "+0Hz")
 
     def synthesize(
         self,
         text: str,
         *,
-        voice: str = "en-US-AriaNeural",
-        rate: str = "+0%",
-        pitch: str = "+0Hz",
+        voice: str,
+        rate: str | None = None,
+        pitch: str | None = None,
         prefer_premium: bool = False,
     ) -> bytes:
-        if prefer_premium and self.nim_key:
-            try:
-                return self._nim_magpie(text, voice)
-            except Exception as e:  # noqa: BLE001
-                LOG.warning("NIM Magpie failed, falling back to edge-tts: %s", e)
+        rate = rate or self.default_rate
+        pitch = pitch or self.default_pitch
 
-        try:
-            return self._edge_tts(text, voice, rate, pitch)
-        except Exception as e:  # noqa: BLE001
-            LOG.warning("edge-tts failed: %s", e)
-            if self.nim_key:
-                return self._nim_magpie(text, voice)
-            raise
+        # Optionally bias the chain to put premium first
+        chain = list(self.chain)
+        if prefer_premium and "nim_magpie" in chain:
+            chain.remove("nim_magpie")
+            chain.insert(0, "nim_magpie")
+
+        last_err: Exception | None = None
+        for name in chain:
+            p = self.providers.get(name)
+            if not p:
+                continue
+            try:
+                if p.get("backend") == "edge_tts":
+                    return self._edge_tts(text, voice, rate, pitch)
+                if name == "nim_magpie":
+                    return self._nim_magpie(p, text, voice)
+                LOG.warning("Unknown TTS provider in chain: %s", name)
+            except Exception as e:  # noqa: BLE001
+                LOG.warning("TTS provider %s failed: %s", name, e)
+                last_err = e
+        raise RuntimeError(f"All TTS providers failed. Last error: {last_err}")
 
     def _edge_tts(self, text: str, voice: str, rate: str, pitch: str) -> bytes:
-        # Lazy import so the module loads even if edge-tts isn't installed yet
-        import edge_tts
+        import edge_tts  # lazy import
 
         async def _gen() -> bytes:
-            communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+            comm = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
             with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
                 tmp = Path(f.name)
             try:
-                await communicate.save(str(tmp))
+                await comm.save(str(tmp))
                 return tmp.read_bytes()
             finally:
                 tmp.unlink(missing_ok=True)
@@ -63,25 +76,26 @@ class TTSRouter:
         LOG.info("TTS via edge-tts (%s)", voice)
         return asyncio.run(_gen())
 
-    def _nim_magpie(self, text: str, voice: str) -> bytes:
-        # Magpie multilingual via NIM. Voices are model-defined; pass through.
-        url = "https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual"
+    def _nim_magpie(self, p: dict, text: str, voice: str) -> bytes:
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("NIM Magpie key not set")
+        params = p.get("params", {}) or {}
+        # Edge-style voice ids don't apply to Magpie; use default unless caller passed a magpie voice
+        magpie_voice = voice if voice and voice.startswith("Magpie-") else params.get("default_voice", "Magpie-Multilingual.EN-US.Ray")
+        payload = {
+            "text": text,
+            "voice": magpie_voice,
+            "encoding": params.get("encoding", "mp3"),
+            "sample_rate_hz": params.get("sample_rate_hz", 22050),
+        }
         headers = {
-            "Authorization": f"Bearer {self.nim_key}",
+            "Authorization": f"Bearer {api_key}",
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
-        payload = {
-            "text": text,
-            "voice": voice if not voice.startswith("en-US-") else "Magpie-Multilingual.EN-US.Ray",
-            "encoding": "mp3",
-            "sample_rate_hz": 22050,
-        }
-        r = requests.post(url, json=payload, headers=headers, timeout=120)
+        r = requests.post(p["url"], json=payload, headers=headers, timeout=self.timeout)
         r.raise_for_status()
-        # NIM returns audio as base64 in 'audio' field
-        import base64
-
         data = r.json()
         audio_b64 = data.get("audio") or data.get("audio_base64") or ""
         if not audio_b64:

@@ -1,20 +1,15 @@
-"""Image-generation router.
-
-Primary:  NVIDIA NIM SDXL
-Fallback: Pollinations.ai  (no API key, unlimited)
-Fallback: HuggingFace Inference (SDXL / FLUX-schnell)
-
-Returns raw PNG bytes.
-"""
+"""Image-generation router — config-driven, no hardcoded URLs/models/params."""
 from __future__ import annotations
 
 import base64
 import logging
 import time
+from typing import Any
 from urllib.parse import quote
 
 import requests
 
+from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.image")
@@ -22,65 +17,67 @@ LOG = logging.getLogger("utube.image")
 
 class ImageRouter:
     def __init__(self) -> None:
-        self.nim_key = env("NVIDIA_NIM_API_KEY")
-        self.hf_key = env("HUGGINGFACE_API_KEY")
+        cfg = get_config()
+        self.cfg = cfg.get_path("image", {}) or {}
+        self.chain: list[str] = self.cfg.get("chain", [])
+        self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
+        self.timeout = self.cfg.get("request_timeout_sec", 120)
+        self.default_negative = self.cfg.get("default_negative_prompt", "")
 
     def generate(
         self,
         prompt: str,
         *,
-        width: int = 1024,
-        height: int = 1024,
-        negative: str = "low quality, blurry, watermark, text, signature",
+        width: int,
+        height: int,
+        negative: str | None = None,
     ) -> bytes:
+        negative = negative if negative is not None else self.default_negative
         errors: list[str] = []
-
-        if self.nim_key:
+        for name in self.chain:
+            p = self.providers.get(name)
+            if not p:
+                continue
             try:
-                return self._nim_sdxl(prompt, width, height, negative)
+                if name == "nvidia_nim_sdxl":
+                    return self._nim_sdxl(p, prompt, width, height, negative)
+                if name == "pollinations":
+                    return self._pollinations(p, prompt, width, height)
+                if name == "huggingface_flux":
+                    return self._huggingface(p, prompt, width, height)
+                LOG.warning("Unknown image provider in chain: %s", name)
             except Exception as e:  # noqa: BLE001
-                LOG.warning("NIM SDXL failed: %s", e)
-                errors.append(f"nim:{e}")
-
-        # Pollinations is keyless, always try
-        try:
-            return self._pollinations(prompt, width, height)
-        except Exception as e:  # noqa: BLE001
-            LOG.warning("Pollinations failed: %s", e)
-            errors.append(f"pollinations:{e}")
-
-        if self.hf_key:
-            try:
-                return self._huggingface(prompt, width, height)
-            except Exception as e:  # noqa: BLE001
-                LOG.warning("HuggingFace failed: %s", e)
-                errors.append(f"hf:{e}")
-
+                LOG.warning("Image provider %s failed: %s", name, e)
+                errors.append(f"{name}:{e}")
         raise RuntimeError(f"All image providers failed: {errors}")
 
-    def _nim_sdxl(self, prompt: str, w: int, h: int, neg: str) -> bytes:
-        url = "https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl"
-        headers = {
-            "Authorization": f"Bearer {self.nim_key}",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
+    # ------- providers --------
+
+    def _nim_sdxl(self, p: dict, prompt: str, w: int, h: int, neg: str) -> bytes:
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("NIM SDXL key not set")
+        params = p.get("params", {}) or {}
         payload = {
             "text_prompts": [
                 {"text": prompt, "weight": 1.0},
                 {"text": neg, "weight": -1.0},
             ],
-            "cfg_scale": 5,
-            "sampler": "K_DPM_2_ANCESTRAL",
-            "seed": 0,
-            "steps": 25,
+            "cfg_scale": params.get("cfg_scale", 5),
+            "sampler": params.get("sampler", "K_DPM_2_ANCESTRAL"),
+            "seed": params.get("seed", 0),
+            "steps": params.get("steps", 25),
             "width": w,
             "height": h,
         }
-        r = requests.post(url, json=payload, headers=headers, timeout=120)
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        r = requests.post(p["url"], json=payload, headers=headers, timeout=self.timeout)
         r.raise_for_status()
         data = r.json()
-        # NIM returns base64 in artifacts
         artifacts = data.get("artifacts") or data.get("images") or []
         if not artifacts:
             raise RuntimeError(f"NIM returned no artifacts: {str(data)[:200]}")
@@ -90,35 +87,34 @@ class ImageRouter:
         LOG.info("Image via NVIDIA NIM SDXL")
         return base64.b64decode(b64)
 
-    def _pollinations(self, prompt: str, w: int, h: int) -> bytes:
-        # No API key, returns image bytes directly
-        url = (
-            f"https://image.pollinations.ai/prompt/{quote(prompt)}"
-            f"?width={w}&height={h}&nologo=true&enhance=true"
-        )
-        r = requests.get(url, timeout=120)
+    def _pollinations(self, p: dict, prompt: str, w: int, h: int) -> bytes:
+        url_template = p.get("url_template", "")
+        url = url_template.format(prompt=quote(prompt), w=w, h=h)
+        r = requests.get(url, timeout=self.timeout)
         r.raise_for_status()
-        if not r.content or len(r.content) < 1000:
+        min_bytes = p.get("min_response_bytes", 1000)
+        if not r.content or len(r.content) < min_bytes:
             raise RuntimeError(f"Pollinations returned tiny payload: {len(r.content)} bytes")
         LOG.info("Image via Pollinations.ai")
         return r.content
 
-    def _huggingface(self, prompt: str, w: int, h: int) -> bytes:
-        # FLUX-schnell is fast; SDXL also works
-        model = "black-forest-labs/FLUX.1-schnell"
-        url = f"https://api-inference.huggingface.co/models/{model}"
-        headers = {"Authorization": f"Bearer {self.hf_key}"}
+    def _huggingface(self, p: dict, prompt: str, w: int, h: int) -> bytes:
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("HuggingFace key not set")
+        cold_retry = p.get("cold_start_retry_sec", 20)
+        params = p.get("params", {}) or {}
         payload = {
             "inputs": prompt,
-            "parameters": {"width": w, "height": h, "num_inference_steps": 4},
+            "parameters": {"width": w, "height": h, **params},
         }
-        # HF cold-starts; retry once
+        headers = {"Authorization": f"Bearer {api_key}"}
         for attempt in range(2):
-            r = requests.post(url, json=payload, headers=headers, timeout=180)
+            r = requests.post(p["url"], json=payload, headers=headers, timeout=self.timeout)
             if r.status_code == 503 and attempt == 0:
-                time.sleep(20)
+                time.sleep(cold_retry)
                 continue
             r.raise_for_status()
-            LOG.info("Image via HuggingFace (%s)", model)
+            LOG.info("Image via HuggingFace")
             return r.content
         raise RuntimeError("HuggingFace timed out")

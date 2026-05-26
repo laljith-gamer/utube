@@ -1,18 +1,14 @@
-"""SVD (Stable Video Diffusion) router.
-
-Primary:  NVIDIA NIM stable-video-diffusion (~4s clip from one image)
-Fallback: HuggingFace Inference (SVD-XT-1.1)
-
-Both take a conditioning image and return MP4 bytes.
-"""
+"""SVD (Stable Video Diffusion) router — config-driven."""
 from __future__ import annotations
 
 import base64
 import logging
 import time
+from typing import Any
 
 import requests
 
+from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.video")
@@ -20,47 +16,55 @@ LOG = logging.getLogger("utube.video")
 
 class VideoRouter:
     def __init__(self) -> None:
-        self.nim_key = env("NVIDIA_NIM_API_KEY")
-        self.hf_key = env("HUGGINGFACE_API_KEY")
+        cfg = get_config()
+        self.cfg = cfg.get_path("video", {}) or {}
+        # video config in providers.yaml is keyed `video:` at top level too —
+        # we want the providers section, not pipeline.video. Re-resolve via path.
+        # Convention: providers.yaml uses `video:` for SVD provider config and
+        # pipeline.yaml uses `video:` for output specs. The deep-merge means both
+        # end up under `video`. Provider chain lives under `video.chain`.
+        self.chain: list[str] = self.cfg.get("chain", []) or []
+        self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
+        self.timeout = self.cfg.get("request_timeout_sec", 300)
 
-    def animate(self, image_png: bytes, *, motion_bucket_id: int = 127, seed: int = 0) -> bytes:
+    def animate(self, image_png: bytes) -> bytes:
         """Return MP4 bytes of an ~4s clip animated from the given image."""
         errors: list[str] = []
-
-        if self.nim_key:
+        for name in self.chain:
+            p = self.providers.get(name)
+            if not p:
+                continue
             try:
-                return self._nim_svd(image_png, motion_bucket_id, seed)
+                if name == "nvidia_nim_svd":
+                    return self._nim_svd(p, image_png)
+                if name == "huggingface_svd":
+                    return self._hf_svd(p, image_png)
+                LOG.warning("Unknown video provider in chain: %s", name)
             except Exception as e:  # noqa: BLE001
-                LOG.warning("NIM SVD failed: %s", e)
-                errors.append(f"nim:{e}")
-
-        if self.hf_key:
-            try:
-                return self._hf_svd(image_png)
-            except Exception as e:  # noqa: BLE001
-                LOG.warning("HF SVD failed: %s", e)
-                errors.append(f"hf:{e}")
-
+                LOG.warning("Video provider %s failed: %s", name, e)
+                errors.append(f"{name}:{e}")
         raise RuntimeError(f"All video providers failed: {errors}")
 
-    def _nim_svd(self, image_png: bytes, motion_bucket_id: int, seed: int) -> bytes:
-        url = "https://ai.api.nvidia.com/v1/genai/stabilityai/stable-video-diffusion"
-        headers = {
-            "Authorization": f"Bearer {self.nim_key}",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
+    def _nim_svd(self, p: dict, image_png: bytes) -> bytes:
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("NIM SVD key not set")
+        params = p.get("params", {}) or {}
         b64 = base64.b64encode(image_png).decode("ascii")
         payload = {
             "image": f"data:image/png;base64,{b64}",
-            "cfg_scale": 1.8,
-            "seed": seed,
-            "motion_bucket_id": motion_bucket_id,
+            "cfg_scale": params.get("cfg_scale", 1.8),
+            "seed": params.get("seed", 0),
+            "motion_bucket_id": params.get("motion_bucket_id", 127),
         }
-        r = requests.post(url, json=payload, headers=headers, timeout=300)
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        r = requests.post(p["url"], json=payload, headers=headers, timeout=self.timeout)
         r.raise_for_status()
         data = r.json()
-        # NIM SVD returns video in 'video' key as base64 mp4
         video_b64 = data.get("video") or data.get("video_base64") or ""
         if not video_b64:
             artifacts = data.get("artifacts") or []
@@ -71,17 +75,16 @@ class VideoRouter:
         LOG.info("SVD clip via NVIDIA NIM")
         return base64.b64decode(video_b64)
 
-    def _hf_svd(self, image_png: bytes) -> bytes:
-        model = "stabilityai/stable-video-diffusion-img2vid-xt-1-1"
-        url = f"https://api-inference.huggingface.co/models/{model}"
-        headers = {
-            "Authorization": f"Bearer {self.hf_key}",
-            "Content-Type": "image/png",
-        }
+    def _hf_svd(self, p: dict, image_png: bytes) -> bytes:
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("HuggingFace key not set")
+        cold_retry = p.get("cold_start_retry_sec", 30)
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "image/png"}
         for attempt in range(2):
-            r = requests.post(url, data=image_png, headers=headers, timeout=300)
+            r = requests.post(p["url"], data=image_png, headers=headers, timeout=self.timeout)
             if r.status_code == 503 and attempt == 0:
-                time.sleep(30)
+                time.sleep(cold_retry)
                 continue
             r.raise_for_status()
             LOG.info("SVD clip via HuggingFace")

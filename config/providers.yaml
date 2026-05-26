@@ -1,0 +1,117 @@
+# All external service endpoints, models, and their default parameters.
+# Add or reorder providers here — no code changes needed.
+# `chain` = order in which providers are tried (first match wins on failure).
+
+llm:
+  chain: [nvidia_nim, cerebras, groq, openrouter]
+  request_timeout_sec: 120
+  # gpt-oss reasoning consumes tokens internally. Auto-bump max_tokens to at least:
+  reasoning_token_floor:
+    low: 1500
+    medium: 4000
+    high: 6000
+  retry_on_rate_limit_seconds: 2
+  providers:
+    nvidia_nim:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: openai/gpt-oss-120b
+      supports_reasoning_effort: true
+    cerebras:
+      base_url: https://api.cerebras.ai/v1
+      api_key_env: CEREBRAS_API_KEY
+      model: gpt-oss-120b
+      supports_reasoning_effort: true
+    groq:
+      base_url: https://api.groq.com/openai/v1
+      api_key_env: GROQ_API_KEY
+      model: openai/gpt-oss-120b
+      supports_reasoning_effort: true
+    openrouter:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: meta-llama/llama-3.3-70b-instruct:free
+      supports_reasoning_effort: false
+
+image:
+  chain: [nvidia_nim_sdxl, pollinations, huggingface_flux]
+  default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
+  request_timeout_sec: 120
+  providers:
+    nvidia_nim_sdxl:
+      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        cfg_scale: 5
+        sampler: K_DPM_2_ANCESTRAL
+        seed: 0
+        steps: 25
+    pollinations:
+      url_template: "https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true"
+      min_response_bytes: 1000
+    huggingface_flux:
+      url: https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell
+      api_key_env: HUGGINGFACE_API_KEY
+      cold_start_retry_sec: 20
+      params:
+        num_inference_steps: 4
+
+video:
+  chain: [nvidia_nim_svd, huggingface_svd]
+  request_timeout_sec: 300
+  providers:
+    nvidia_nim_svd:
+      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-video-diffusion
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        cfg_scale: 1.8
+        seed: 0
+        motion_bucket_id: 127
+    huggingface_svd:
+      url: https://api-inference.huggingface.co/models/stabilityai/stable-video-diffusion-img2vid-xt-1-1
+      api_key_env: HUGGINGFACE_API_KEY
+      cold_start_retry_sec: 30
+
+tts:
+  chain: [edge, nim_magpie]
+  default_rate: "+0%"
+  default_pitch: "+0Hz"
+  request_timeout_sec: 120
+  providers:
+    edge:
+      backend: edge_tts             # uses the edge-tts python lib (no key, no URL)
+    nim_magpie:
+      url: https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        encoding: mp3
+        sample_rate_hz: 22050
+        default_voice: "Magpie-Multilingual.EN-US.Ray"
+
+stock:
+  chain: [pexels, pixabay]
+  request_timeout_sec: 120
+  providers:
+    pexels:
+      url: https://api.pexels.com/videos/search
+      api_key_env: PEXELS_API_KEY
+      per_page: 5
+      size: medium
+    pixabay:
+      url: https://pixabay.com/api/videos/
+      api_key_env: PIXABAY_API_KEY
+      per_page: 5
+      safesearch: true
+
+youtube:
+  category_id: "28"                # 28 = Science & Technology
+  upload_chunk_size_mb: 8
+  scopes: ["https://www.googleapis.com/auth/youtube.upload"]
+  default_made_for_kids: false
+  token_uri: "https://oauth2.googleapis.com/token"
+  client_id_env: YOUTUBE_CLIENT_ID
+  client_secret_env: YOUTUBE_CLIENT_SECRET
+  refresh_token_env: YOUTUBE_REFRESH_TOKEN
+  title_max_chars: 100
+  description_max_chars: 5000
+  tags_max: 30

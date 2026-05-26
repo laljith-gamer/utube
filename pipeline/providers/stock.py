@@ -1,15 +1,13 @@
-"""Stock media (B-roll + music) router.
-
-Primary:  Pexels API (free key)
-Fallback: Pixabay API (free key)
-"""
+"""Stock B-roll router — Pexels + Pixabay, fully config-driven."""
 from __future__ import annotations
 
 import logging
 import random
+from typing import Any
 
 import requests
 
+from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.stock")
@@ -17,87 +15,80 @@ LOG = logging.getLogger("utube.stock")
 
 class StockRouter:
     def __init__(self) -> None:
-        self.pexels_key = env("PEXELS_API_KEY")
-        self.pixabay_key = env("PIXABAY_API_KEY")
+        cfg = get_config()
+        self.cfg = cfg.get_path("stock", {}) or {}
+        self.chain: list[str] = self.cfg.get("chain", []) or []
+        self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
+        self.timeout = self.cfg.get("request_timeout_sec", 120)
 
-    # ----- VIDEO -----
     def find_video(self, keywords: list[str], *, orientation: str = "portrait") -> bytes | None:
         for kw in keywords:
-            url = self._pexels_video_url(kw, orientation)
-            if url:
-                return _download(url)
-            url = self._pixabay_video_url(kw, orientation)
-            if url:
-                return _download(url)
+            for name in self.chain:
+                p = self.providers.get(name)
+                if not p:
+                    continue
+                api_key = env(p.get("api_key_env", ""))
+                if not api_key:
+                    continue
+                try:
+                    if name == "pexels":
+                        url = self._pexels(p, kw, orientation, api_key)
+                    elif name == "pixabay":
+                        url = self._pixabay(p, kw, api_key)
+                    else:
+                        continue
+                    if url:
+                        return self._download(url)
+                except Exception as e:  # noqa: BLE001
+                    LOG.warning("Stock provider %s failed for %r: %s", name, kw, e)
         return None
 
-    def _pexels_video_url(self, query: str, orientation: str) -> str | None:
-        if not self.pexels_key:
+    def _pexels(self, p: dict, query: str, orientation: str, api_key: str) -> str | None:
+        params = {
+            "query": query,
+            "orientation": orientation,
+            "per_page": p.get("per_page", 5),
+            "size": p.get("size", "medium"),
+        }
+        r = requests.get(
+            p["url"], params=params, headers={"Authorization": api_key}, timeout=self.timeout
+        )
+        r.raise_for_status()
+        videos = r.json().get("videos", [])
+        if not videos:
             return None
-        try:
-            r = requests.get(
-                "https://api.pexels.com/videos/search",
-                params={"query": query, "orientation": orientation, "per_page": 5, "size": "medium"},
-                headers={"Authorization": self.pexels_key},
-                timeout=30,
-            )
-            r.raise_for_status()
-            videos = r.json().get("videos", [])
-            if not videos:
-                return None
-            v = random.choice(videos[: min(3, len(videos))])
-            files = sorted(
-                [f for f in v.get("video_files", []) if f.get("file_type") == "video/mp4"],
-                key=lambda f: abs((f.get("width") or 0) - (1080 if orientation == "portrait" else 1920)),
-            )
-            if files:
-                LOG.info("B-roll via Pexels: %s", query)
-                return files[0]["link"]
-        except Exception as e:  # noqa: BLE001
-            LOG.warning("Pexels search failed for %r: %s", query, e)
+        v = random.choice(videos[: min(3, len(videos))])
+        target_w = 1080 if orientation == "portrait" else 1920
+        files = sorted(
+            [f for f in v.get("video_files", []) if f.get("file_type") == "video/mp4"],
+            key=lambda f: abs((f.get("width") or 0) - target_w),
+        )
+        if files:
+            LOG.info("B-roll via Pexels: %s", query)
+            return files[0]["link"]
         return None
 
-    def _pixabay_video_url(self, query: str, orientation: str) -> str | None:
-        if not self.pixabay_key:
+    def _pixabay(self, p: dict, query: str, api_key: str) -> str | None:
+        params = {
+            "key": api_key,
+            "q": query,
+            "per_page": p.get("per_page", 5),
+            "safesearch": str(bool(p.get("safesearch", True))).lower(),
+        }
+        r = requests.get(p["url"], params=params, timeout=self.timeout)
+        r.raise_for_status()
+        hits = r.json().get("hits", [])
+        if not hits:
             return None
-        try:
-            r = requests.get(
-                "https://pixabay.com/api/videos/",
-                params={"key": self.pixabay_key, "q": query, "per_page": 5, "safesearch": "true"},
-                timeout=30,
-            )
-            r.raise_for_status()
-            hits = r.json().get("hits", [])
-            if not hits:
-                return None
-            v = random.choice(hits[: min(3, len(hits))])
-            sizes = v.get("videos", {})
-            for key in ("medium", "large", "small", "tiny"):
-                if key in sizes and sizes[key].get("url"):
-                    LOG.info("B-roll via Pixabay: %s", query)
-                    return sizes[key]["url"]
-        except Exception as e:  # noqa: BLE001
-            LOG.warning("Pixabay search failed for %r: %s", query, e)
+        v = random.choice(hits[: min(3, len(hits))])
+        for size_key in ("medium", "large", "small", "tiny"):
+            sized = v.get("videos", {}).get(size_key, {})
+            if sized.get("url"):
+                LOG.info("B-roll via Pixabay: %s", query)
+                return sized["url"]
         return None
 
-    # ----- MUSIC -----
-    def find_music(self, mood: str = "chill") -> bytes | None:
-        if not self.pixabay_key:
-            return None
-        try:
-            r = requests.get(
-                "https://pixabay.com/api/",
-                params={"key": self.pixabay_key, "q": mood, "per_page": 5},
-                timeout=30,
-            )
-            # Pixabay /api/ is for images; Pixabay music API isn't public — fall back to local assets.
-            # We just return None here so assemble.py picks a packaged track.
-        except Exception:
-            pass
-        return None
-
-
-def _download(url: str) -> bytes:
-    r = requests.get(url, timeout=120, stream=True)
-    r.raise_for_status()
-    return r.content
+    def _download(self, url: str) -> bytes:
+        r = requests.get(url, timeout=self.timeout, stream=True)
+        r.raise_for_status()
+        return r.content
