@@ -1,9 +1,11 @@
 {goal}
 
-You are writing a {target_duration}-second {format_label} for the channel above,
-in the niche: {niche_title}.
+You are writing a {target_duration}-second high-energy viral {format_label} for
+the channel above, niche: {niche_title}.
 Voice persona: {voice_style}.
 Visual style: {visual_style}.
+Style suffix appended to every visual_prompt: "{visual_style_suffix}".
+Suggested high-energy vocabulary you SHOULD use where natural: {style_keywords}.
 
 Topic: {topic_title}
 Angle: {angle}
@@ -11,33 +13,43 @@ Angle: {angle}
 Research brief:
 {research_brief}
 
-Hard rules:
+Hard rules — break ANY of these and the script is rejected:
 - Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
+  Voice will play back at +15-20% speed, so write CRISP — the spoken pacing
+  is faster than reading speed.
 - Exactly {num_scenes} scenes.
-- First {hook_max_seconds} seconds = a stop-the-scroll hook (no "hey guys", no slow intro).
-- Each scene must be visualizable with a still image OR a short 4-second motion clip.
-- End with a question or CTA that makes people comment, consistent with the channel goal.
-- Title <= {title_max_chars} chars, no clickbait lies.
-- Description includes 1 source URL and the disclosure: "{ai_disclosure}".
-- Hashtags: 5-8, mixing #shorts plus topical tags.
-- Thumbnail text: 3-4 punchy words max.
+- Each scene's duration_sec must be between {scene_min_seconds} and {scene_max_seconds}.
+- Sentences in `narration` MUST be {sent_min}-{sent_max} words. Punchy. Active voice.
+  No "let's dive in", no "in this video", no "hey guys".
+- First sentence of `hook` MUST contain a number, dollar amount, percentage,
+  comparison, or world-first claim — it has to LAND in {hook_max_seconds} seconds.
+- Use the channel's hook_patterns and shock_numbers from the research brief.
+- Each scene ends with a small cliff that pulls the viewer into the next
+  (an unanswered "but why?", "until...", "then...").
+- Visual prompts: photoreal cinematic. NEVER include words "diagram",
+  "infographic", "screenshot", "PowerPoint" — we want film-style imagery.
+- Title <= {title_max_chars} chars, no clickbait LIES, but lead with the
+  shock number/claim in the title.
+- Description includes the angle, 1 source URL, hashtags, and the disclosure: "{ai_disclosure}".
+- Hashtags: 5-8, mixing #shorts plus topical tags relevant to the niche.
+- Thumbnail text: 3-4 punchy ALL-CAPS words max, like a magazine cover.
 
-Respond with ONLY this JSON shape, no prose:
+Respond with ONLY this JSON shape, no prose, no preamble:
 {{
-  "hook": "<first {hook_max_seconds}-second hook line>",
+  "hook": "<first {hook_max_seconds}-second line — number-led, jaw-drop>",
   "scenes": [
     {{
-      "narration":     "<one sentence, spoken>",
-      "duration_sec":  <int 3-7>,
-      "visual_prompt": "<detailed SDXL prompt, photorealistic or matching style>",
-      "broll_keywords":["<3-5 keywords for stock fallback>"],
+      "narration":     "<one or two punchy sentences, {sent_min}-{sent_max} words each>",
+      "duration_sec":  <int between {scene_min_seconds} and {scene_max_seconds}>,
+      "visual_prompt": "<cinematic SDXL prompt; the style_suffix is added automatically>",
+      "broll_keywords":["<3-5 stock-search keywords as a fallback>"],
       "use_motion":    <true|false>
     }}
   ],
-  "cta": "<final line that drives a comment or follow>",
-  "title":            "<= {title_max_chars} chars",
-  "description":      "<2-3 sentences + source URL + #hashtags + AI disclosure>",
+  "cta": "<final line that drives a comment or follow — a question or call>",
+  "title":            "<= {title_max_chars} chars, leads with the shock number/claim>",
+  "description":      "<2-3 sentences + source URL + #hashtags + disclosure>",
   "hashtags":         ["#shorts", "#..."],
-  "thumbnail_prompt": "<SDXL prompt for the thumbnail background>",
-  "thumbnail_text":   "<3-4 word punch>"
+  "thumbnail_prompt": "<SDXL prompt for the thumbnail background — bold, dramatic>",
+  "thumbnail_text":   "<3-4 ALL-CAPS punchy words>"
 }}

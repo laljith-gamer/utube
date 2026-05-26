@@ -25,6 +25,7 @@ def select_topic(
     niche_title: str,
     sources_label: str,
     recent_hashes: list[str],
+    slot_angle_hint: str = "",
 ) -> dict[str, Any]:
     if not candidates:
         raise RuntimeError("No candidates to choose from")
@@ -40,6 +41,7 @@ def select_topic(
     prompt = template.format(
         goal=goal_summary(),
         niche_title=niche_title,
+        angle_hint=slot_angle_hint or "(none)",
         n_candidates=len(candidates),
         sources=sources_label,
         recent_hashes=", ".join(recent_hashes[-30:]) or "(none)",

@@ -1,16 +1,20 @@
 {goal}
 
 You are the head of content for the channel above, working on the niche: {niche_title}.
+Suggested angle hint for this niche: {angle_hint}
 
 Below is today's pool of {n_candidates} candidate topics scraped from {sources}.
 Pick the SINGLE best topic for a {target_duration}-second {format_label}.
 
-Selection criteria (in order, weighted by the channel's stated goal and tone):
-1. Hook strength — can the first {hook_max_seconds} seconds stop a scroll?
-2. Educational payoff — does the viewer learn something specific that serves the channel's goal?
-3. Visual potential — can it be told with images and short clips?
-4. Freshness — prefer something from the last 24h.
-5. Distinctness — must not duplicate any topic in the last 30 days.
+Selection criteria (weighted heavily by viral potential, in this order):
+1. SHOCK FACTOR — does it contain a big number, jaw-dropping comparison, or
+   "you won't believe" angle the viewer can FEEL in the first 2 seconds?
+2. Hook potential — can the first {hook_max_seconds} seconds stop a thumb-scroll?
+3. Story shape — is there a clear before/after, problem/twist, or
+   challenge/reveal structure?
+4. Visual potential — can it be told with dramatic images and short clips?
+5. Freshness — prefer something from the last 24h.
+6. Distinctness — must not duplicate any topic in the last 30 days.
 
 Recently used topic hashes to avoid: {recent_hashes}
 
@@ -20,7 +24,7 @@ Candidates:
 Respond with ONLY a JSON object, no prose:
 {{
   "chosen_index": <int>,
-  "reason": "<one sentence why this beat the others, referring to the channel goal>",
-  "angle": "<the specific angle/framing to take, one sentence>",
+  "reason": "<one sentence focused on the SHOCK angle and why it serves the channel goal>",
+  "angle": "<the single shocking framing in one sentence — lead with the number/claim>",
   "topic_hash": "<short slug like 'apple-vision-pro-shipping-2026'>"
 }}

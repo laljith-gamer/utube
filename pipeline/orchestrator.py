@@ -59,6 +59,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
             niche_title=slot.get("title", slot_id),
             sources_label=", ".join(s.get("type", "") for s in slot.get("sources", [])),
             recent_hashes=ledger.recent_hashes(slot_id, days=int(cfg.get_path("dedup_days", 30))),
+            slot_angle_hint=slot.get("angle_hint", ""),
         )
         write_json(out / "topic.json", topic)
         ledger.record_topic(slot_id, topic["topic_hash"])
@@ -77,7 +78,8 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
         if skip_svd:
             # Disable SVD by zeroing its allocation just for this run
             cfg["video"] = {**cfg.get("video", {}), "use_svd_for_n_scenes": 0}
-        vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
+        vis = visuals.generate_visuals(image=img, video=vid, stock=stock,
+                                       script=sc, slot=slot, out_dir=out)
         write_json(out / "visuals.json", vis)
 
         # 6. Captions

@@ -1,26 +1,35 @@
 # 5 niche lanes — one slot = one daily video.
-# Per-slot voice/style/sources only. Global video format specs live in
-# config/pipeline.yaml > video, so the same channel can be retuned without
-# touching every niche.
+# Each slot defines: title, sources, voice + per-niche pacing (rate/pitch),
+# visual style suffix (appended to every visual prompt for cinematic feel),
+# style_keywords (vocabulary the LLM is encouraged to use), schedule, music.
 
 slots:
-  - id: did_you_know
-    title: "Did You Know? Tech Facts"
+  - id: mind_blowing_ai
+    title: "Mind-Blowing AI Reveals"
+    angle_hint: "An AI just did something no human can — what is it and how it works."
     sources:
-      - type: wikipedia_otd
       - type: reddit
-        subreddits: [todayilearned, technology]
+        subreddits: [MachineLearning, LocalLLaMA, singularity, artificial]
         time_filter: day
-      - type: github_trending
-    voice: en-US-AvaMultilingualNeural
-    voice_style: friendly
-    style: cozy_reveal
-    palette: ["#FFB347", "#2B2D42"]
-    schedule_utc: "04:00"
-    music_mood: chill
+      - type: rss
+        urls:
+          - https://huggingface.co/blog/feed.xml
+      - type: hackernews
+        front_page: true
+    voice: en-US-GuyNeural
+    voice_rate: "+18%"
+    voice_pitch: "+2Hz"
+    voice_style: hyped
+    style: cinematic_futuristic
+    style_suffix: "cinematic, dramatic lighting, ultra-sharp, vibrant colors, hyperreal, high contrast, motion blur, 8k"
+    style_keywords: ["insane", "literally", "just", "never before", "instantly", "0.3 seconds", "1000x"]
+    palette: ["#7B61FF", "#0F0F23"]
+    schedule_utc: "13:00"
+    music_mood: futuristic
 
-  - id: tech_news
-    title: "Tech News of the Day"
+  - id: tech_money_shock
+    title: "Tech Money Shocks"
+    angle_hint: "A jaw-dropping number — billion-dollar deal, 99% margin, 30-second loss — explained fast."
     sources:
       - type: hackernews
         front_page: true
@@ -28,57 +37,80 @@ slots:
         urls:
           - https://techcrunch.com/feed/
           - https://www.theverge.com/rss/index.xml
+      - type: reddit
+        subreddits: [technology, business]
+        time_filter: day
     voice: en-US-GuyNeural
-    voice_style: newscast
-    style: fast_news_ticker
+    voice_rate: "+20%"
+    voice_pitch: "+0Hz"
+    voice_style: news_thriller
+    style: bold_news_ticker
+    style_suffix: "high contrast cinematic news photography, dramatic neon highlights, urban skyline backdrop, 8k"
+    style_keywords: ["billion", "$", "%", "in seconds", "wiped out", "skyrocketed", "crashed"]
     palette: ["#E63946", "#1D3557"]
     schedule_utc: "09:00"
     music_mood: corporate_upbeat
 
-  - id: ai_breakthrough
-    title: "AI Breakthrough"
+  - id: viral_did_you_know
+    title: "Did You Know — Tech Edition"
+    angle_hint: "An obscure tech fact that sounds fake but is verifiably true."
     sources:
+      - type: wikipedia_otd
       - type: reddit
-        subreddits: [MachineLearning, LocalLLaMA, singularity]
+        subreddits: [todayilearned, technology, gadgets]
         time_filter: day
-      - type: rss
-        urls:
-          - https://huggingface.co/blog/feed.xml
-    voice: en-US-AriaNeural
-    voice_style: curious
-    style: clean_futuristic
-    palette: ["#7B61FF", "#0F0F23"]
-    schedule_utc: "13:00"
-    music_mood: futuristic
+      - type: github_trending
+    voice: en-US-AvaMultilingualNeural
+    voice_rate: "+12%"
+    voice_pitch: "+1Hz"
+    voice_style: friendly_storyteller
+    style: vibrant_reveal
+    style_suffix: "soft cinematic lighting, warm color grade, shallow depth of field, ultra-detailed, magazine-quality, 8k"
+    style_keywords: ["nobody knows", "secretly", "hidden", "the real reason", "actually", "in 1 second"]
+    palette: ["#FFB347", "#2B2D42"]
+    schedule_utc: "04:00"
+    music_mood: chill
 
-  - id: cybersecurity
-    title: "Cybersecurity Bite"
+  - id: cyber_heist
+    title: "Cyber Heist Stories"
+    angle_hint: "How hackers stole / broke / hijacked something this week — fast retelling."
     sources:
       - type: reddit
-        subreddits: [netsec, cybersecurity]
+        subreddits: [netsec, cybersecurity, hacking]
         time_filter: day
       - type: rss
         urls:
           - https://feeds.feedburner.com/TheHackersNews
+          - https://krebsonsecurity.com/feed/
     voice: en-US-DavisNeural
-    voice_style: serious
-    style: dark_suspense
+    voice_rate: "+10%"
+    voice_pitch: "-2Hz"
+    voice_style: thriller_narrator
+    style: dark_cyber_thriller
+    style_suffix: "dark cyber-noir aesthetic, green terminal glow, dramatic shadows, glitch artifacts, hyperreal, 8k"
+    style_keywords: ["stole", "breach", "in 30 seconds", "without anyone noticing", "exposed", "hijacked"]
     palette: ["#00FF41", "#0D0208"]
     schedule_utc: "17:00"
     music_mood: tense
 
-  - id: viral_science
-    title: "Viral Science / Future Tech"
+  - id: future_shock
+    title: "Future Tech Mind-Bend"
+    angle_hint: "A bold near-future prediction backed by something already happening today."
     sources:
       - type: reddit
-        subreddits: [Futurology, Damnthatsinteresting, science]
+        subreddits: [Futurology, science, Damnthatsinteresting]
         time_filter: day
       - type: rss
         urls:
           - https://www.arstechnica.com/feed/
+          - https://www.technologyreview.com/feed/
     voice: en-US-JennyNeural
-    voice_style: cinematic
-    style: cinematic_dramatic
+    voice_rate: "+12%"
+    voice_pitch: "+1Hz"
+    voice_style: cinematic_curious
+    style: epic_cinematic
+    style_suffix: "epic cinematic wide shot, golden hour lighting, volumetric atmosphere, dramatic perspective, 8k"
+    style_keywords: ["by 2030", "first time ever", "soon", "already", "replace", "obsolete"]
     palette: ["#06FFA5", "#011627"]
     schedule_utc: "21:00"
     music_mood: epic

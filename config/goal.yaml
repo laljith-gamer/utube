@@ -5,19 +5,32 @@
 channel:
   name: "TechByte Daily"
   language: en
-  audience: "tech-curious general public, 18-45"
+  audience: "tech-curious general public, 18-45, mobile-first short-form viewers"
   goal: |
-    Make people 1% smarter about technology and the future every day,
-    with content that is fact-grounded, fun to watch, and impossible to scroll past.
+    Make every viewer GASP, then learn something they will tell a friend about.
+    Style guide is high-energy viral Shorts in the spirit of MrBeast and other
+    top viral creators: stop-the-scroll hooks in the first 2 seconds, big
+    numbers, surprising claims, fast cuts, no slow intros, no "hey guys",
+    every sentence earns the next one. Tech topics, but framed as
+    challenges, reveals, mind-blowing facts, or before/after stories — not
+    dry news summaries.
   tone:
-    - concise
-    - energetic
-    - fact-grounded
-    - no clickbait lies
-    - friendly authority
+    - "high-energy"
+    - "punchy short sentences (6-12 words)"
+    - "concrete numbers and percentages"
+    - "active voice"
+    - "fact-grounded — never invent stats"
+    - "no clickbait lies, but always lead with the most shocking true angle"
+    - "intense vocabulary: insane, instantly, literally, just, never before, nobody knew"
+  hook_patterns:
+    - "Number + outcome"           # "$1.2 BILLION lost in 30 seconds."
+    - "Impossible claim + proof"   # "AI just did what no human can. Here's how."
+    - "Comparison shock"           # "ChatGPT used 0.3% of the energy. Google used 50x."
+    - "Cliff + reveal"             # "What happened next broke the internet."
+    - "Insider secret"             # "Engineers won't admit this — but..."
   format: shorts                   # shorts | long_form
-  ai_disclosure: "AI-assisted"     # appears in every video description
+  ai_disclosure: "AI-assisted"
   branding:
-    intro_sting_seconds: 0         # set >0 to reserve space for an intro
+    intro_sting_seconds: 0
     outro_sting_seconds: 0
-    watermark_text: ""             # optional channel handle to overlay
+    watermark_text: ""

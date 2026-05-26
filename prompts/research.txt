@@ -1,7 +1,9 @@
 {goal}
 
-You are a fact-checker preparing a research brief for a {target_duration}-second {format_label}
-on the channel above. The brief must serve the channel's stated goal and tone.
+You are a fact-checker preparing a research brief for a {target_duration}-second
+{format_label} on the channel above. The brief must arm the scriptwriter with
+SHOCK MATERIAL: concrete numbers, surprising contrasts, and the single most
+counterintuitive fact.
 
 Topic: {topic_title}
 Angle: {angle}
@@ -11,14 +13,19 @@ Source excerpt:
 {source_text}
 ---
 
-Produce a research brief that the scriptwriter can rely on. Include only facts you can support
-from the excerpt; if the excerpt is thin, mark gaps explicitly.
+Strict rules:
+- Include only facts you can support from the excerpt.
+- If the excerpt is thin, fill `open_questions` and DON'T fabricate numbers.
+- Prefer hard numbers, dollar amounts, percentages, multiples (10x, 100x),
+  before/after comparisons, world-firsts, dates.
 
 Respond with ONLY a JSON object:
 {{
-  "key_facts":     ["<5-8 bullet facts, each one short sentence>"],
-  "surprising":    "<the single most surprising/counterintuitive fact>",
+  "key_facts":     ["<5-8 short factual bullets, each grounded in the excerpt>"],
+  "shock_numbers": ["<each big number, dollar, %, multiple, or world-first as a short string>"],
+  "surprising":    "<the single most counterintuitive fact — one sentence>",
+  "before_after":  "<if there's a clear before/after, state it; else empty string>",
   "context":       "<one paragraph of background a viewer needs>",
-  "open_questions":["<questions the source did NOT answer — the script must avoid these>"],
+  "open_questions":["<questions the source did NOT answer — script must avoid these>"],
   "citations":     ["<URL or short source label per fact>"]
 }}

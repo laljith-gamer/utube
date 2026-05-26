@@ -1,4 +1,12 @@
-"""Per-scene visuals: SDXL still → SVD animation → stock fallback. All sizes from config."""
+"""Per-scene visuals.
+
+For each scene:
+  1. Augment the LLM's visual_prompt with the niche's `style_suffix`
+     (cinematic/dramatic style words from config/niches.yaml).
+  2. Generate SDXL still.
+  3. If the scene is flagged for SVD (or in the first N scenes), animate it.
+  4. If both fail, fall back to stock B-roll using broll_keywords.
+"""
 from __future__ import annotations
 
 import logging
@@ -18,12 +26,14 @@ def generate_visuals(
     video: VideoRouter,
     stock: StockRouter,
     script: dict,
+    slot: dict,
     out_dir: Path,
 ) -> list[dict]:
     cfg = get_config()
     width = int(cfg.get_path("video.width", 1080))
     height = int(cfg.get_path("video.height", 1920))
     use_svd_for_n_scenes = int(cfg.get_path("video.use_svd_for_n_scenes", 4))
+    style_suffix = (slot.get("style_suffix") or "").strip()
 
     visuals_dir = out_dir / "visuals"
     visuals_dir.mkdir(parents=True, exist_ok=True)
@@ -38,7 +48,9 @@ def generate_visuals(
     for i, scene in enumerate(scenes):
         scene_dir = visuals_dir / f"scene_{i:02d}"
         scene_dir.mkdir(exist_ok=True)
-        prompt = scene.get("visual_prompt", "")
+        base_prompt = (scene.get("visual_prompt") or "").strip()
+        # Append cinematic style suffix only if it's not already implied
+        prompt = f"{base_prompt}, {style_suffix}" if style_suffix and base_prompt else base_prompt or style_suffix
         broll = scene.get("broll_keywords") or []
         record: dict = {"index": i, "prompt": prompt}
 

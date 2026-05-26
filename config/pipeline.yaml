@@ -11,6 +11,21 @@ video:                              # final output specs
   num_scenes: 7
   use_svd_for_n_scenes: 4
 
+# Pacing controls — drive the "MrBeast feel": fast cuts, snappy delivery,
+# no dead air. Scenes shorter than scene_min_sec are auto-padded by the LLM
+# (it's told the minimum); scenes longer than scene_max_sec are flagged.
+pacing:
+  scene_min_seconds: 2.5
+  scene_max_seconds: 5.5
+  default_voice_rate: "+15%"        # used if a slot doesn't override
+  default_voice_pitch: "+0Hz"
+  trim_silence: true                # remove leading/trailing silence per segment
+  silence_threshold_db: -45         # below this is considered silence
+  silence_min_duration_sec: 0.15
+  master_tempo_multiplier: 1.0      # 1.0 = no change, 1.05 = 5% faster overall
+  scene_transition: hard_cut        # hard_cut | crossfade
+  crossfade_duration_sec: 0.15      # only used if scene_transition=crossfade
+
 discover:
   user_agent: "utube-bot/1.0 (+https://github.com/laljith-gamer/utube)"
   total_candidates_limit: 25
@@ -28,7 +43,7 @@ research:
   topic_select:
     max_tokens: 2000
     temperature: 0.5
-    reasoning_effort: null         # null = no reasoning (fast, cheap)
+    reasoning_effort: null
   brief:
     max_tokens: 2500
     temperature: 0.4
@@ -36,13 +51,15 @@ research:
 
 script:
   max_tokens: 8000
-  temperature: 0.8
-  # "low" works well for a 35s narration: enough internal planning, plenty of
-  # tokens left for the actual JSON output. "high" causes truncation where the
-  # model spends the entire budget reasoning and never writes the answer.
+  temperature: 0.85
+  # "low" works well for a 35s narration; high causes truncation.
   reasoning_effort: low
-  words_per_second: 2.5            # 150 wpm narration pace
+  words_per_second: 2.5             # 150 wpm baseline — actual speaking rate
+                                    # is also boosted by tts voice_rate
   hook_max_seconds: 3
+  # Sentence-length guidance pushed into prompt; LLM aims for these.
+  narration_sentence_words_min: 6
+  narration_sentence_words_max: 12
 
 audio:
   bitrate: "128k"
@@ -50,24 +67,24 @@ audio:
 
 captions:
   enabled: true
-  whisper_model_size: base         # tiny | base | small | medium | large-v3
+  whisper_model_size: base          # tiny | base | small | medium | large-v3
   whisper_device: cpu
   whisper_compute_type: int8
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 3               # how many words per caption cue
+  words_per_chunk: 2                # MrBeast-pop: 1-2 words per cue (was 3)
 
 thumbnail:
   width: 1280
   height: 720
-  jpeg_quality: 88
-  text_height_ratio: 0.16
-  text_y_ratio: 0.55
-  text_line_spacing_ratio: 0.18
-  margin_left: 40
-  stroke_width: 3
-  darken_overlay_alpha: 140        # 0-255, bottom-half darkening for legibility
+  jpeg_quality: 90
+  text_height_ratio: 0.18           # bigger text (was 0.16)
+  text_y_ratio: 0.50
+  text_line_spacing_ratio: 0.20
+  margin_left: 50
+  stroke_width: 5                   # bolder stroke (was 3)
+  darken_overlay_alpha: 170         # darker base for legibility (was 140)
   font_paths:
     - /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
     - /usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf
@@ -75,10 +92,12 @@ thumbnail:
 
 assemble:
   ken_burns:
-    zoom_increment_per_frame: 0.0015
-    max_zoom: 1.4
+    zoom_increment_per_frame: 0.0028  # more aggressive motion (was 0.0015)
+    max_zoom: 1.55                    # higher zoom limit (was 1.4)
+    pan_x_amplitude: 0.10             # subtle horizontal pan (0..0.5)
+    pan_y_amplitude: 0.06
   music:
-    volume: 0.18                   # bg music level (1.0 = original)
+    volume: 0.20
     loop: true
   ffmpeg:
     video_codec: libx264
@@ -91,11 +110,13 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize_divisor: 3            # final fontsize = caption_style.fontsize / divisor (libass)
-    primary_color_hex: "00FFFFFF"  # AABBGGRR for ASS
+    fontsize: 36                    # libass points; bigger = more pop (was implicit ~24)
+    primary_color_hex: "00FFFFFF"   # AABBGGRR for ASS
     outline_color_hex: "00000000"
-    alignment: 2                   # 2 = bottom center
-    margin_v: 120
+    outline_width: 5                # thicker border for legibility (was 4)
+    shadow_depth: 1
+    alignment: 2                    # 2 = bottom center
+    margin_v: 200                   # higher off bottom (was 120)
 
 stage_timeouts_sec:
   discover: 60
