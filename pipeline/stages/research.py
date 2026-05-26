@@ -41,9 +41,8 @@ def select_topic(
 
     out = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=500,
+        max_tokens=2000,
         temperature=0.5,
-        reasoning_effort="medium",
     )
 
     idx = int(out.get("chosen_index", 0))
@@ -99,7 +98,7 @@ def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
 
     brief = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=1000,
+        max_tokens=2500,
         temperature=0.4,
     )
     LOG.info("Research brief: %d facts, %d gaps",

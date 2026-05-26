@@ -86,11 +86,17 @@ class LLMRouter:
         json_mode: bool = False,
         reasoning_effort: str | None = None,
     ) -> str:
+        # gpt-oss reasoning consumes tokens against max_tokens before any answer
+        # is emitted. Ensure plenty of headroom so we don't get empty/truncated output.
+        if reasoning_effort:
+            min_budget = {"low": 1500, "medium": 4000, "high": 6000}.get(reasoning_effort, 4000)
+            max_tokens = max(max_tokens, min_budget)
+
         last_err: Exception | None = None
         for p in self.active:
             try:
                 LOG.info("LLM call → %s (%s)", p.name, p.model)
-                client = OpenAI(api_key=p.api_key, base_url=p.base_url, timeout=60.0)
+                client = OpenAI(api_key=p.api_key, base_url=p.base_url, timeout=120.0)
                 kwargs: dict[str, Any] = {
                     "model": p.model,
                     "messages": messages,
@@ -102,9 +108,21 @@ class LLMRouter:
                 if reasoning_effort and "gpt-oss" in p.model:
                     kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
                 resp = client.chat.completions.create(**kwargs)
-                content = resp.choices[0].message.content or ""
-                if not content.strip():
-                    raise RuntimeError("Empty response")
+                msg = resp.choices[0].message
+                content = (msg.content or "").strip()
+                if not content:
+                    # gpt-oss on some providers puts the answer in reasoning_content;
+                    # OpenAI SDK surfaces unknown fields via model_extra.
+                    extra = getattr(msg, "model_extra", None) or {}
+                    for key in ("reasoning_content", "reasoning", "thinking"):
+                        candidate = extra.get(key)
+                        if isinstance(candidate, str) and candidate.strip():
+                            content = candidate.strip()
+                            LOG.info("  (used %s field as content)", key)
+                            break
+                if not content:
+                    finish = getattr(resp.choices[0], "finish_reason", None)
+                    raise RuntimeError(f"Empty response (finish_reason={finish})")
                 return content
             except Exception as e:  # noqa: BLE001
                 LOG.warning("LLM provider %s failed: %s", p.name, e)
@@ -135,7 +153,7 @@ class LLMRouter:
 
 
 def _parse_json(text: str) -> dict[str, Any]:
-    """Try strict json.loads, then strip code fences, then regex."""
+    """Try strict json.loads, then strip code fences, then regex, then a truncation repair."""
     text = text.strip()
     try:
         return json.loads(text)
@@ -150,5 +168,54 @@ def _parse_json(text: str) -> dict[str, Any]:
     # Find first {...} block
     m = re.search(r"\{.*\}", text, flags=re.DOTALL)
     if m:
-        return json.loads(m.group(0))
+        try:
+            return json.loads(m.group(0))
+        except json.JSONDecodeError:
+            pass
+    # Last resort: try to repair a truncated JSON object by closing
+    # any unterminated string and any open braces/brackets.
+    m = re.search(r"\{.*", text, flags=re.DOTALL)
+    if m:
+        repaired = _try_repair_truncated(m.group(0))
+        if repaired is not None:
+            try:
+                return json.loads(repaired)
+            except json.JSONDecodeError:
+                pass
     raise ValueError(f"Could not parse JSON from LLM output: {text[:200]}")
+
+
+def _try_repair_truncated(s: str) -> str | None:
+    """Best-effort: close an unterminated string, then close open braces/brackets."""
+    # Walk the string tracking string state and brace/bracket depth
+    in_str = False
+    escape = False
+    stack: list[str] = []
+    for ch in s:
+        if escape:
+            escape = False
+            continue
+        if in_str:
+            if ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch in "{[":
+            stack.append("}" if ch == "{" else "]")
+        elif ch in "}]":
+            if stack and stack[-1] == ch:
+                stack.pop()
+            else:
+                return None  # malformed beyond simple truncation
+    repaired = s
+    if in_str:
+        repaired += '"'
+    # If we end mid key (e.g. ..."key": ) drop the trailing ", ?key?" before closing
+    repaired = re.sub(r",\s*$", "", repaired)
+    repaired = re.sub(r":\s*$", ': null', repaired)
+    while stack:
+        repaired += stack.pop()
+    return repaired

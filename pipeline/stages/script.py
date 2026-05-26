@@ -37,7 +37,7 @@ def generate_script(
 
     script = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=2500,
+        max_tokens=6000,
         temperature=0.8,
         reasoning_effort="high",
     )
