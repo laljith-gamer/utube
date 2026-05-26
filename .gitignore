@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+runs/*/
+!runs/.gitkeep
+*.mp4
+*.mp3
+*.wav
+*.tmp
+tmp/
+output/
+build/
+dist/
+*.egg-info/
+
+# OAuth tokens (NEVER commit these)
+client_secret*.json
+token.json
+credentials.json
+*.pickle
+
+# Quota ledger (local state)
+ledger.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Whisper model cache
+.cache/
+models/
