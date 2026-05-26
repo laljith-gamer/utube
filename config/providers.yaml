@@ -6,10 +6,11 @@ llm:
   chain: [nvidia_nim, cerebras, groq, openrouter]
   request_timeout_sec: 120
   # gpt-oss reasoning consumes tokens internally. Auto-bump max_tokens to at least:
+  # these values to leave room for the actual answer after reasoning completes.
   reasoning_token_floor:
-    low: 1500
-    medium: 4000
-    high: 6000
+    low: 3000
+    medium: 8000
+    high: 16000
   retry_on_rate_limit_seconds: 2
   providers:
     nvidia_nim:

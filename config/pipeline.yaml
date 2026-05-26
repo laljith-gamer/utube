@@ -35,9 +35,12 @@ research:
     reasoning_effort: null
 
 script:
-  max_tokens: 6000
+  max_tokens: 8000
   temperature: 0.8
-  reasoning_effort: high
+  # "low" works well for a 35s narration: enough internal planning, plenty of
+  # tokens left for the actual JSON output. "high" causes truncation where the
+  # model spends the entire budget reasoning and never writes the answer.
+  reasoning_effort: low
   words_per_second: 2.5            # 150 wpm narration pace
   hook_max_seconds: 3
 
