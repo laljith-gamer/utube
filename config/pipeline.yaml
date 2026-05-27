@@ -97,11 +97,12 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize_divisor: 3            # final fontsize = caption_style.fontsize / divisor (libass)
+    fontsize: 18                   # libass FontSize in points (relative to PlayResY=288). Lower = smaller captions.
     primary_color_hex: "00FFFFFF"  # AABBGGRR for ASS
     outline_color_hex: "00000000"
+    outline_width: 3
     alignment: 2                   # 2 = bottom center
-    margin_v: 120
+    margin_v: 110
 
 stage_timeouts_sec:
   discover: 60
