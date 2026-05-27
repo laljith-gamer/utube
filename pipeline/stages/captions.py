@@ -147,13 +147,14 @@ def _render_ass(*, chunks: list[list[dict]], ccfg: dict, style_cfg: dict,
     margin_v = int(style_cfg.get("margin_v", 0))
     margin_h = int(style_cfg.get("margin_h", 60))
     border_style = int(style_cfg.get("border_style", 1))
+    wrap_style = int(style_cfg.get("wrap_style", 0))
 
     header = (
         "[Script Info]\n"
         "ScriptType: v4.00+\n"
         f"PlayResX: {play_x}\n"
         f"PlayResY: {play_y}\n"
-        "WrapStyle: 0\n"
+        f"WrapStyle: {wrap_style}\n"
         "ScaledBorderAndShadow: yes\n"
         "\n"
         "[V4+ Styles]\n"

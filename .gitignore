@@ -30,8 +30,9 @@ token.json
 credentials.json
 *.pickle
 
-# Quota ledger (local state)
+# Legacy quota ledger (replaced by assets/history.json — committed to repo)
 ledger.json
+# assets/history.json IS tracked — do NOT add it here.
 
 # OS
 .DS_Store
