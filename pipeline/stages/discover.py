@@ -88,30 +88,52 @@ def _hackernews(limit: int) -> list[dict]:
 
 
 def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
-    r = requests.get(
-        f"https://www.reddit.com/r/{subreddit}/top.json",
-        params={"t": time_filter, "limit": limit},
-        headers={"User-Agent": _ua()},
-        timeout=_timeout(),
+    """Fetch top posts. Reddit aggressively blocks anonymous bots — try a
+    browser-like UA, then fall back to old.reddit.com if blocked."""
+    hosts = ["https://www.reddit.com", "https://old.reddit.com"]
+    # A more browser-like UA helps slip past simple bot blocks.
+    browser_ua = (
+        "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) "
+        "Gecko/20100101 Firefox/124.0"
     )
-    if r.status_code == 429:
-        LOG.warning("Reddit rate-limited for r/%s", subreddit)
-        return []
-    r.raise_for_status()
-    out = []
-    for c in r.json().get("data", {}).get("children", []):
-        d = c.get("data", {})
-        if d.get("over_18") or d.get("stickied"):
-            continue
-        out.append({
-            "title": d.get("title", ""),
-            "url": "https://reddit.com" + d.get("permalink", ""),
-            "external_url": d.get("url"),
-            "score": d.get("score", 0),
-            "summary": (d.get("selftext") or "")[:500],
-            "source": f"reddit:{subreddit}",
-        })
-    return out
+    headers_variants = [
+        {"User-Agent": browser_ua, "Accept": "application/json"},
+        {"User-Agent": _ua(), "Accept": "application/json"},
+    ]
+    last_err: Exception | None = None
+    for host in hosts:
+        for headers in headers_variants:
+            try:
+                r = requests.get(
+                    f"{host}/r/{subreddit}/top.json",
+                    params={"t": time_filter, "limit": limit},
+                    headers=headers,
+                    timeout=_timeout(),
+                )
+                if r.status_code in (403, 429):
+                    LOG.warning("Reddit %s for r/%s via %s",
+                                r.status_code, subreddit, host)
+                    last_err = RuntimeError(f"{r.status_code} for r/{subreddit}")
+                    continue
+                r.raise_for_status()
+                out = []
+                for c in r.json().get("data", {}).get("children", []):
+                    d = c.get("data", {})
+                    if d.get("over_18") or d.get("stickied"):
+                        continue
+                    out.append({
+                        "title": d.get("title", ""),
+                        "url": "https://reddit.com" + d.get("permalink", ""),
+                        "external_url": d.get("url"),
+                        "score": d.get("score", 0),
+                        "summary": (d.get("selftext") or "")[:500],
+                        "source": f"reddit:{subreddit}",
+                    })
+                return out
+            except Exception as e:  # noqa: BLE001
+                last_err = e
+    LOG.warning("Reddit unavailable for r/%s (%s); skipping", subreddit, last_err)
+    return []
 
 
 def _rss(url: str, limit: int) -> list[dict]:

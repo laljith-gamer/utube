@@ -81,7 +81,14 @@ tts:
   providers:
     edge:
       backend: edge_tts             # uses the edge-tts python lib (no key, no URL)
+                                    # On 'No audio was received' the router
+                                    # auto-retries with rate=+0%, pitch=+0Hz.
     nim_magpie:
+      # NOTE: this URL is best-effort. NVIDIA's Speech NIM does not currently
+      # expose a stable public OpenAI-style HTTP endpoint here, and the URL
+      # below returns 404 in trial-tier accounts. The provider is kept in the
+      # chain as a last-resort and 404s are skipped quietly. If you have a
+      # working endpoint (e.g. via NIM self-host or NVCF), update this URL.
       url: https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual
       api_key_env: NVIDIA_NIM_API_KEY
       params:
