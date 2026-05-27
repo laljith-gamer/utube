@@ -74,14 +74,29 @@ video:
       cold_start_retry_sec: 30
 
 tts:
-  chain: [edge, nim_magpie]
-  default_rate: "+0%"
-  default_pitch: "+0Hz"
+  # edge -> gtts. Both are no-API-key. Microsoft's Edge endpoint refuses ~5-10%
+  # of cloud-runner requests; gTTS hits Google Translate from a different host,
+  # so the two providers are independent failure modes.
+  # `nim_magpie` is intentionally NOT in the chain — NVIDIA's URL 404s; re-enable
+  # this entry only after confirming the new endpoint path on the NIM catalog.
+  chain: [edge, gtts]
+  # Speed-up is applied via ffmpeg `atempo` in audio.py post-processing, NOT via
+  # SSML. SSML rate triggers extra rejections from Microsoft's endpoint, and
+  # gTTS has no rate parameter at all. Post-processing works for both.
+  default_rate: "+12%"             # +12% on top of natural TTS speed
+  default_pitch: "+0Hz"            # kept for future TTS providers; ignored today
+  trim_silence: true               # trim leading/trailing silence per segment
+  silence_threshold_db: -45        # silence detection threshold
+  silence_keep_sec: 0.05           # leave a tiny breath so cuts don't sound clipped
   request_timeout_sec: 120
   providers:
     edge:
       backend: edge_tts             # uses the edge-tts python lib (no key, no URL)
-    nim_magpie:
+    gtts:
+      backend: gtts                 # google translate TTS (no key, very reliable)
+      params:
+        slow: false                 # natural speed (we apply rate via atempo)
+    nim_magpie:                     # NOT in chain — endpoint 404s as of 2026-05.
       url: https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual
       api_key_env: NVIDIA_NIM_API_KEY
       params:

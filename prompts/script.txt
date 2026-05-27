@@ -1,43 +1,106 @@
 {goal}
 
-You are writing a {target_duration}-second {format_label} for the channel above,
-in the niche: {niche_title}.
-Voice persona: {voice_style}.
-Visual style: {visual_style}.
+You are a top-tier YouTube Shorts scriptwriter (think Veritasium, Cleo Abram,
+Johnny Harris, Mark Rober, MrBeast — for the niche: {niche_title}).
 
 Topic: {topic_title}
 Angle: {angle}
+Voice persona: {voice_style}
+Visual style: {visual_style}
 
 Research brief:
 {research_brief}
 
-Hard rules:
-- Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
-- Exactly {num_scenes} scenes.
-- First {hook_max_seconds} seconds = a stop-the-scroll hook (no "hey guys", no slow intro).
-- Each scene must be visualizable with a still image OR a short 4-second motion clip.
-- End with a question or CTA that makes people comment, consistent with the channel goal.
-- Title <= {title_max_chars} chars, no clickbait lies.
-- Description includes 1 source URL and the disclosure: "{ai_disclosure}".
-- Hashtags: exactly {hashtags_count} distinct, lowercase hashtags, dynamically chosen for THIS specific video. Always include #shorts as the first one. The remaining {hashtags_count_minus_one} must mix: niche tags, topic-specific keywords from the script, and audience-style tags. No duplicates, no spaces, each tag <= 25 characters.
-- Thumbnail text: 3-4 punchy words max.
+==============================================================
+STRUCTURE — exactly {num_scenes} scenes following this 5-beat arc
+==============================================================
+Beat 1 — HOOK (scenes 1-2, total <= {hook_max_seconds}s):
+  Cold open. Make the viewer's thumb stop. Use a question, a wild number, or a
+  pattern interrupt. NO "hey guys", NO "welcome back", NO slow intro. State the
+  puzzle, do not solve it yet. Open the loop.
 
-Respond with ONLY this JSON shape, no prose:
+Beat 2 — ESCALATE (scenes 3-4):
+  Raise the stakes. Why does this matter? What is at risk / different / weird?
+
+Beat 3 — EXPAND (scenes 5-9):
+  Three to five concrete, specific facts. Numbers, names, dates, dollars,
+  percentages. Each scene = ONE punchy beat (not two). Each builds on the last.
+
+Beat 4 — PAYOFF (scenes 10-11):
+  Resolve the loop opened in the hook. The "ah-ha" moment. Make it feel earned.
+
+Beat 5 — CTA (final cta line, separate from scenes):
+  A specific question that makes a viewer comment. Not "subscribe please".
+  Examples that work:
+    - "Comment YES if you knew this."
+    - "Would you do it? A or B?"
+    - "Which one shocked you most?"
+
+==============================================================
+HARD WRITING RULES
+==============================================================
+- Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
+- Each scene narration is ONE sentence, max 12 words, plain spoken English.
+- Use SPECIFICS only: "$3.4 trillion", "1947", "0.001 seconds", "73% of users".
+  NEVER vague words: "a lot", "many", "some", "amazing", "very", "really",
+  "incredible", "literally", "basically", "actually", "honestly".
+- BANNED openings: "hey guys", "welcome back", "today we're going to",
+  "did you know that", "in this video", "let me tell you", "so basically".
+- Do not start consecutive scenes with the same word.
+- Use present tense, active voice. Cut every adverb you can.
+- The hook MUST contain a number, a contradiction, or a forbidden-question shape
+  ("What if I told you...", "Why does X...", "How is X possible...").
+- The CTA must reference a specific element from the script (not generic).
+
+==============================================================
+VISUAL RULES (every scene is a moving video clip — no slideshow)
+==============================================================
+- Each visual_prompt describes a real subject in a real setting that animates
+  well: person doing X, machine running, liquid pouring, screen typing, drone
+  shot of city, close-up of hands. AVOID abstract overlays, charts, slide-style
+  text walls, frozen diagrams.
+- Pattern-interrupt the visuals: alternate scale/angle scene to scene
+  (extreme close-up -> wide shot -> over-the-shoulder -> top-down -> macro).
+- broll_keywords: 3-5 simple nouns a stock-video search will actually match.
+  Bad: "innovation". Good: "soldering iron, circuit board, sparks".
+
+==============================================================
+TITLE / DESCRIPTION / HASHTAGS / THUMBNAIL
+==============================================================
+- Title <= {title_max_chars} chars. Use ONE of these proven Shorts shapes:
+    "The real reason {{specific thing}} is {{surprising verb}}"
+    "Why {{number/specific}} is {{counterintuitive claim}}"
+    "{{Specific noun}}: the {{age}}-year-old {{secret/trick/mistake}}"
+    "What {{group}} won't tell you about {{topic}}"
+  No clickbait lies. The payoff in the script must match the title.
+- Description: 2-3 short sentences echoing the hook + payoff (NOT the entire
+  script). One source URL. End with the AI disclosure: "{ai_disclosure}".
+  Then a blank line, then all hashtags joined by spaces.
+- Hashtags: exactly {hashtags_count} distinct, lowercase. First MUST be #shorts.
+  The other {hashtags_count_minus_one} mix: niche tags, topic-specific keywords
+  taken from the script body, and audience tags. No duplicates, no spaces inside
+  a tag, each tag <= 25 chars.
+- Thumbnail: text 3-4 punchy words, must read in <0.5s on a phone. Image prompt
+  should describe a single high-contrast subject + one emotional cue (face,
+  reaction object, or dramatic lighting).
+
+==============================================================
+OUTPUT — return ONLY this JSON, no prose, no code fences
+==============================================================
 {{
-  "hook": "<first {hook_max_seconds}-second hook line>",
+  "hook": "<<= {hook_max_seconds}s, opens the loop, contains a number or contradiction>",
   "scenes": [
     {{
-      "narration":     "<one sentence, spoken>",
-      "duration_sec":  <int 3-7>,
-      "visual_prompt": "<detailed SDXL prompt, photorealistic or matching style>",
-      "broll_keywords":["<3-5 keywords for stock fallback>"],
-      "use_motion":    <true|false>
+      "narration":     "<one sentence, <= 12 words, specific>",
+      "duration_sec":  <int 2-4>,
+      "visual_prompt": "<real subject in real setting, animates well, 1 line>",
+      "broll_keywords":["<3-5 plain nouns for stock fallback>"]
     }}
   ],
-  "cta": "<final line that drives a comment or follow>",
-  "title":            "<= {title_max_chars} chars",
-  "description":      "<2-3 sentences + source URL + #hashtags + AI disclosure>",
+  "cta": "<comment-bait question that references a specific element>",
+  "title":            "<= {title_max_chars} chars, one of the title shapes above",
+  "description":      "<2-3 sentences + source URL + AI disclosure>\n\n<all hashtags space-separated>",
   "hashtags":         ["#shorts", "#...", "...exactly {hashtags_count} entries total"],
-  "thumbnail_prompt": "<SDXL prompt for the thumbnail background>",
-  "thumbnail_text":   "<3-4 word punch>"
+  "thumbnail_prompt": "<high-contrast subject + emotional cue, SDXL prompt>",
+  "thumbnail_text":   "<3-4 punchy words>"
 }}

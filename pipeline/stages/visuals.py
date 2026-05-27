@@ -1,4 +1,17 @@
-"""Per-scene visuals: SDXL still → SVD animation → stock fallback. All sizes from config."""
+"""Per-scene visuals — MOTION ONLY (no static image slideshow).
+
+Pipeline per scene:
+    1. SDXL still -> SVD animation         (primary, gives generated motion)
+    2. Stock B-roll video                  (real-footage fallback)
+    3. Synthesized moving gradient filler  (final fallback, marked in record)
+
+The SDXL still is kept on disk only as SVD's input + for debugging. It is never
+emitted as a "use this still as the scene" instruction to the assemble stage.
+
+Config:
+    visuals.skip_svd: bool   - if true, skip SDXL+SVD and go straight to stock+filler.
+                               Used by `--skip-svd` for fast manual tests.
+"""
 from __future__ import annotations
 
 import logging
@@ -23,17 +36,12 @@ def generate_visuals(
     cfg = get_config()
     width = int(cfg.get_path("video.width", 1080))
     height = int(cfg.get_path("video.height", 1920))
-    use_svd_for_n_scenes = int(cfg.get_path("video.use_svd_for_n_scenes", 4))
+    skip_svd = bool(cfg.get_path("visuals.skip_svd", False))
 
     visuals_dir = out_dir / "visuals"
     visuals_dir.mkdir(parents=True, exist_ok=True)
 
     scenes = script["scenes"]
-    svd_scene_idxs = [i for i, s in enumerate(scenes) if s.get("use_motion")]
-    if not svd_scene_idxs:
-        svd_scene_idxs = list(range(min(len(scenes), use_svd_for_n_scenes)))
-    svd_scene_idxs = svd_scene_idxs[:use_svd_for_n_scenes]
-
     out: list[dict] = []
     for i, scene in enumerate(scenes):
         scene_dir = visuals_dir / f"scene_{i:02d}"
@@ -42,36 +50,51 @@ def generate_visuals(
         broll = scene.get("broll_keywords") or []
         record: dict = {"index": i, "prompt": prompt}
 
-        png_path = scene_dir / "image.png"
-        try:
-            png_bytes = image.generate(prompt, width=width, height=height)
-            png_path.write_bytes(png_bytes)
-            record["image"] = str(png_path.relative_to(out_dir))
-            LOG.info("scene %d: image generated (%d bytes)", i, len(png_bytes))
-        except Exception as e:  # noqa: BLE001
-            LOG.warning("scene %d: image gen failed: %s", i, e)
-            png_path = None
-
-        if i in svd_scene_idxs and png_path is not None:
+        # ----- 1. SDXL still -> SVD animation -----
+        if not skip_svd:
+            still_path = scene_dir / "still.png"
+            still_ok = False
             try:
-                mp4_bytes = video.animate(png_path.read_bytes())
-                mp4_path = scene_dir / "clip.mp4"
-                mp4_path.write_bytes(mp4_bytes)
-                record["video"] = str(mp4_path.relative_to(out_dir))
-                LOG.info("scene %d: SVD clip generated (%d bytes)", i, len(mp4_bytes))
+                png_bytes = image.generate(prompt, width=width, height=height)
+                still_path.write_bytes(png_bytes)
+                still_ok = True
+                LOG.info("scene %d: still generated for SVD (%d bytes)", i, len(png_bytes))
             except Exception as e:  # noqa: BLE001
-                LOG.warning("scene %d: SVD failed, will use Ken Burns on still: %s", i, e)
+                LOG.warning("scene %d: SDXL image gen failed: %s", i, e)
 
-        if "image" not in record and "video" not in record:
-            stock_bytes = stock.find_video(broll, orientation="portrait")
+            if still_ok:
+                try:
+                    mp4_bytes = video.animate(still_path.read_bytes())
+                    mp4_path = scene_dir / "clip.mp4"
+                    mp4_path.write_bytes(mp4_bytes)
+                    record["video"] = str(mp4_path.relative_to(out_dir))
+                    record["source"] = "svd"
+                    LOG.info("scene %d: SVD motion clip ok (%d bytes)", i, len(mp4_bytes))
+                except Exception as e:  # noqa: BLE001
+                    LOG.warning("scene %d: SVD failed, will try stock video: %s", i, e)
+
+        # ----- 2. Stock B-roll video fallback -----
+        if "video" not in record:
+            try:
+                stock_bytes = stock.find_video(broll, orientation="portrait")
+            except Exception as e:  # noqa: BLE001
+                LOG.warning("scene %d: stock provider raised: %s", i, e)
+                stock_bytes = None
             if stock_bytes:
                 mp4_path = scene_dir / "stock.mp4"
                 mp4_path.write_bytes(stock_bytes)
                 record["video"] = str(mp4_path.relative_to(out_dir))
-                LOG.info("scene %d: stock B-roll fallback used", i)
-            else:
-                LOG.error("scene %d: no visual could be obtained!", i)
-                record["error"] = "no visual"
+                record["source"] = "stock"
+                LOG.info("scene %d: stock video fallback used", i)
+
+        # ----- 3. Synthesized motion filler (no static image fallback) -----
+        if "video" not in record:
+            record["motion_fallback"] = True
+            record["source"] = "filler"
+            LOG.warning(
+                "scene %d: no SVD or stock available; assemble will render motion filler",
+                i,
+            )
 
         out.append(record)
 

@@ -1,4 +1,20 @@
-"""TTS router — config-driven (edge-tts primary, NIM Magpie premium)."""
+"""TTS router — config-driven multi-provider chain with full error visibility.
+
+Providers
+---------
+edge   : Microsoft Edge TTS via the edge-tts python lib. No API key. High quality
+         but flaky from cloud runners (~5-10% empty-response rate).
+gtts   : Google Translate TTS via the gTTS python lib. No API key. Lower quality
+         voice but extremely reliable; used as the no-network-key fallback.
+
+Speed control is applied AFTER synthesis via ffmpeg's `atempo` filter (see
+pipeline/stages/audio.py). Sending SSML rate to Microsoft's Edge endpoint
+triggers extra rejections, and gTTS has no rate parameter, so post-processing
+is the simplest path that works for every provider.
+
+If you re-introduce a paid provider (NVIDIA NIM Magpie etc.), follow the
+existing `_xxx()` pattern: synthesize at neutral speed, return MP3 bytes.
+"""
 from __future__ import annotations
 
 import asyncio
@@ -23,66 +39,127 @@ class TTSRouter:
         self.chain: list[str] = self.cfg.get("chain", []) or []
         self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
         self.timeout = self.cfg.get("request_timeout_sec", 120)
-        self.default_rate = self.cfg.get("default_rate", "+0%")
-        self.default_pitch = self.cfg.get("default_pitch", "+0Hz")
 
-    def synthesize(
-        self,
-        text: str,
-        *,
-        voice: str,
-        rate: str | None = None,
-        pitch: str | None = None,
-        prefer_premium: bool = False,
-    ) -> bytes:
-        rate = rate or self.default_rate
-        pitch = pitch or self.default_pitch
+    def synthesize(self, text: str, *, voice: str, prefer_premium: bool = False) -> bytes:
+        """Try each provider in order; return MP3 bytes from the first success.
 
-        # Optionally bias the chain to put premium first
+        Speed-up is applied later (audio.py atempo). All providers should
+        return audio at NATURAL speed.
+        """
         chain = list(self.chain)
         if prefer_premium and "nim_magpie" in chain:
             chain.remove("nim_magpie")
             chain.insert(0, "nim_magpie")
 
-        last_err: Exception | None = None
+        errors: list[str] = []
         for name in chain:
-            p = self.providers.get(name)
-            if not p:
-                continue
+            p = self.providers.get(name) or {}
             try:
-                if p.get("backend") == "edge_tts":
-                    return self._edge_tts(text, voice, rate, pitch)
+                backend = p.get("backend") or name
+                if backend == "edge_tts":
+                    return self._edge_tts(text, voice)
+                if backend == "gtts":
+                    return self._gtts(text, voice, p.get("params", {}) or {})
                 if name == "nim_magpie":
                     return self._nim_magpie(p, text, voice)
-                LOG.warning("Unknown TTS provider in chain: %s", name)
+                LOG.warning("Unknown TTS provider in chain: %s (backend=%s)", name, backend)
+                errors.append(f"{name}: unknown backend {backend!r}")
             except Exception as e:  # noqa: BLE001
+                msg = f"{name}: {e}"
                 LOG.warning("TTS provider %s failed: %s", name, e)
-                last_err = e
-        raise RuntimeError(f"All TTS providers failed. Last error: {last_err}")
+                errors.append(msg)
 
-    def _edge_tts(self, text: str, voice: str, rate: str, pitch: str) -> bytes:
+        # Surface every error so the next debugging session doesn't need
+        # another round-trip through the workflow logs.
+        raise RuntimeError("All TTS providers failed.\n  - " + "\n  - ".join(errors))
+
+    # ------------------------------------------------------------------ edge
+
+    def _edge_tts(self, text: str, voice: str) -> bytes:
+        """Synthesize with Microsoft Edge TTS at neutral rate/pitch.
+
+        Sending non-zero rate/pitch over SSML triggers extra rejections from
+        Microsoft's endpoint when called from cloud-runner IPs, so we always
+        request neutral and let ffmpeg atempo apply the speed-up downstream.
+        """
         import edge_tts  # lazy import
 
         async def _gen() -> bytes:
-            comm = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+            comm = edge_tts.Communicate(text, voice, rate="+0%", pitch="+0Hz")
             with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
                 tmp = Path(f.name)
             try:
                 await comm.save(str(tmp))
-                return tmp.read_bytes()
+                data = tmp.read_bytes()
+                if not data:
+                    raise RuntimeError("edge-tts returned empty audio")
+                return data
             finally:
                 tmp.unlink(missing_ok=True)
 
         LOG.info("TTS via edge-tts (%s)", voice)
         return asyncio.run(_gen())
 
+    # ------------------------------------------------------------------ gtts
+
+    def _gtts(self, text: str, voice: str, params: dict) -> bytes:
+        """Google Translate TTS — robust no-key fallback.
+
+        gTTS has no rate parameter; post-processing applies our +12%.
+        Voice is mapped from Edge-style IDs to gtts (lang, tld) pairs:
+            en-US-XxxNeural -> lang='en', tld='com'
+            en-GB-XxxNeural -> lang='en', tld='co.uk'
+            en-AU-XxxNeural -> lang='en', tld='com.au'
+            en-IN-XxxNeural -> lang='en', tld='co.in'
+        """
+        from gtts import gTTS  # lazy import
+
+        lang, tld = self._gtts_voice_map(voice)
+        slow = bool(params.get("slow", False))
+
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
+            tmp = Path(f.name)
+        try:
+            tts = gTTS(text=text, lang=lang, tld=tld, slow=slow)
+            tts.save(str(tmp))
+            data = tmp.read_bytes()
+            if not data:
+                raise RuntimeError("gtts returned empty audio")
+            LOG.info("TTS via gtts (lang=%s, tld=%s)", lang, tld)
+            return data
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    @staticmethod
+    def _gtts_voice_map(voice: str) -> tuple[str, str]:
+        if not voice:
+            return ("en", "com")
+        v = voice.lower()
+        for prefix, tld in (
+            ("en-us", "com"),
+            ("en-gb", "co.uk"),
+            ("en-au", "com.au"),
+            ("en-in", "co.in"),
+            ("en-ca", "ca"),
+            ("en-ie", "ie"),
+        ):
+            if v.startswith(prefix):
+                return ("en", tld)
+        # Fall through: take the language part (e.g. 'fr-FR-...' -> 'fr')
+        lang = voice.split("-", 1)[0].lower() or "en"
+        return (lang, "com")
+
+    # ------------------------------------------------------------------ nim
+
     def _nim_magpie(self, p: dict, text: str, voice: str) -> bytes:
         api_key = env(p.get("api_key_env", ""))
         if not api_key:
             raise RuntimeError("NIM Magpie key not set")
         params = p.get("params", {}) or {}
-        # Edge-style voice ids don't apply to Magpie; use default unless caller passed a magpie voice
-        magpie_voice = voice if voice and voice.startswith("Magpie-") else params.get("default_voice", "Magpie-Multilingual.EN-US.Ray")
+        magpie_voice = (
+            voice if voice and voice.startswith("Magpie-")
+            else params.get("default_voice", "Magpie-Multilingual.EN-US.Ray")
+        )
         payload = {
             "text": text,
             "voice": magpie_voice,

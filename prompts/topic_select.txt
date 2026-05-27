@@ -5,12 +5,27 @@ You are the head of content for the channel above, working on the niche: {niche_
 Below is today's pool of {n_candidates} candidate topics scraped from {sources}.
 Pick the SINGLE best topic for a {target_duration}-second {format_label}.
 
-Selection criteria (in order, weighted by the channel's stated goal and tone):
-1. Hook strength — can the first {hook_max_seconds} seconds stop a scroll?
-2. Educational payoff — does the viewer learn something specific that serves the channel's goal?
-3. Visual potential — can it be told with images and short clips?
-4. Freshness — prefer something from the last 24h.
-5. Distinctness — must not duplicate any topic in the last 30 days.
+Successful Shorts in this niche almost always have ONE of these shapes:
+  - Counterintuitive: most people believe X, but the truth is Y.
+  - Hidden cause: the REAL reason X happens / works / failed.
+  - Specific number that surprises: "73% of...", "$3.4 trillion...", "0.001s...".
+  - Forbidden question: "Why does no one talk about X?"
+  - Before/after: how X went from impossible to normal.
+
+REJECT topics that are:
+  - Generic explainers ("what is X?") with no twist.
+  - Pure announcements with no conflict or surprise.
+  - Topics requiring charts, code blocks, or long quotes to explain.
+  - Topics where the payoff cannot be stated in one sentence.
+
+Selection criteria (in priority order, weighted by the channel goal and tone):
+1. Hook strength — first {hook_max_seconds} seconds can stop a scroll.
+2. A clear OPEN LOOP: a question/puzzle that the script can tease for ~25s
+   before paying off.
+3. Educational payoff in one specific reveal sentence.
+4. Visual potential: nameable real subjects/settings (not abstract concepts).
+5. Freshness: prefer last 24-72h.
+6. Distinctness: must not duplicate any topic in the last 30 days.
 
 Recently used topic hashes to avoid: {recent_hashes}
 
@@ -20,7 +35,9 @@ Candidates:
 Respond with ONLY a JSON object, no prose:
 {{
   "chosen_index": <int>,
-  "reason": "<one sentence why this beat the others, referring to the channel goal>",
-  "angle": "<the specific angle/framing to take, one sentence>",
-  "topic_hash": "<short slug like 'apple-vision-pro-shipping-2026'>"
+  "reason":       "<one sentence; reference the channel goal AND which Shorts shape this fits>",
+  "angle":        "<the specific angle/framing — must imply a hook and a payoff>",
+  "open_loop":    "<the question or puzzle the hook will pose>",
+  "payoff":       "<one sentence: the reveal the script will deliver at the end>",
+  "topic_hash":   "<short slug like 'apple-vision-pro-shipping-2026'>"
 }}

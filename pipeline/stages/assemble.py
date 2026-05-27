@@ -1,5 +1,11 @@
-"""Final FFmpeg assembly: per-scene clips + Ken Burns + caption burn-in + music duck.
-All ffmpeg knobs (codec, crf, preset, Ken Burns, music volume, caption style) live in
+"""Final FFmpeg assembly: motion-only scenes + caption burn-in + music duck.
+
+Per scene we render either:
+  * a real video clip (SVD or stock), scaled+cropped to portrait, looped to fit duration; or
+  * a synthesized animated gradient (motion filler) — used only when SVD AND stock both
+    failed for the scene. There is NO still-image / Ken Burns slideshow path.
+
+All ffmpeg knobs (codec, crf, preset, music volume, caption style, filler colors) live in
 pipeline.yaml > assemble.
 """
 from __future__ import annotations
@@ -41,10 +47,10 @@ def assemble_video(
         out_clip = work_dir / f"scene_{i:02d}.mp4"
         if "video" in v:
             _render_from_video(out_dir / v["video"], out_clip, dur, width, height, fps, acfg)
-        elif "image" in v:
-            _render_from_image(out_dir / v["image"], out_clip, dur, width, height, fps, acfg)
         else:
-            _render_solid(out_clip, dur, width, height, fps, acfg)
+            # No real footage was obtained for this scene. Synthesize motion
+            # (animated gradient) instead of falling back to a static image.
+            _render_motion_filler(out_clip, dur, width, height, fps, acfg)
         scene_clips.append(out_clip)
 
     silent_video = work_dir / "silent.mp4"
@@ -59,39 +65,14 @@ def assemble_video(
         out=output_path,
         cfg=acfg,
     )
-    LOG.info("Final video → %s", output_path)
+    LOG.info("Final video -> %s", output_path)
     return output_path
 
 
 # ---------- per-scene renderers ----------
 
-def _render_from_image(img: Path, out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
-    kb = acfg.get("ken_burns", {}) or {}
-    zoom_inc = float(kb.get("zoom_increment_per_frame", 0.0015))
-    max_zoom = float(kb.get("max_zoom", 1.4))
-    zoom_frames = int(dur * fps)
-    vf = (
-        f"scale={w*2}:{h*2}:force_original_aspect_ratio=increase,"
-        f"crop={w*2}:{h*2},"
-        f"zoompan=z='min(zoom+{zoom_inc},{max_zoom})':"
-        f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-        f"d={zoom_frames}:s={w}x{h}:fps={fps},"
-        f"setsar=1"
-    )
-    f = acfg.get("ffmpeg", {}) or {}
-    cmd = [
-        "ffmpeg", "-y", "-loop", "1", "-i", str(img),
-        "-t", f"{dur:.2f}",
-        "-vf", vf,
-        "-c:v", f.get("video_codec", "libx264"),
-        "-pix_fmt", f.get("pix_fmt", "yuv420p"),
-        "-r", str(fps),
-        str(out),
-    ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True)
-
-
 def _render_from_video(src: Path, out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+    """Loop and crop any input clip to exactly `dur` seconds at the target portrait size."""
     f = acfg.get("ffmpeg", {}) or {}
     vf = (
         f"scale={w}:{h}:force_original_aspect_ratio=increase,"
@@ -109,18 +90,51 @@ def _render_from_video(src: Path, out: Path, dur: float, w: int, h: int, fps: in
     subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 
-def _render_solid(out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+def _render_motion_filler(out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+    """Synthesize a moving gradient as a no-real-footage fallback.
+
+    Uses ffmpeg's `gradients` lavfi source (FFmpeg >= 5) for a smooth animated
+    multi-color gradient. If `gradients` is unavailable on the runner we fall back
+    to a `color`+`hue` rotation which is always present.
+    """
     f = acfg.get("ffmpeg", {}) or {}
-    color = random.choice(["0x111111", "0x222244", "0x111122"])
-    cmd = [
-        "ffmpeg", "-y", "-f", "lavfi",
-        "-i", f"color=c={color}:s={w}x{h}:r={fps}",
+    mf = acfg.get("motion_filler", {}) or {}
+    colors = mf.get("colors", ["0x0a0a2a", "0x4f1eb1", "0x111122", "0x222244"])
+    speed = float(mf.get("speed", 0.02))
+    # Pick a different color seed every time so consecutive fillers don't look identical.
+    random.shuffle(colors)
+    c0, c1, c2, c3 = (colors + colors)[:4]
+
+    primary = [
+        "ffmpeg", "-y",
+        "-f", "lavfi",
+        "-i",
+        f"gradients=size={w}x{h}:rate={fps}:duration={dur:.2f}:"
+        f"speed={speed}:c0={c0}:c1={c1}:c2={c2}:c3={c3}:type=linear",
         "-t", f"{dur:.2f}",
         "-c:v", f.get("video_codec", "libx264"),
         "-pix_fmt", f.get("pix_fmt", "yuv420p"),
+        "-r", str(fps),
         str(out),
     ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    res = subprocess.run(primary, capture_output=True, text=True)
+    if res.returncode == 0:
+        return
+
+    LOG.warning("gradients filter unavailable, using hue-rotation fallback: %s",
+                res.stderr.strip().splitlines()[-1] if res.stderr else "?")
+    fallback = [
+        "ffmpeg", "-y",
+        "-f", "lavfi",
+        "-i", f"color=c={c0}:s={w}x{h}:r={fps}:d={dur:.2f}",
+        "-vf", f"hue=h='t*40':s='0.6+0.4*sin(t)'",
+        "-t", f"{dur:.2f}",
+        "-c:v", f.get("video_codec", "libx264"),
+        "-pix_fmt", f.get("pix_fmt", "yuv420p"),
+        "-r", str(fps),
+        str(out),
+    ]
+    subprocess.run(fallback, check=True, capture_output=True, text=True)
 
 
 # ---------- composition ----------
@@ -163,12 +177,12 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
         style = (
             f"FontName={cs.get('fontname', 'DejaVu Sans')},"
             f"Bold={int(cs.get('bold', 1))},"
-            f"FontSize={int(cs.get('fontsize_divisor', 3) and 24)},"
+            f"FontSize={int(cs.get('fontsize', 18))},"
             f"PrimaryColour=&H{cs.get('primary_color_hex', '00FFFFFF')},"
             f"OutlineColour=&H{cs.get('outline_color_hex', '00000000')},"
-            f"Outline={int(cs.get('outline_width', 4))},"
+            f"Outline={int(cs.get('outline_width', 3))},"
             f"Alignment={int(cs.get('alignment', 2))},"
-            f"MarginV={int(cs.get('margin_v', 120))}"
+            f"MarginV={int(cs.get('margin_v', 110))}"
         )
         filter_parts.append(f"[0:v]subtitles='{sub_path}':force_style='{style}'[v]")
     else:

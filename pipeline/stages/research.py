@@ -61,6 +61,8 @@ def select_topic(
     chosen = dict(candidates[idx])
     chosen["angle"] = out.get("angle", "")
     chosen["reason"] = out.get("reason", "")
+    chosen["open_loop"] = out.get("open_loop", "")
+    chosen["payoff"] = out.get("payoff", "")
     chosen["topic_hash"] = out.get("topic_hash") or topic_hash(chosen["title"])
     LOG.info("Selected topic: %s", chosen["title"])
     return chosen

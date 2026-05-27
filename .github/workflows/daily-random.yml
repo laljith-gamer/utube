@@ -51,6 +51,7 @@ jobs:
     timeout-minutes: 90
     permissions:
       contents: write   # commit ledger.json + run artifacts back to repo
+      issues:   write   # auto-open an issue when the run fails (see last step)
     steps:
       - uses: actions/checkout@v4
         with:
