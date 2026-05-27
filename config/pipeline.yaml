@@ -127,10 +127,15 @@ thumbnail:
   width: 720                        # 9:16 vertical (was 1280)
   height: 1280                      # 9:16 vertical (was 720)
   jpeg_quality: 90
-  text_height_ratio: 0.13           # smaller relative because canvas is taller
-  text_y_ratio: 0.42
-  text_line_spacing_ratio: 0.16
-  margin_left: 60
+  # Initial font height as fraction of canvas height. The renderer
+  # auto-shrinks if the longest word still wouldn't fit within
+  # max_text_width_ratio of the canvas width — so this is a CEILING.
+  text_height_ratio: 0.085          # was 0.13 — too big; now ~108px on 1280
+  text_y_ratio: 0.50
+  text_line_spacing_ratio: 0.13
+  max_text_width_ratio: 0.86        # text wraps when it exceeds this fraction
+  max_lines: 4                      # safety cap; never wrap beyond this
+  margin_left: 50
   stroke_width: 5
   darken_overlay_alpha: 170
   font_paths:
@@ -158,17 +163,17 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize: 48                    # was 38 — bigger again
+    fontsize: 64                    # was 48 — bigger again
     primary_color_hex: "00FFFFFF"   # white  (ASS colour notation: AABBGGRR)
                                     #   — colour of all non-active words
     highlight_color_hex: "0000FFFF" # yellow — colour of the ONE active word
     outline_color_hex: "00000000"
     back_color_hex: "A0000000"
-    outline_width: 4
+    outline_width: 5                # bumped slightly because text is bigger
     shadow_depth: 1
     alignment: 5                    # 5 = MIDDLE-CENTER
     margin_v: 0                     # ignored when alignment is middle
-    margin_h: 80                    # was 60 — wider side margin so words fit
+    margin_h: 80                    # left/right side margin in pixels
     border_style: 1
     wrap_style: 0                   # 0=smart even-length, 1=EOL, 2=none, 3=lower-wider
 
