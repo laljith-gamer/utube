@@ -19,7 +19,7 @@ Hard rules:
 - End with a question or CTA that makes people comment, consistent with the channel goal.
 - Title <= {title_max_chars} chars, no clickbait lies.
 - Description includes 1 source URL and the disclosure: "{ai_disclosure}".
-- Hashtags: 5-8, mixing #shorts plus topical tags.
+- Hashtags: exactly {hashtags_count} distinct, lowercase hashtags, dynamically chosen for THIS specific video. Always include #shorts as the first one. The remaining {hashtags_count_minus_one} must mix: niche tags, topic-specific keywords from the script, and audience-style tags. No duplicates, no spaces, each tag <= 25 characters.
 - Thumbnail text: 3-4 punchy words max.
 
 Respond with ONLY this JSON shape, no prose:
@@ -37,7 +37,7 @@ Respond with ONLY this JSON shape, no prose:
   "cta": "<final line that drives a comment or follow>",
   "title":            "<= {title_max_chars} chars",
   "description":      "<2-3 sentences + source URL + #hashtags + AI disclosure>",
-  "hashtags":         ["#shorts", "#..."],
+  "hashtags":         ["#shorts", "#...", "...exactly {hashtags_count} entries total"],
   "thumbnail_prompt": "<SDXL prompt for the thumbnail background>",
   "thumbnail_text":   "<3-4 word punch>"
 }}

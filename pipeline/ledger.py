@@ -27,7 +27,7 @@ class Ledger:
                 return cls(path=path, data=json.loads(path.read_text(encoding="utf-8")))
             except Exception as e:  # noqa: BLE001
                 LOG.warning("Ledger %s corrupt (%s); starting fresh", path, e)
-        return cls(path=path, data={"topics": {}, "usage": {}})
+        return cls(path=path, data={"topics": {}, "themes": {}, "usage": {}})
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -53,6 +53,28 @@ class Ledger:
         if len(topics) > 200:
             for k in list(topics.keys())[:-200]:
                 topics.pop(k, None)
+
+    # ----- themes (global, not per-lane) -----
+
+    def recent_theme_ids(self, *, days: int) -> set[str]:
+        """Return theme ids used in the last `days`. Used to skip-pick repeats."""
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        out: set[str] = set()
+        for tid, ts in self.data.get("themes", {}).items():
+            try:
+                if datetime.fromisoformat(ts) >= cutoff:
+                    out.add(tid)
+            except ValueError:
+                continue
+        return out
+
+    def record_theme(self, theme_id: str) -> None:
+        themes = self.data.setdefault("themes", {})
+        themes[theme_id] = datetime.now(timezone.utc).isoformat()
+        # Trim to last 2000 (covers ~3 years at 2 vids/day)
+        if len(themes) > 2000:
+            for k in list(themes.keys())[:-2000]:
+                themes.pop(k, None)
 
     # ----- usage -----
 

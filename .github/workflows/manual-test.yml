@@ -3,9 +3,9 @@ name: Manual Test (single video, no upload)
 on:
   workflow_dispatch:
     inputs:
-      slot:
-        description: "Niche slot to build"
-        required: true
+      lane:
+        description: "Lane preset to use (random theme picked from this lane)"
+        required: false
         default: "tech_news"
         type: choice
         options:
@@ -14,6 +14,10 @@ on:
           - ai_breakthrough
           - cybersecurity
           - viral_science
+      theme:
+        description: "Optional: force a specific theme id (overrides lane)"
+        required: false
+        default: ""
       skip_svd:
         description: "Skip SVD animation (faster build)"
         required: false
@@ -44,20 +48,29 @@ jobs:
 
       - name: Build args
         id: args
+        env:
+          LANE:    ${{ inputs.lane }}
+          THEME:   ${{ inputs.theme }}
+          SKIPSVD: ${{ inputs.skip_svd }}
         run: |
-          ARGS="--slot ${{ inputs.slot }} --no-upload"
-          if [ "${{ inputs.skip_svd }}" = "true" ]; then ARGS="$ARGS --skip-svd"; fi
+          ARGS="--no-upload"
+          if [ -n "$THEME" ]; then
+            ARGS="$ARGS --theme $THEME"
+          else
+            ARGS="$ARGS --lane $LANE"
+          fi
+          if [ "$SKIPSVD" = "true" ]; then ARGS="$ARGS --skip-svd"; fi
           echo "args=$ARGS" >> "$GITHUB_OUTPUT"
 
       - name: Run pipeline (no upload)
         env:
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
-          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY:   ${{ secrets.CEREBRAS_API_KEY }}
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
           DRY_RUN: "1"
         run: |
           python -m pipeline.orchestrator ${{ steps.args.outputs.args }}
@@ -66,7 +79,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: video-${{ inputs.slot }}-${{ github.run_id }}
+          name: video-${{ inputs.lane }}-${{ github.run_id }}
           path: |
             runs/**/*.mp4
             runs/**/thumbnail.jpg
