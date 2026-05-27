@@ -75,8 +75,11 @@ video:
 
 tts:
   chain: [edge, nim_magpie]
-  default_rate: "+0%"
+  default_rate: "+12%"             # voice speed: 0% = normal, +12% = pro-Shorts pacing
   default_pitch: "+0Hz"
+  trim_silence: true               # trim leading/trailing silence per segment (kills Edge-TTS dead air)
+  silence_threshold_db: -45        # silence detection threshold for trimming
+  silence_keep_sec: 0.05           # leave a tiny breath so cuts don't sound clipped
   request_timeout_sec: 120
   providers:
     edge:

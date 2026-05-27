@@ -6,9 +6,9 @@ video:                              # final output specs
   height: 1920
   fps: 30
   target_duration_sec: 35
-  min_duration_sec: 28
+  min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
   max_duration_sec: 45
-  num_scenes: 7
+  num_scenes: 12                    # ~2.9s per scene = MrBeast/Cleo Abram cut rhythm
 
 # Visuals: every scene is motion-based.
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
@@ -46,8 +46,10 @@ script:
   # tokens left for the actual JSON output. "high" causes truncation where the
   # model spends the entire budget reasoning and never writes the answer.
   reasoning_effort: low
-  words_per_second: 2.5            # 150 wpm narration pace
-  hook_max_seconds: 3
+  # 3.0 wps written * +12% TTS rate ~= 200 wpm spoken (pro Shorts pace).
+  # If videos sound rushed, drop to 2.7. If too slow, push to 3.2.
+  words_per_second: 3.0
+  hook_max_seconds: 2              # first 2s decides retention on Shorts
   hashtags_count: 20               # exact number of dynamic hashtags the LLM must produce
 
 audio:
