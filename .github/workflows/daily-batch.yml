@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       slot:
-        description: "Optional: run only one slot id (did_you_know|tech_news|ai_breakthrough|cybersecurity|viral_science). Empty = all 5."
+        description: "Optional: run only one slot id (mind_blowing_ai|tech_money_shock|viral_did_you_know|cyber_heist|future_shock). Empty = all 5."
         required: false
         default: ""
       no_upload:

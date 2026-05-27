@@ -6,14 +6,14 @@ on:
       slot:
         description: "Niche slot to build"
         required: true
-        default: "tech_news"
+        default: "mind_blowing_ai"
         type: choice
         options:
-          - did_you_know
-          - tech_news
-          - ai_breakthrough
-          - cybersecurity
-          - viral_science
+          - mind_blowing_ai
+          - tech_money_shock
+          - viral_did_you_know
+          - cyber_heist
+          - future_shock
       skip_svd:
         description: "Skip SVD animation (faster build)"
         required: false
