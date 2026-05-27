@@ -372,23 +372,32 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
     f = cfg.get("ffmpeg", {}) or {}
     music_cfg = cfg.get("music", {}) or {}
 
-    sub_path = str(srt).replace(":", r"\:").replace("'", r"\'")
+    # The "srt" parameter name is legacy — the file may be either an .ass
+    # or a classic .srt. ASS files carry their own style; SRT needs force_style.
+    sub_path_raw = str(srt)
+    sub_ext = srt.suffix.lower()
+    sub_path = sub_path_raw.replace(":", r"\:").replace("'", r"\'")
     has_subs = srt.exists() and srt.stat().st_size > 0
 
     inputs = ["-i", str(silent_video), "-i", str(narration)]
     filter_parts: list[str] = []
-    if has_subs:
+    if has_subs and sub_ext == ".ass":
+        # ASS — use the dedicated `ass=` filter; it picks up the file's own
+        # style block, fade tags, karaoke timing, etc. No force_style.
+        filter_parts.append(f"[0:v]ass='{sub_path}'[v]")
+    elif has_subs:
+        # Plain SRT path — apply force_style from config.
         style_kv = [
             ("FontName",       str(cs.get("fontname", "DejaVu Sans"))),
             ("Bold",           str(int(cs.get("bold", 1)))),
-            ("FontSize",       str(int(cs.get("fontsize", 22)))),
+            ("FontSize",       str(int(cs.get("fontsize", 32)))),
             ("PrimaryColour",  f"&H{cs.get('primary_color_hex', '00FFFFFF')}"),
             ("OutlineColour",  f"&H{cs.get('outline_color_hex', '00000000')}"),
             ("BackColour",     f"&H{cs.get('back_color_hex', 'A0000000')}"),
-            ("Outline",        str(int(cs.get("outline_width", 3)))),
+            ("Outline",        str(int(cs.get("outline_width", 4)))),
             ("Shadow",         str(int(cs.get("shadow_depth", 1)))),
-            ("Alignment",      str(int(cs.get("alignment", 2)))),
-            ("MarginV",        str(int(cs.get("margin_v", 280)))),
+            ("Alignment",      str(int(cs.get("alignment", 5)))),
+            ("MarginV",        str(int(cs.get("margin_v", 0)))),
             ("BorderStyle",    str(int(cs.get("border_style", 1)))),
         ]
         style = ",".join(f"{k}={v}" for k, v in style_kv)

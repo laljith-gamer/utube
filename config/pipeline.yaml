@@ -17,46 +17,39 @@ video:                              # final output specs
 pacing:
   scene_min_seconds: 2.5
   scene_max_seconds: 5.5
-  default_voice_rate: "+15%"        # used if a slot doesn't override
+  default_voice_rate: "+15%"
   default_voice_pitch: "+0Hz"
   trim_silence: true
   silence_threshold_db: -45
   silence_min_duration_sec: 0.15
   master_tempo_multiplier: 1.0
-  scene_transition: hard_cut        # hard_cut | crossfade
+  scene_transition: hard_cut
   crossfade_duration_sec: 0.15
 
-# Visuals routing — drives "real motion video, not a slideshow":
-# When a scene has a key_subject AND prefer_stock_video is true, we search
-# Pexels/Pixabay first for real footage that matches the narration. Only
-# when stock has no match do we fall back to AI image generation + Ken Burns.
+# Visuals routing — drives "real motion video, not a slideshow".
 visuals:
-  prefer_stock_video: true          # try stock B-roll BEFORE SDXL when key_subject exists
-  enable_svd: false                 # SVD animates SDXL stills; off by default (slow + credits)
-  motion_scenes_default: 5          # if LLM doesn't flag use_motion, mark first N as motion
-  stock_min_match_score: 0          # 0=accept first match (Pexels has no score field)
+  prefer_stock_video: true
+  enable_svd: false
+  motion_scenes_default: 5
+  stock_min_match_score: 0
 
-# Per-scene text overlays — the way a human editor would slap a big "$1B"
-# on screen when the narrator says "one billion". The LLM emits an optional
-# text_overlay string per scene; if present, we burn it on with FFmpeg drawtext.
+# Per-scene text overlays for big-number callouts.
 overlay:
   enabled: true
   fontname: "DejaVu Sans"
-  fontsize: 130                     # very large; this is for short punchy text only
+  fontsize: 130
   fontcolor: "white"
   bordercolor: "black"
   borderw: 6
   shadow_x: 4
   shadow_y: 4
-  position: top                     # top | center | bottom
-  margin_v_ratio: 0.18              # distance from top/bottom as fraction of height
+  position: top
+  margin_v_ratio: 0.18
   fade_in_sec: 0.20
   fade_out_sec: 0.25
-  enter_zoom_factor: 1.10           # subtle pop-in scale animation
+  enter_zoom_factor: 1.10
 
-# Outro card — the last 2-3 seconds where a real YouTuber says
-# "Follow / subscribe for more". Generated with FFmpeg + drawtext on the
-# last frame darkened to ~50%; no extra assets needed.
+# Outro card — the last 2-3 seconds, "Follow for more" headline.
 outro:
   enabled: true
   duration_sec: 2.5
@@ -66,7 +59,7 @@ outro:
   fontsize_main: 110
   fontsize_sub: 46
   fontcolor: "white"
-  background_dim_alpha: 0.55        # 0..1, how much we darken the freeze-frame
+  background_dim_alpha: 0.55
   borderw_main: 7
   borderw_sub: 3
 
@@ -106,24 +99,35 @@ audio:
   bitrate: "128k"
   codec: libmp3lame
 
+# Captions — "TikTok-style" karaoke captions: dead-center, fade in/out,
+# active word highlights in a different colour and pulses slightly larger.
 captions:
   enabled: true
-  whisper_model_size: base
+  whisper_model_size: base          # tiny | base | small | medium | large-v3
   whisper_device: cpu
   whisper_compute_type: int8
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 3                # back to 3 (was 2) — easier to read
+  words_per_chunk: 3                # words shown together per cue line
+  format: ass                       # ass | srt — ass enables karaoke + fade
+  fade_in_ms: 150                   # line invisible -> visible
+  fade_out_ms: 250                  # line visible -> invisible
+  highlight_active_word: true       # use \K karaoke colour highlight per word
+  active_word_scale_pct: 115        # size pulse % during the word's spoken time
+                                    # (100 = no pulse, 130 = bouncy)
+  size_pulse_up_ratio: 0.30         # fraction of word duration to scale UP
+                                    # (rest of the time scales back to 100)
 
+# Thumbnail — 9:16 to match the Shorts vertical format
 thumbnail:
-  width: 1280
-  height: 720
+  width: 720                        # 9:16 vertical (was 1280)
+  height: 1280                      # 9:16 vertical (was 720)
   jpeg_quality: 90
-  text_height_ratio: 0.18
-  text_y_ratio: 0.50
-  text_line_spacing_ratio: 0.20
-  margin_left: 50
+  text_height_ratio: 0.13           # smaller relative because canvas is taller
+  text_y_ratio: 0.42
+  text_line_spacing_ratio: 0.16
+  margin_left: 60
   stroke_width: 5
   darken_overlay_alpha: 170
   font_paths:
@@ -151,14 +155,16 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize: 22                    # smaller (was 36) — non-intrusive
-    primary_color_hex: "00FFFFFF"
+    fontsize: 32                    # bumped from 22 — slightly bigger
+    primary_color_hex: "00FFFFFF"   # white  (ASS colour notation: AABBGGRR)
+    highlight_color_hex: "0000FFFF" # yellow (active word)
     outline_color_hex: "00000000"
     back_color_hex: "A0000000"
-    outline_width: 3                # thinner (was 5)
+    outline_width: 4
     shadow_depth: 1
-    alignment: 2                    # 2 = bottom center
-    margin_v: 280                   # higher off bottom (was 200) — more breathing room
+    alignment: 5                    # 5 = MIDDLE-CENTER (was 2 = bottom-center)
+    margin_v: 0                     # ignored when alignment is middle
+    margin_h: 60                    # left/right side margin in pixels
     border_style: 1
 
 stage_timeouts_sec:

@@ -82,8 +82,9 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
                                        script=sc, slot=slot, out_dir=out)
         write_json(out / "visuals.json", vis)
 
-        # 6. Captions
-        srt = out / "captions.srt"
+        # 6. Captions — extension follows captions.format (ass | srt)
+        sub_ext = (cfg.get_path("captions.format", "srt") or "srt").lower()
+        srt = out / f"captions.{sub_ext}"
         captions.transcribe_to_srt(out / audio_summary["master"], srt)
 
         # 7. Thumbnail
