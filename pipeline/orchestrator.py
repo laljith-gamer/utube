@@ -101,7 +101,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
 
         # 5. Visuals
         if skip_svd:
-            cfg["video"] = {**cfg.get("video", {}), "use_svd_for_n_scenes": 0}
+            cfg["visuals"] = {**cfg.get("visuals", {}), "skip_svd": True}
         vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
         write_json(out / "visuals.json", vis)
 
@@ -252,7 +252,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--theme", default=None,
                         help="Force a specific theme id (skips random pick)")
     parser.add_argument("--no-upload", action="store_true", help="Skip YouTube upload")
-    parser.add_argument("--skip-svd", action="store_true", help="Skip SVD animation (Ken Burns only)")
+    parser.add_argument("--skip-svd", action="store_true",
+                        help="Skip SDXL+SVD; visuals stage uses only stock video and motion filler")
     args = parser.parse_args(argv)
 
     upload = not args.no_upload and not env_bool("DRY_RUN")

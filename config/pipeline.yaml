@@ -9,7 +9,12 @@ video:                              # final output specs
   min_duration_sec: 28
   max_duration_sec: 45
   num_scenes: 7
-  use_svd_for_n_scenes: 4
+
+# Visuals: every scene is motion-based.
+# Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
+# There is NO static-image / Ken Burns slideshow path.
+visuals:
+  skip_svd: false                   # set to true to skip SDXL+SVD (uses stock + filler only)
 
 discover:
   user_agent: "utube-bot/1.0 (+https://github.com/laljith-gamer/utube)"
@@ -75,9 +80,9 @@ thumbnail:
     - /Library/Fonts/Arial Bold.ttf
 
 assemble:
-  ken_burns:
-    zoom_increment_per_frame: 0.0015
-    max_zoom: 1.4
+  motion_filler:                     # used only when SVD AND stock both fail for a scene
+    speed: 0.02
+    colors: ["0x0a0a2a", "0x4f1eb1", "0x111122", "0x222244"]
   music:
     volume: 0.18                   # bg music level (1.0 = original)
     loop: true

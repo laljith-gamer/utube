@@ -15,7 +15,7 @@ Hard rules:
 - Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
 - Exactly {num_scenes} scenes.
 - First {hook_max_seconds} seconds = a stop-the-scroll hook (no "hey guys", no slow intro).
-- Each scene must be visualizable with a still image OR a short 4-second motion clip.
+- Every scene is rendered as a MOVING video clip (generated motion or stock footage). Each visual_prompt should describe a vivid scene that looks good with subtle camera/subject motion (real subjects, settings, action implied) — avoid abstract text overlays, charts, or static diagrams.
 - End with a question or CTA that makes people comment, consistent with the channel goal.
 - Title <= {title_max_chars} chars, no clickbait lies.
 - Description includes 1 source URL and the disclosure: "{ai_disclosure}".
@@ -29,9 +29,8 @@ Respond with ONLY this JSON shape, no prose:
     {{
       "narration":     "<one sentence, spoken>",
       "duration_sec":  <int 3-7>,
-      "visual_prompt": "<detailed SDXL prompt, photorealistic or matching style>",
-      "broll_keywords":["<3-5 keywords for stock fallback>"],
-      "use_motion":    <true|false>
+      "visual_prompt": "<detailed SDXL prompt: a real subject in a real setting, photoreal or matching style, that will look good when subtle motion is added>",
+      "broll_keywords":["<3-5 keywords for stock-video fallback>"]
     }}
   ],
   "cta": "<final line that drives a comment or follow>",
