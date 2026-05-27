@@ -112,14 +112,15 @@ captions:
   words_per_chunk: 2                # words shown together per cue line
                                     # (2 fits comfortably at fontsize 38;
                                     # bump to 3-4 if you reduce font size)
-  format: ass                       # ass | srt — ass enables karaoke + fade
+  format: ass                       # ass | srt — ass enables word-by-word highlight
   fade_in_ms: 150                   # line invisible -> visible
   fade_out_ms: 250                  # line visible -> invisible
-  highlight_active_word: true       # use \K karaoke colour highlight per word
-  active_word_scale_pct: 115        # size pulse % during the word's spoken time
-                                    # (100 = no pulse, 130 = bouncy)
-  size_pulse_up_ratio: 0.30         # fraction of word duration to scale UP
-                                    # (rest of the time scales back to 100)
+  highlight_active_word: true       # if true, only the spoken word is the
+                                    # highlight colour; all other words stay
+                                    # primary (white). NO gradient transition —
+                                    # the colour STEPS instantly word by word.
+  active_word_scale_pct: 115        # size pulse % during the word's spoken
+                                    # time (100 = no pulse, 130 = bouncy)
 
 # Thumbnail — 9:16 to match the Shorts vertical format
 thumbnail:
@@ -157,9 +158,10 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize: 38                    # was 32 — slightly bigger again
+    fontsize: 48                    # was 38 — bigger again
     primary_color_hex: "00FFFFFF"   # white  (ASS colour notation: AABBGGRR)
-    highlight_color_hex: "0000FFFF" # yellow (active word)
+                                    #   — colour of all non-active words
+    highlight_color_hex: "0000FFFF" # yellow — colour of the ONE active word
     outline_color_hex: "00000000"
     back_color_hex: "A0000000"
     outline_width: 4

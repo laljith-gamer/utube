@@ -128,11 +128,8 @@ def _chunk_words(words: list[dict], n: int) -> list[list[dict]]:
 
 def _render_ass(*, chunks: list[list[dict]], ccfg: dict, style_cfg: dict,
                 play_x: int, play_y: int) -> str:
-    fade_in = int(ccfg.get("fade_in_ms", 150))
-    fade_out = int(ccfg.get("fade_out_ms", 250))
     highlight = bool(ccfg.get("highlight_active_word", True))
     scale_pct = int(ccfg.get("active_word_scale_pct", 115))
-    pulse_up_ratio = float(ccfg.get("size_pulse_up_ratio", 0.30))
 
     fontname = str(style_cfg.get("fontname", "DejaVu Sans"))
     bold = int(style_cfg.get("bold", 1))
@@ -176,64 +173,75 @@ def _render_ass(*, chunks: list[list[dict]], ccfg: dict, style_cfg: dict,
     for words in chunks:
         if not words:
             continue
-        line_start = words[0]["start"]
-        line_end = words[-1]["end"] + 0.05  # tiny tail so fade-out has time
-        # Some whisper edge cases produce zero-duration words; ensure end > start
-        if line_end <= line_start:
-            line_end = line_start + 0.5
-
-        text = _build_ass_line_text(
+        events.extend(_build_chunk_events(
             words=words,
-            line_start=line_start,
-            fade_in_ms=fade_in,
-            fade_out_ms=fade_out,
-            highlight=highlight,
+            ccfg=ccfg,
+            primary=primary,
+            highlight=highlight_col,
             scale_pct=scale_pct,
-            pulse_up_ratio=pulse_up_ratio,
-        )
-        events.append(
-            f"Dialogue: 0,{_ass_ts(line_start)},{_ass_ts(line_end)},Default,,0,0,0,,{text}\n"
-        )
+            highlight_on=highlight,
+        ))
 
     return header + "".join(events)
 
 
-def _build_ass_line_text(*, words: list[dict], line_start: float,
-                         fade_in_ms: int, fade_out_ms: int,
-                         highlight: bool, scale_pct: int,
-                         pulse_up_ratio: float) -> str:
-    """Build the override+text portion of one Dialogue line."""
-    fragments: list[str] = []
+def _build_chunk_events(*, words: list[dict], ccfg: dict, primary: str,
+                       highlight: str, scale_pct: int,
+                       highlight_on: bool) -> list[str]:
+    """Emit one Dialogue line PER WORD.
+
+    Each event spans only that word's spoken window. The full chunk text is
+    rendered every time, but exactly one word is the highlight colour
+    (and optionally scaled up) — every other word stays primary (white).
+    Back-to-back events keep the chunk visually continuous.
+
+    Line-level fade-in is applied only to the FIRST event of the chunk,
+    fade-out only to the LAST event.
+    """
+    fade_in_ms = int(ccfg.get("fade_in_ms", 150))
+    fade_out_ms = int(ccfg.get("fade_out_ms", 250))
+
+    chunk_start = words[0]["start"]
+    chunk_end = words[-1]["end"] + 0.05
+
+    out: list[str] = []
     for i, w in enumerate(words):
-        word_start_ms = max(0, int((w["start"] - line_start) * 1000))
-        word_end_ms = max(word_start_ms + 1, int((w["end"] - line_start) * 1000))
-        word_dur_ms = word_end_ms - word_start_ms
+        evt_start = w["start"] if i > 0 else chunk_start
+        evt_end = words[i + 1]["start"] if i + 1 < len(words) else chunk_end
+        if evt_end <= evt_start:
+            evt_end = evt_start + 0.1
 
-        overrides: list[str] = []
-        # Line fade only on the first override block of the line
-        if i == 0:
-            overrides.append(f"\\fad({fade_in_ms},{fade_out_ms})")
+        # Build the chunk text with word i highlighted, others primary.
+        parts: list[str] = []
+        for j, ww in enumerate(words):
+            overrides: list[str] = []
+            # Line-level fade only on first event (j==0 of FIRST word event)
+            # and last event (j==0 of LAST word event).
+            if j == 0:
+                if i == 0 and i == len(words) - 1:
+                    overrides.append(f"\\fad({fade_in_ms},{fade_out_ms})")
+                elif i == 0:
+                    overrides.append(f"\\fad({fade_in_ms},0)")
+                elif i == len(words) - 1:
+                    overrides.append(f"\\fad(0,{fade_out_ms})")
+                # else middle event: no fade
 
-        # Karaoke colour highlight: \K duration in centiseconds
-        if highlight:
-            k_centis = max(1, word_dur_ms // 10)
-            overrides.append(f"\\K{k_centis}")
+            if j == i and highlight_on:
+                overrides.append(f"\\1c&H{highlight}&")
+                if scale_pct != 100:
+                    overrides.append(f"\\fscx{scale_pct}\\fscy{scale_pct}")
+            else:
+                overrides.append(f"\\1c&H{primary}&")
+                overrides.append("\\fscx100\\fscy100")
 
-        # Size pulse on the active word — scale up then back to 100 over the
-        # word's duration. Times are relative to line start in ASS \t.
-        if scale_pct != 100 and word_dur_ms > 0:
-            up_end = word_start_ms + max(20, int(word_dur_ms * pulse_up_ratio))
-            overrides.append(
-                f"\\t({word_start_ms},{up_end},\\fscx{scale_pct}\\fscy{scale_pct})"
-            )
-            overrides.append(
-                f"\\t({up_end},{word_end_ms},\\fscx100\\fscy100)"
-            )
+            prefix = "{" + "".join(overrides) + "}" if overrides else ""
+            parts.append(prefix + _ass_escape_text(ww["text"]))
 
-        prefix = "{" + "".join(overrides) + "}" if overrides else ""
-        fragments.append(prefix + _ass_escape_text(w["text"]))
-
-    return " ".join(fragments)
+        text = " ".join(parts)
+        out.append(
+            f"Dialogue: 0,{_ass_ts(evt_start)},{_ass_ts(evt_end)},Default,,0,0,0,,{text}\n"
+        )
+    return out
 
 
 def _ass_escape_text(text: str) -> str:
