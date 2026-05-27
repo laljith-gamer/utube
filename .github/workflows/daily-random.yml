@@ -1,14 +1,29 @@
-name: Daily Batch (5 videos)
+name: Daily Random Uploads
+
+# Two random windows per day (IST), 1 or 2 videos each.
+#
+#   Window 1 cron:  23:30 UTC  =>  05:00 IST   (random sleep 0-59min => fires anywhere in 05:00-06:00 IST)
+#   Window 2 cron:  00:30 UTC  =>  06:00 IST   (random sleep 0-59min => fires anywhere in 06:00-07:00 IST)
+#
+# Per-window video count (1 or 2) is chosen by the orchestrator from
+# config/schedule.yaml > videos_min / videos_max.
 
 on:
-  # Runs once a day at 00:00 UTC. The orchestrator computes per-slot publishAt
-  # so each video goes live at its niche's scheduled time (04:00, 09:00, 13:00, 17:00, 21:00 UTC).
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "30 23 * * *"   # 05:00 IST window starts
+    - cron: "30 0 * * *"    # 06:00 IST window starts
   workflow_dispatch:
     inputs:
-      slot:
-        description: "Optional: run only one slot id (did_you_know|tech_news|ai_breakthrough|cybersecurity|viral_science). Empty = all 5."
+      videos_min:
+        description: "Min videos this run (overrides schedule.yaml)"
+        required: false
+        default: "1"
+      videos_max:
+        description: "Max videos this run (overrides schedule.yaml)"
+        required: false
+        default: "2"
+      lane:
+        description: "Optional: restrict random pick to this lane id"
         required: false
         default: ""
       no_upload:
@@ -16,13 +31,18 @@ on:
         required: false
         default: "false"
       skip_svd:
-        description: "Skip SVD animation (faster, Ken Burns only)"
+        description: "Skip SVD animation (faster build)"
         required: false
         default: "false"
+      skip_random_sleep:
+        description: "Skip the 0-59 min random delay (manual runs)"
+        required: false
+        default: "true"
 
-# Prevent two daily runs from clobbering the ledger
+# Each window gets its own concurrency lane so they don't cancel each other,
+# but two of the same window can't double-fire.
 concurrency:
-  group: utube-daily
+  group: utube-random-${{ github.event.schedule || 'manual' }}
   cancel-in-progress: false
 
 jobs:
@@ -42,6 +62,13 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      - name: Random delay within the hour
+        if: github.event_name == 'schedule' || inputs.skip_random_sleep != 'true'
+        run: |
+          DELAY=$((RANDOM % 3600))
+          echo "Sleeping ${DELAY}s to randomize publish time within the window."
+          sleep "$DELAY"
+
       - name: Install ffmpeg + fonts
         run: |
           sudo apt-get update -qq
@@ -52,28 +79,31 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build matrix args
+      - name: Build args
         id: args
+        env:
+          VIDEOS_MIN: ${{ inputs.videos_min || '1' }}
+          VIDEOS_MAX: ${{ inputs.videos_max || '2' }}
+          LANE:       ${{ inputs.lane || '' }}
+          NO_UPLOAD:  ${{ inputs.no_upload || 'false' }}
+          SKIP_SVD:   ${{ inputs.skip_svd || 'false' }}
         run: |
-          ARGS=""
-          if [ -n "${{ inputs.slot }}" ]; then ARGS="$ARGS --slot ${{ inputs.slot }}"; fi
-          if [ "${{ inputs.no_upload }}" = "true" ]; then ARGS="$ARGS --no-upload"; fi
-          if [ "${{ inputs.skip_svd }}" = "true" ]; then ARGS="$ARGS --skip-svd"; fi
+          ARGS="--random-batch --videos-min $VIDEOS_MIN --videos-max $VIDEOS_MAX"
+          if [ -n "$LANE" ];        then ARGS="$ARGS --lane $LANE"; fi
+          if [ "$NO_UPLOAD" = "true" ]; then ARGS="$ARGS --no-upload"; fi
+          if [ "$SKIP_SVD" = "true" ];  then ARGS="$ARGS --skip-svd"; fi
           echo "args=$ARGS" >> "$GITHUB_OUTPUT"
 
       - name: Run orchestrator
         env:
-          # LLM providers (set whichever you have)
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
-          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY:   ${{ secrets.CEREBRAS_API_KEY }}
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
-          # Stock media
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
-          # YouTube upload
-          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
@@ -98,7 +128,7 @@ jobs:
           git config user.email "utube-bot@users.noreply.github.com"
           git add ledger.json runs/**/*.json runs/**/captions.srt 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "chore(run): batch summary $(date -u +%Y-%m-%d)"
+            git commit -m "chore(run): random batch $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin HEAD:${{ github.ref_name }} || true
           else
             echo "Nothing to commit."
@@ -113,7 +143,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo:  context.repo.repo,
-              title: `Daily batch failed (${today})`,
+              title: `Daily random run failed (${today})`,
               body:  `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               labels: ["daily-batch-failure"],
             });

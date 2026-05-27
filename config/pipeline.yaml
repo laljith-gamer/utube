@@ -43,6 +43,7 @@ script:
   reasoning_effort: low
   words_per_second: 2.5            # 150 wpm narration pace
   hook_max_seconds: 3
+  hashtags_count: 20               # exact number of dynamic hashtags the LLM must produce
 
 audio:
   bitrate: "128k"

@@ -28,6 +28,7 @@ def generate_script(
     wps = float(scfg.get("words_per_second", 2.5))
     target_words = int(target_duration * wps)
     title_max = int(cfg.get_path("youtube.title_max_chars", 100))
+    hashtags_count = int(scfg.get("hashtags_count", 20))
 
     prompt = template.format(
         goal=goal_summary(),
@@ -45,6 +46,8 @@ def generate_script(
         hook_max_seconds=int(scfg.get("hook_max_seconds", 3)),
         title_max_chars=title_max,
         ai_disclosure=cfg.get_path("channel.ai_disclosure", "AI-assisted"),
+        hashtags_count=hashtags_count,
+        hashtags_count_minus_one=hashtags_count - 1,
     )
 
     script = llm.chat_json(

@@ -1,20 +1,33 @@
 """Top-level orchestrator. ALL configuration via config/*.yaml — no constants here.
 
-Modes:
-  - python -m pipeline.orchestrator                        # all niche slots, full pipeline
-  - python -m pipeline.orchestrator --slot tech_news       # one slot only
-  - python -m pipeline.orchestrator --no-upload            # build but skip upload
-  - python -m pipeline.orchestrator --slot tech_news --no-upload --skip-svd
+Modes
+-----
+    # Default (used by the daily workflow): random batch from the global theme pool.
+    python -m pipeline.orchestrator --random-batch
+
+    # Pick within a single lane.
+    python -m pipeline.orchestrator --random-batch --lane tech_news
+
+    # Force a specific theme (manual debugging / regenerating one video).
+    python -m pipeline.orchestrator --theme tech_news__why-seed-is-making-headlines-right-now__chatgpt-updates
+
+    # Build but skip YouTube upload.
+    python -m pipeline.orchestrator --random-batch --no-upload
+
+    # Skip SVD animation for a faster build.
+    python -m pipeline.orchestrator --random-batch --skip-svd
 """
 from __future__ import annotations
 
 import argparse
 import logging
+import random
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from . import themes as themes_mod
 from .config import get_config
 from .ledger import Ledger
 from .providers.image import ImageRouter
@@ -31,10 +44,12 @@ LOG = logging.getLogger("utube.orchestrator")
 
 def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> dict:
     cfg = get_config()
-    slot_id = slot["id"]
+    slot_id = slot["id"]                        # unique per video (theme id)
+    lane_id = slot.get("lane", slot_id)         # for per-lane topic dedup
     out = run_dir(slot_id)
     LOG.info("=" * 72)
-    LOG.info("SLOT %s — %s", slot_id, slot.get("title", ""))
+    LOG.info("THEME %s (lane=%s)", slot_id, lane_id)
+    LOG.info("Title seed: %s", slot.get("title_seed", slot.get("title", "")))
     LOG.info("Output dir: %s", out)
     LOG.info("=" * 72)
 
@@ -44,10 +59,21 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
     tts = TTSRouter()
     stock = StockRouter()
 
-    result: dict = {"slot": slot_id, "ok": False, "out_dir": str(out)}
+    result: dict = {"slot": slot_id, "lane": lane_id, "ok": False, "out_dir": str(out)}
     try:
         # 1. Discover
         candidates = discover.discover_for_niche(slot)
+        # Seed-inject the chosen theme so the LLM topic-picker has a strong on-brand option.
+        # Stays additive — the LLM is still free to pick a fresher discovered candidate.
+        seed_title = slot.get("title_seed")
+        if seed_title:
+            candidates = [{
+                "title":   seed_title,
+                "url":     "",
+                "score":   9999,
+                "summary": seed_title,
+                "source":  "theme_seed",
+            }] + candidates
         write_json(out / "candidates.json", candidates)
         if not candidates:
             raise RuntimeError("No candidates discovered for this niche")
@@ -56,12 +82,12 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
         topic = research.select_topic(
             llm,
             candidates,
-            niche_title=slot.get("title", slot_id),
+            niche_title=slot.get("title", lane_id),
             sources_label=", ".join(s.get("type", "") for s in slot.get("sources", [])),
-            recent_hashes=ledger.recent_hashes(slot_id, days=int(cfg.get_path("dedup_days", 30))),
+            recent_hashes=ledger.recent_hashes(lane_id, days=int(cfg.get_path("dedup_days", 30))),
         )
         write_json(out / "topic.json", topic)
-        ledger.record_topic(slot_id, topic["topic_hash"])
+        ledger.record_topic(lane_id, topic["topic_hash"])
 
         brief = research.build_research_brief(llm, topic)
         write_json(out / "research.json", brief)
@@ -75,7 +101,6 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
 
         # 5. Visuals
         if skip_svd:
-            # Disable SVD by zeroing its allocation just for this run
             cfg["video"] = {**cfg.get("video", {}), "use_svd_for_n_scenes": 0}
         vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
         write_json(out / "visuals.json", vis)
@@ -112,8 +137,17 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
 
         # 9. Upload
         if upload:
-            publish_at = _publish_at_for_slot(slot.get("schedule_utc"))
-            tags = [h.lstrip("#") for h in sc.get("hashtags", [])][:30]
+            publish_strategy = (cfg.get_path("publish_strategy", "immediate") or "immediate").lower()
+            tags_max = int(cfg.get_path("youtube.tags_max", 30))
+            tags = [h.lstrip("#") for h in sc.get("hashtags", [])][:tags_max]
+
+            if publish_strategy == "scheduled":
+                publish_at = _publish_at_for_slot(slot.get("schedule_utc"))
+                privacy = cfg.get_path("privacy_status_for_scheduled", "private")
+            else:
+                publish_at = None
+                privacy = cfg.get_path("default_privacy", "public")
+
             up = upload_video(
                 video_out,
                 title=sc["title"],
@@ -121,17 +155,19 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
                 tags=tags,
                 publish_at_iso=publish_at,
                 thumbnail_path=thumb_path,
-                privacy_status=cfg.get_path("privacy_status_for_scheduled", "private"),
+                privacy_status=privacy,
             )
             result["upload"] = up
         else:
             LOG.info("--no-upload set; skipping YouTube upload")
 
         result["ok"] = True
+        # Mark this theme as used only once the run actually produced a video.
+        ledger.record_theme(slot_id)
         write_json(out / "result.json", result)
         return result
     except Exception as e:  # noqa: BLE001
-        LOG.error("SLOT %s failed: %s\n%s", slot_id, e, traceback.format_exc())
+        LOG.error("THEME %s failed: %s\n%s", slot_id, e, traceback.format_exc())
         result["error"] = str(e)
         result["traceback"] = traceback.format_exc()
         write_json(out / "result.json", result)
@@ -158,9 +194,46 @@ def _pick_music(mood: str | None) -> Path | None:
     if music_dir.is_dir():
         tracks = sorted(p for p in music_dir.iterdir() if p.suffix.lower() in (".mp3", ".wav", ".m4a"))
         if tracks:
-            import random
             return random.choice(tracks)
     return None
+
+
+# ---------- theme selection ----------
+
+def _select_slots(cfg, ledger: Ledger, args) -> list[dict]:
+    """Resolve CLI flags into a concrete list of slot dicts the orchestrator will run."""
+    lanes = cfg.get("lanes", []) or []
+    if not lanes:
+        raise RuntimeError("No lanes defined. Check config/lanes.yaml.")
+
+    # 1. --theme: force a single theme
+    if args.theme:
+        theme = themes_mod.find_theme(args.theme, lanes)
+        if not theme:
+            raise SystemExit(f"Unknown --theme {args.theme!r}")
+        return [themes_mod.materialize_slot(theme, lanes)]
+
+    # 2. --random-batch: pick N themes (optionally filtered to one lane)
+    dedup_days = int(cfg.get_path("dedup_days", 30))
+    used = ledger.recent_theme_ids(days=dedup_days)
+
+    if args.random_batch:
+        vmin = args.videos_min if args.videos_min is not None else int(cfg.get_path("videos_min", 1))
+        vmax = args.videos_max if args.videos_max is not None else int(cfg.get_path("videos_max", 2))
+        vmin, vmax = max(1, vmin), max(vmin, vmax)
+        n = random.randint(vmin, vmax)
+        LOG.info("Random batch: picking %d theme(s) from pool (min=%d max=%d)", n, vmin, vmax)
+        picked = themes_mod.pick_themes(n, lanes_cfg=lanes, exclude_ids=used, only_lane=args.lane)
+        return [themes_mod.materialize_slot(t, lanes) for t in picked]
+
+    # 3. --lane only: produce one random theme inside that lane
+    if args.lane:
+        picked = themes_mod.pick_themes(1, lanes_cfg=lanes, exclude_ids=used, only_lane=args.lane)
+        return [themes_mod.materialize_slot(t, lanes) for t in picked]
+
+    # 4. No flags: produce one random theme from anywhere.
+    picked = themes_mod.pick_themes(1, lanes_cfg=lanes, exclude_ids=used)
+    return [themes_mod.materialize_slot(t, lanes) for t in picked]
 
 
 # ---------- entry point ----------
@@ -168,7 +241,16 @@ def _pick_music(mood: str | None) -> Path | None:
 def main(argv: list[str] | None = None) -> int:
     setup_logging(level="INFO")
     parser = argparse.ArgumentParser(description="utube — produce daily videos")
-    parser.add_argument("--slot", help="Run only one slot id (e.g. tech_news). Omit to run all.")
+    parser.add_argument("--random-batch", action="store_true",
+                        help="Pick a random N (videos_min..videos_max) themes from the pool")
+    parser.add_argument("--videos-min", type=int, default=None,
+                        help="Override videos_min from schedule.yaml")
+    parser.add_argument("--videos-max", type=int, default=None,
+                        help="Override videos_max from schedule.yaml")
+    parser.add_argument("--lane", default=None,
+                        help="Restrict random pick to this lane id (e.g. tech_news)")
+    parser.add_argument("--theme", default=None,
+                        help="Force a specific theme id (skips random pick)")
     parser.add_argument("--no-upload", action="store_true", help="Skip YouTube upload")
     parser.add_argument("--skip-svd", action="store_true", help="Skip SVD animation (Ken Burns only)")
     args = parser.parse_args(argv)
@@ -176,20 +258,16 @@ def main(argv: list[str] | None = None) -> int:
     upload = not args.no_upload and not env_bool("DRY_RUN")
 
     cfg = get_config()
-    slots = cfg.get("slots", []) or []
-    if args.slot:
-        slots = [s for s in slots if s["id"] == args.slot]
-        if not slots:
-            LOG.error("Unknown --slot %r. Available: %s",
-                      args.slot, [s["id"] for s in cfg.get("slots", [])])
-            return 2
-
     ledger = Ledger.load(repo_root() / "ledger.json")
+
+    slots = _select_slots(cfg, ledger, args)
 
     LOG.info("Run date: %s", run_date())
     LOG.info("Channel: %s", cfg.get_path("channel.name", "?"))
-    LOG.info("Slots to run: %s", [s["id"] for s in slots])
+    LOG.info("Themes to run: %s", [s["id"] for s in slots])
     LOG.info("Upload: %s", upload)
+    LOG.info("Publish strategy: %s",
+             cfg.get_path("publish_strategy", "immediate"))
 
     results = []
     for slot in slots:
@@ -200,7 +278,7 @@ def main(argv: list[str] | None = None) -> int:
 
     n_ok = sum(1 for r in results if r.get("ok"))
     LOG.info("=" * 72)
-    LOG.info("BATCH SUMMARY: %d / %d slots ok", n_ok, len(results))
+    LOG.info("BATCH SUMMARY: %d / %d themes ok", n_ok, len(results))
     for r in results:
         marker = "OK " if r.get("ok") else "FAIL"
         LOG.info("  [%s] %s — %s", marker, r["slot"], r.get("title") or r.get("error", ""))

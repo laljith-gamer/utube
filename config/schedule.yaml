@@ -1,7 +1,11 @@
-# Daily run schedule (workflow runs once a day, produces all slots in parallel,
-# uploads each with the slot's individual schedule_utc as publishAt).
+# Daily run schedule.
+#
+# Cron is now defined in .github/workflows/daily-random.yml as TWO windows
+# (5-6 AM IST and 6-7 AM IST). Each window picks a random number of videos
+# in [videos_min, videos_max] and uploads each immediately.
 
-cron_utc: "0 0 * * *"
-publish_strategy: scheduled            # "scheduled" → uses publishAt; "immediate" → public on upload
-privacy_status_for_scheduled: private  # required by YouTube when using publishAt
-dedup_days: 30                         # don't pick a topic whose hash matches one used in the last N days
+publish_strategy: immediate            # "immediate" -> public on upload (no publishAt)
+default_privacy: public                # public | unlisted | private
+videos_min: 1                          # minimum videos per window
+videos_max: 2                          # maximum videos per window
+dedup_days: 30                         # don't reuse a topic_hash OR theme_id within N days

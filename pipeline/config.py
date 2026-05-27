@@ -28,7 +28,7 @@ CONFIG_FILES = [
     "goal.yaml",
     "providers.yaml",
     "pipeline.yaml",
-    "niches.yaml",
+    "lanes.yaml",
     "schedule.yaml",
 ]
 
