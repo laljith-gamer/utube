@@ -1,9 +1,13 @@
 """TTS narration: per-segment + master MP3, audio bitrate/codec from config.
 
-Per-segment silence is trimmed (controlled by tts.trim_silence in providers.yaml)
-to remove the 200-300ms of dead air Edge-TTS pads each clip with. Across ~14
-segments per video this saves several seconds of pause and gives the final cut
-the wall-to-wall energy of pro Shorts.
+Per segment we run a single ffmpeg pass that:
+  1. Trims leading + trailing silence (kills the 200-300ms Edge-TTS dead air)
+  2. Speeds up audio via `atempo` so the configured `tts.default_rate` is
+     applied uniformly across providers (edge-tts can't handle SSML rate
+     reliably; gTTS has no rate parameter at all — post-processing fixes both).
+
+Across ~14 segments per video this saves several seconds of pause AND gives the
+final cut a pro Shorts pace, all in one ffmpeg invocation per segment.
 """
 from __future__ import annotations
 
@@ -31,6 +35,8 @@ def synthesize_narration(
     trim = bool(tts_cfg.get("trim_silence", True))
     silence_db = int(tts_cfg.get("silence_threshold_db", -45))
     keep_sec = float(tts_cfg.get("silence_keep_sec", 0.05))
+    rate_pct_str = str(tts_cfg.get("default_rate", "+0%"))
+    atempo_factor = _atempo_factor(rate_pct_str)
 
     voice = slot.get("voice", "en-US-AriaNeural")
     audio_dir = out_dir / "audio"
@@ -50,42 +56,90 @@ def synthesize_narration(
         mp3 = audio_dir / f"{name}.mp3"
         data = tts.synthesize(text, voice=voice)
         mp3.write_bytes(data)
-        if trim:
-            _trim_silence(mp3, silence_db=silence_db, keep_sec=keep_sec, codec=cfg.get("codec", "libmp3lame"), bitrate=cfg.get("bitrate", "128k"))
+        if trim or abs(atempo_factor - 1.0) > 0.005:
+            _postprocess_segment(
+                mp3,
+                trim=trim,
+                atempo_factor=atempo_factor,
+                silence_db=silence_db,
+                keep_sec=keep_sec,
+                codec=cfg.get("codec", "libmp3lame"),
+                bitrate=cfg.get("bitrate", "128k"),
+            )
         dur = _probe_duration(mp3)
-        per_scene.append({"name": name, "text": text, "file": str(mp3.relative_to(out_dir)), "duration": dur})
+        per_scene.append({
+            "name": name, "text": text,
+            "file": str(mp3.relative_to(out_dir)),
+            "duration": dur,
+        })
         seg_files.append(mp3)
-        LOG.info("  TTS %s -> %.2fs", name, dur)
+        LOG.info("  TTS %s -> %.2fs (atempo=%.3f)", name, dur, atempo_factor)
 
     master = audio_dir / "narration.mp3"
-    _ffmpeg_concat(seg_files, master, codec=cfg.get("codec", "libmp3lame"), bitrate=cfg.get("bitrate", "128k"))
+    _ffmpeg_concat(
+        seg_files, master,
+        codec=cfg.get("codec", "libmp3lame"),
+        bitrate=cfg.get("bitrate", "128k"),
+    )
     master_dur = _probe_duration(master)
 
     summary = {
         "voice": voice,
+        "atempo": atempo_factor,
         "master": str(master.relative_to(out_dir)),
         "master_duration": master_dur,
         "segments": per_scene,
     }
     (out_dir / "audio_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    LOG.info("Narration: %.2fs total across %d segments", master_dur, len(seg_files))
+    LOG.info("Narration: %.2fs total across %d segments (rate=%s)", master_dur, len(seg_files), rate_pct_str)
     return summary
 
 
-def _trim_silence(path: Path, *, silence_db: int, keep_sec: float, codec: str, bitrate: str) -> None:
-    """Trim leading + trailing silence from an MP3 in place.
+# ---------- helpers ----------
 
-    Uses the ``silenceremove,areverse,silenceremove,areverse`` idiom: the first
-    pass trims leading silence; reversing the audio then trimming again removes
-    what was originally the trailing silence (without touching mid-clip pauses).
+def _atempo_factor(rate_str: str) -> float:
+    """Convert '+12%' / '-10%' / '+0%' -> 1.12 / 0.90 / 1.00.
+
+    `atempo` accepts 0.5-2.0; we clamp to that to avoid ffmpeg errors.
     """
-    tmp = path.with_suffix(".trim.mp3")
-    af = (
-        f"silenceremove=start_periods=1:start_silence={keep_sec}:start_threshold={silence_db}dB,"
-        f"areverse,"
-        f"silenceremove=start_periods=1:start_silence={keep_sec}:start_threshold={silence_db}dB,"
-        f"areverse"
-    )
+    s = (rate_str or "+0%").strip().replace("%", "")
+    sign = -1.0 if s.startswith("-") else 1.0
+    try:
+        pct = float(s.lstrip("+-")) / 100.0
+    except ValueError:
+        return 1.0
+    return max(0.5, min(2.0, 1.0 + sign * pct))
+
+
+def _postprocess_segment(
+    path: Path, *,
+    trim: bool,
+    atempo_factor: float,
+    silence_db: int,
+    keep_sec: float,
+    codec: str,
+    bitrate: str,
+) -> None:
+    """Single ffmpeg pass: optional silence trim + optional tempo shift.
+
+    Uses `silenceremove,areverse,silenceremove,areverse` for trim so mid-clip
+    pauses are untouched, then optionally chains an `atempo=N` filter.
+    """
+    af_parts: list[str] = []
+    if trim:
+        af_parts.extend([
+            f"silenceremove=start_periods=1:start_silence={keep_sec}:start_threshold={silence_db}dB",
+            "areverse",
+            f"silenceremove=start_periods=1:start_silence={keep_sec}:start_threshold={silence_db}dB",
+            "areverse",
+        ])
+    if abs(atempo_factor - 1.0) > 0.005:
+        af_parts.append(f"atempo={atempo_factor:.4f}")
+    if not af_parts:
+        return
+
+    af = ",".join(af_parts)
+    tmp = path.with_suffix(".pp.mp3")
     cmd = [
         "ffmpeg", "-y", "-i", str(path),
         "-af", af,
@@ -98,8 +152,9 @@ def _trim_silence(path: Path, *, silence_db: int, keep_sec: float, codec: str, b
     else:
         if tmp.exists():
             tmp.unlink(missing_ok=True)
-        LOG.warning("silence trim failed for %s (leaving original): %s",
-                    path.name, (res.stderr or "").strip().splitlines()[-1] if res.stderr else "?")
+        last = (res.stderr or "").strip().splitlines()
+        LOG.warning("audio post-process failed for %s (leaving original): %s",
+                    path.name, last[-1] if last else "?")
 
 
 def _ffmpeg_concat(files: list[Path], output: Path, *, codec: str, bitrate: str) -> None:
