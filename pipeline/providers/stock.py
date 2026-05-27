@@ -1,4 +1,9 @@
-"""Stock B-roll router — Pexels + Pixabay, fully config-driven."""
+"""Stock B-roll router — Pexels + Pixabay, fully config-driven.
+
+The find_video method takes an ordered list of queries; we try each in turn
+until one matches. Caller passes the most-specific (key_subject) first and
+broader fallbacks (broll_keywords) after.
+"""
 from __future__ import annotations
 
 import logging
@@ -21,8 +26,18 @@ class StockRouter:
         self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
         self.timeout = self.cfg.get("request_timeout_sec", 120)
 
-    def find_video(self, keywords: list[str], *, orientation: str = "portrait") -> bytes | None:
-        for kw in keywords:
+    def find_video(self, queries: list[str], *, orientation: str = "portrait") -> bytes | None:
+        """Try each query in order, across all providers in chain. First hit wins."""
+        # Filter empty / dedupe while preserving order
+        seen: set[str] = set()
+        ordered: list[str] = []
+        for q in queries:
+            q = (q or "").strip()
+            if q and q.lower() not in seen:
+                seen.add(q.lower())
+                ordered.append(q)
+
+        for q in ordered:
             for name in self.chain:
                 p = self.providers.get(name)
                 if not p:
@@ -32,15 +47,16 @@ class StockRouter:
                     continue
                 try:
                     if name == "pexels":
-                        url = self._pexels(p, kw, orientation, api_key)
+                        url = self._pexels(p, q, orientation, api_key)
                     elif name == "pixabay":
-                        url = self._pixabay(p, kw, api_key)
+                        url = self._pixabay(p, q, api_key)
                     else:
                         continue
                     if url:
                         return self._download(url)
                 except Exception as e:  # noqa: BLE001
-                    LOG.warning("Stock provider %s failed for %r: %s", name, kw, e)
+                    LOG.warning("Stock provider %s failed for %r: %s", name, q, e)
+        LOG.info("Stock: no match for any of %d queries", len(ordered))
         return None
 
     def _pexels(self, p: dict, query: str, orientation: str, api_key: str) -> str | None:
@@ -64,7 +80,7 @@ class StockRouter:
             key=lambda f: abs((f.get("width") or 0) - target_w),
         )
         if files:
-            LOG.info("B-roll via Pexels: %s", query)
+            LOG.info("B-roll via Pexels: %r → %s", query, files[0]["link"][:80])
             return files[0]["link"]
         return None
 
@@ -84,7 +100,7 @@ class StockRouter:
         for size_key in ("medium", "large", "small", "tiny"):
             sized = v.get("videos", {}).get(size_key, {})
             if sized.get("url"):
-                LOG.info("B-roll via Pixabay: %s", query)
+                LOG.info("B-roll via Pixabay: %r → %s", query, sized["url"][:80])
                 return sized["url"]
         return None
 

@@ -13,6 +13,14 @@ Angle: {angle}
 Research brief:
 {research_brief}
 
+You are also acting as the human EDITOR of this channel. Real editors:
+- Match the visual to the literal subject of every sentence ("when she says
+  'stack of money', show a stack of money").
+- Throw a big text overlay on screen when a number, dollar amount, or
+  percentage is dropped — like a magazine headline.
+- Build subscriber loyalty: ask the viewer something, give them a reason
+  to follow, tease the next video.
+
 Hard rules — break ANY of these and the script is rejected:
 - Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
   Voice will play back at +15-20% speed, so write CRISP — the spoken pacing
@@ -23,14 +31,25 @@ Hard rules — break ANY of these and the script is rejected:
   No "let's dive in", no "in this video", no "hey guys".
 - First sentence of `hook` MUST contain a number, dollar amount, percentage,
   comparison, or world-first claim — it has to LAND in {hook_max_seconds} seconds.
-- Use the channel's hook_patterns and shock_numbers from the research brief.
 - Each scene ends with a small cliff that pulls the viewer into the next
   (an unanswered "but why?", "until...", "then...").
+- `key_subject` per scene MUST be a literal, searchable noun phrase you'd
+  type into a stock-footage site (good: "hands typing on laptop keyboard",
+  "stack of dollar bills", "AI robot face close-up", "server room red lights";
+  bad: "the AI revolution", "shocking moment", "future of tech").
+- `text_overlay` is OPTIONAL per scene. ONLY set it when the narration says
+  a concrete number, money amount, percentage, year, or 1-3 word power
+  phrase that benefits from a magazine-headline overlay. ALL CAPS, max 6
+  characters or 2 short words. Otherwise leave it as empty string "".
 - Visual prompts: photoreal cinematic. NEVER include words "diagram",
   "infographic", "screenshot", "PowerPoint" — we want film-style imagery.
+- CTA must explicitly invite engagement: a question to comment on, OR a
+  reason to follow ("Save this — part 2 drops tomorrow", "Follow if you
+  want more breaches like this", etc.). Not generic "subscribe please".
 - Title <= {title_max_chars} chars, no clickbait LIES, but lead with the
   shock number/claim in the title.
-- Description includes the angle, 1 source URL, hashtags, and the disclosure: "{ai_disclosure}".
+- Description includes the angle, 1 source URL, hashtags, and the
+  disclosure: "{ai_disclosure}".
 - Hashtags: 5-8, mixing #shorts plus topical tags relevant to the niche.
 - Thumbnail text: 3-4 punchy ALL-CAPS words max, like a magazine cover.
 
@@ -41,12 +60,14 @@ Respond with ONLY this JSON shape, no prose, no preamble:
     {{
       "narration":     "<one or two punchy sentences, {sent_min}-{sent_max} words each>",
       "duration_sec":  <int between {scene_min_seconds} and {scene_max_seconds}>,
+      "key_subject":   "<literal searchable noun phrase, see rules>",
       "visual_prompt": "<cinematic SDXL prompt; the style_suffix is added automatically>",
       "broll_keywords":["<3-5 stock-search keywords as a fallback>"],
-      "use_motion":    <true|false>
+      "use_motion":    <true|false>,
+      "text_overlay":  "<optional: ALL CAPS 1-3 words / 1-6 chars, or empty string>"
     }}
   ],
-  "cta": "<final line that drives a comment or follow — a question or call>",
+  "cta": "<final line that drives a comment OR follow — concrete reason>",
   "title":            "<= {title_max_chars} chars, leads with the shock number/claim>",
   "description":      "<2-3 sentences + source URL + #hashtags + disclosure>",
   "hashtags":         ["#shorts", "#..."],

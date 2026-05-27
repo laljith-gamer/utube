@@ -1,24 +1,28 @@
 # 5 niche lanes — one slot = one daily video.
-# Each slot defines: title, sources, voice + per-niche pacing (rate/pitch),
-# visual style suffix (appended to every visual prompt for cinematic feel),
-# style_keywords (vocabulary the LLM is encouraged to use), schedule, music.
+# Sources are RSS-first because Reddit aggressively blocks anonymous JSON
+# access from datacenter IPs (GitHub Actions runners). Reddit is kept as a
+# "best-effort bonus" in some lanes and never breaks the pipeline if blocked.
 
 slots:
   - id: mind_blowing_ai
     title: "Mind-Blowing AI Reveals"
     angle_hint: "An AI just did something no human can — what is it and how it works."
     sources:
-      - type: reddit
-        subreddits: [MachineLearning, LocalLLaMA, singularity, artificial]
-        time_filter: day
       - type: rss
         urls:
           - https://huggingface.co/blog/feed.xml
+          - https://blog.google/technology/ai/rss/
+          - https://openai.com/blog/rss.xml
+          - https://www.technologyreview.com/feed/
+          - https://blogs.nvidia.com/blog/category/deep-learning/feed/
       - type: hackernews
         front_page: true
+      - type: reddit
+        subreddits: [MachineLearning, LocalLLaMA, singularity]
+        time_filter: day
     voice: en-US-GuyNeural
     voice_rate: "+18%"
-    voice_pitch: "+2Hz"
+    voice_pitch: "+0Hz"
     voice_style: hyped
     style: cinematic_futuristic
     style_suffix: "cinematic, dramatic lighting, ultra-sharp, vibrant colors, hyperreal, high contrast, motion blur, 8k"
@@ -31,12 +35,15 @@ slots:
     title: "Tech Money Shocks"
     angle_hint: "A jaw-dropping number — billion-dollar deal, 99% margin, 30-second loss — explained fast."
     sources:
-      - type: hackernews
-        front_page: true
       - type: rss
         urls:
           - https://techcrunch.com/feed/
           - https://www.theverge.com/rss/index.xml
+          - https://www.engadget.com/rss.xml
+          - https://feeds.reuters.com/reuters/technologyNews
+          - https://feeds.bloomberg.com/technology/news.rss
+      - type: hackernews
+        front_page: true
       - type: reddit
         subreddits: [technology, business]
         time_filter: day
@@ -56,13 +63,18 @@ slots:
     angle_hint: "An obscure tech fact that sounds fake but is verifiably true."
     sources:
       - type: wikipedia_otd
+      - type: hackernews
+        front_page: true
+      - type: github_trending
+      - type: rss
+        urls:
+          - https://news.ycombinator.com/rss
       - type: reddit
         subreddits: [todayilearned, technology, gadgets]
         time_filter: day
-      - type: github_trending
     voice: en-US-AvaMultilingualNeural
     voice_rate: "+12%"
-    voice_pitch: "+1Hz"
+    voice_pitch: "+0Hz"
     voice_style: friendly_storyteller
     style: vibrant_reveal
     style_suffix: "soft cinematic lighting, warm color grade, shallow depth of field, ultra-detailed, magazine-quality, 8k"
@@ -75,16 +87,21 @@ slots:
     title: "Cyber Heist Stories"
     angle_hint: "How hackers stole / broke / hijacked something this week — fast retelling."
     sources:
-      - type: reddit
-        subreddits: [netsec, cybersecurity, hacking]
-        time_filter: day
       - type: rss
         urls:
           - https://feeds.feedburner.com/TheHackersNews
           - https://krebsonsecurity.com/feed/
+          - https://www.bleepingcomputer.com/feed/
+          - https://www.darkreading.com/rss.xml
+          - https://www.schneier.com/feed/atom/
+      - type: hackernews
+        front_page: true
+      - type: reddit
+        subreddits: [netsec, cybersecurity]
+        time_filter: day
     voice: en-US-DavisNeural
     voice_rate: "+10%"
-    voice_pitch: "-2Hz"
+    voice_pitch: "+0Hz"
     voice_style: thriller_narrator
     style: dark_cyber_thriller
     style_suffix: "dark cyber-noir aesthetic, green terminal glow, dramatic shadows, glitch artifacts, hyperreal, 8k"
@@ -97,16 +114,21 @@ slots:
     title: "Future Tech Mind-Bend"
     angle_hint: "A bold near-future prediction backed by something already happening today."
     sources:
-      - type: reddit
-        subreddits: [Futurology, science, Damnthatsinteresting]
-        time_filter: day
       - type: rss
         urls:
           - https://www.arstechnica.com/feed/
           - https://www.technologyreview.com/feed/
+          - https://spectrum.ieee.org/feeds/feed.rss
+          - https://www.newscientist.com/section/technology/feed/
+          - https://www.wired.com/feed/category/science/latest/rss
+      - type: hackernews
+        front_page: true
+      - type: reddit
+        subreddits: [Futurology, science]
+        time_filter: day
     voice: en-US-JennyNeural
     voice_rate: "+12%"
-    voice_pitch: "+1Hz"
+    voice_pitch: "+0Hz"
     voice_style: cinematic_curious
     style: epic_cinematic
     style_suffix: "epic cinematic wide shot, golden hour lighting, volumetric atmosphere, dramatic perspective, 8k"
