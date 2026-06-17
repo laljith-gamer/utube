@@ -67,15 +67,32 @@ captions:
   words_per_chunk: 3               # how many words per caption cue
 
 thumbnail:
-  width: 1280
-  height: 720
-  jpeg_quality: 88
-  text_height_ratio: 0.16
-  text_y_ratio: 0.55
-  text_line_spacing_ratio: 0.18
-  margin_left: 40
-  stroke_width: 3
-  darken_overlay_alpha: 140        # 0-255, bottom-half darkening for legibility
+  width: 1080
+  height: 1920
+  jpeg_quality: 92
+  prompt_suffix: "vertical 9:16 YouTube Shorts thumbnail, cinematic close-up, high contrast, dramatic lighting, sharp subject, clean negative space for bold title text, premium viral thumbnail composition, no text, no watermark"
+  enhance_contrast: 1.12
+  enhance_color: 1.08
+  enhance_sharpness: 1.15
+  text_height_ratio: 0.135
+  text_min_height_ratio: 0.07
+  text_y_ratio: 0.66
+  text_line_spacing_ratio: 0.08
+  text_max_width_ratio: 0.86
+  text_max_lines: 3
+  text_align: center
+  margin_left: 72
+  stroke_width: 5
+  darken_overlay_alpha: 165        # 0-255, lower-half darkening for portrait readability
+  top_overlay_alpha: 60
+  vignette_alpha: 110
+  accent_bar_height_ratio: 0.012
+  text_panel_alpha: 145
+  text_panel_padding_ratio: 0.028
+  text_panel_radius_ratio: 0.028
+  text_shadow_offset_ratio: 0.006
+  badge_text: ""
+  badge_height_ratio: 0.042
   font_paths:
     - /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
     - /usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf
