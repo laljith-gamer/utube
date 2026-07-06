@@ -21,7 +21,9 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
+import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +33,12 @@ from ..config import get_config
 from ..utils import env
 
 LOG = logging.getLogger("utube.tts")
+
+# Per-request character ceiling enforced client-side. Some Camb.ai plans cap
+# each request (e.g. the free tier at 500); we split the text ourselves and
+# concatenate the resulting audio so a long script still synthesizes in one
+# logical utterance without exceeding the per-request quota.
+CAMB_CHUNK_CHAR_LIMIT = 480
 
 
 class TTSRouter:
@@ -123,11 +131,36 @@ class TTSRouter:
         }
         url = p.get("url", "https://client.camb.ai/apis/tts-stream")
 
+        # Split long text so each request stays under the plan's per-request
+        # character ceiling (e.g. the free tier caps at 500). We split on
+        # sentence/phrase boundaries so delivery stays natural across seams.
+        text_chunks = self._camb_chunk_text(text, CAMB_CHUNK_CHAR_LIMIT)
         LOG.info(
-            "TTS via Camb.ai (model=%s, voice_id=%s)",
+            "TTS via Camb.ai (model=%s, voice_id=%s, chunks=%d, chars=%d)",
             payload.get("speech_model"),
             payload.get("voice_id"),
+            len(text_chunks),
+            len(text or ""),
         )
+
+        audio_parts: list[bytes] = []
+        for i, chunk_text in enumerate(text_chunks):
+            chunk_payload = dict(payload)
+            chunk_payload["text"] = chunk_text
+            audio_parts.append(self._camb_request(url, chunk_payload, headers, index=i))
+            # Be gentle between requests so we don't trip rate limits.
+            if i < len(text_chunks) - 1:
+                time.sleep(1.0)
+
+        data = b"".join(audio_parts)
+        if not data:
+            raise RuntimeError("Camb.ai returned empty audio")
+        return data
+
+    def _camb_request(
+        self, url: str, payload: dict, headers: dict, *, index: int
+    ) -> bytes:
+        """One streaming Camb.ai request. Returns raw audio bytes."""
         with requests.post(
             url,
             json=payload,
@@ -139,11 +172,66 @@ class TTSRouter:
                 body = (r.text or "").strip()
                 raise RuntimeError(f"Camb.ai HTTP {r.status_code}: {body[:500]}")
             chunks = [chunk for chunk in r.iter_content(chunk_size=64 * 1024) if chunk]
+        if not chunks:
+            raise RuntimeError(f"Camb.ai returned empty audio for chunk {index}")
+        return b"".join(chunks)
 
-        data = b"".join(chunks)
-        if not data:
-            raise RuntimeError("Camb.ai returned empty audio")
-        return data
+    @staticmethod
+    def _camb_chunk_text(text: str, limit: int) -> list[str]:
+        """Split text into <=limit-char pieces at sentence/phrase boundaries.
+
+        Keeps punctuation with its sentence. A single sentence longer than
+        `limit` is hard-split on whitespace so we never send an over-limit
+        request regardless of input.
+        """
+        if not text or not text.strip():
+            return [text] if text else []
+        text = text.strip()
+        if limit <= 0 or len(text) <= limit:
+            return [text]
+
+        # Greedy packing: accumulate sentences until adding the next would
+        # exceed the limit, then flush. Sentence split on . ! ? followed by
+        # optional quotes/space and keep the delimiter.
+        sentences = re.split(r"(?<=[.!?])\s+", text)
+        chunks: list[str] = []
+        cur = ""
+        for sent in sentences:
+            if not sent:
+                continue
+            # A single sentence over the limit gets hard-wrapped on words.
+            if len(sent) > limit:
+                if cur:
+                    chunks.append(cur)
+                    cur = ""
+                words = sent.split(" ")
+                buf = ""
+                for w in words:
+                    # A token with no breakable spaces (e.g. a long URL) still
+                    # must be split so no request exceeds the ceiling.
+                    if len(w) > limit:
+                        if buf:
+                            chunks.append(buf)
+                            buf = ""
+                        for i in range(0, len(w), limit):
+                            chunks.append(w[i:i + limit])
+                        continue
+                    if buf and len(buf) + 1 + len(w) > limit:
+                        chunks.append(buf)
+                        buf = w
+                    else:
+                        buf = (buf + " " + w).strip()
+                if buf:
+                    chunks.append(buf)
+                continue
+            if cur and len(cur) + 1 + len(sent) > limit:
+                chunks.append(cur)
+                cur = sent
+            else:
+                cur = (cur + " " + sent).strip()
+        if cur:
+            chunks.append(cur)
+        return chunks
 
     @staticmethod
     def _camb_voice_id(voice: str, params: dict) -> int:
