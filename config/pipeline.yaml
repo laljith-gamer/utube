@@ -46,7 +46,7 @@ script:
   # tokens left for the actual JSON output. "high" causes truncation where the
   # model spends the entire budget reasoning and never writes the answer.
   reasoning_effort: low
-  # 3.0 wps written * +12% TTS rate ~= 200 wpm spoken (pro Shorts pace).
+  # 3.0 wps written with Camb speaking_rate ~= 1.08 gives a brisk Shorts pace.
   # If videos sound rushed, drop to 2.7. If too slow, push to 3.2.
   words_per_second: 3.0
   hook_max_seconds: 2              # first 2s decides retention on Shorts

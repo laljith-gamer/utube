@@ -1,19 +1,20 @@
-"""TTS router — config-driven multi-provider chain with full error visibility.
+"""TTS router - config-driven multi-provider chain with full error visibility.
 
 Providers
 ---------
+camb   : Camb.ai streaming TTS. High-quality MARS voices with instruction-based
+         delivery control. Requires CAMB_API_KEY.
 edge   : Microsoft Edge TTS via the edge-tts python lib. No API key. High quality
          but flaky from cloud runners (~5-10% empty-response rate).
 gtts   : Google Translate TTS via the gTTS python lib. No API key. Lower quality
          voice but extremely reliable; used as the no-network-key fallback.
 
-Speed control is applied AFTER synthesis via ffmpeg's `atempo` filter (see
-pipeline/stages/audio.py). Sending SSML rate to Microsoft's Edge endpoint
-triggers extra rejections, and gTTS has no rate parameter, so post-processing
-is the simplest path that works for every provider.
+Optional speed control is applied after synthesis via ffmpeg's `atempo` filter
+(see pipeline/stages/audio.py). Camb should generally use native
+`voice_settings.speaking_rate`; Edge and gTTS stay at neutral provider speed.
 
-If you re-introduce a paid provider (NVIDIA NIM Magpie etc.), follow the
-existing `_xxx()` pattern: synthesize at neutral speed, return MP3 bytes.
+If you re-introduce another paid provider (NVIDIA NIM Magpie etc.), follow the
+existing `_xxx()` pattern: synthesize at natural speed and return audio bytes.
 """
 from __future__ import annotations
 
@@ -41,10 +42,10 @@ class TTSRouter:
         self.timeout = self.cfg.get("request_timeout_sec", 120)
 
     def synthesize(self, text: str, *, voice: str, prefer_premium: bool = False) -> bytes:
-        """Try each provider in order; return MP3 bytes from the first success.
+        """Try each provider in order; return audio bytes from the first success.
 
-        Speed-up is applied later (audio.py atempo). All providers should
-        return audio at NATURAL speed.
+        Providers should return natural, unmodified audio. The audio stage
+        handles format normalization and optional post-processing.
         """
         chain = list(self.chain)
         if prefer_premium and "nim_magpie" in chain:
@@ -56,6 +57,8 @@ class TTSRouter:
             p = self.providers.get(name) or {}
             try:
                 backend = p.get("backend") or name
+                if backend == "camb_tts" or name == "camb":
+                    return self._camb_tts(p, text, voice)
                 if backend == "edge_tts":
                     return self._edge_tts(text, voice)
                 if backend == "gtts":
@@ -72,6 +75,110 @@ class TTSRouter:
         # Surface every error so the next debugging session doesn't need
         # another round-trip through the workflow logs.
         raise RuntimeError("All TTS providers failed.\n  - " + "\n  - ".join(errors))
+
+    # ------------------------------------------------------------------ camb
+
+    def _camb_tts(self, p: dict, text: str, voice: str) -> bytes:
+        """Synthesize with Camb.ai's streaming TTS endpoint.
+
+        The narration script is passed as `text` exactly as received. Human
+        delivery guidance belongs in Camb's `user_instructions`, which lets us
+        shape pacing and emphasis without inserting tags or rewriting words.
+        """
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError("Camb.ai key not set")
+
+        params = p.get("params", {}) or {}
+        speech_model = str(params.get("speech_model", "mars-instruct"))
+        payload: dict[str, Any] = {
+            "text": text,
+            "language": str(params.get("language") or self._camb_language_from_voice(voice)).lower(),
+            "voice_id": self._camb_voice_id(voice, params),
+            "speech_model": speech_model,
+        }
+
+        user_instructions = params.get("user_instructions")
+        if user_instructions and speech_model == "mars-instruct":
+            payload["user_instructions"] = str(user_instructions)
+
+        output_configuration = params.get("output_configuration")
+        if not output_configuration and params.get("output_format"):
+            output_configuration = {"format": params.get("output_format")}
+        if output_configuration:
+            payload["output_configuration"] = output_configuration
+
+        for key in (
+            "voice_settings",
+            "inference_options",
+            "enhance_named_entities_pronunciation",
+        ):
+            if key in params:
+                payload[key] = params[key]
+
+        payload = self._drop_none(payload)
+        headers = {
+            "x-api-key": api_key,
+            "Content-Type": "application/json",
+        }
+        url = p.get("url", "https://client.camb.ai/apis/tts-stream")
+
+        LOG.info(
+            "TTS via Camb.ai (model=%s, voice_id=%s)",
+            payload.get("speech_model"),
+            payload.get("voice_id"),
+        )
+        with requests.post(
+            url,
+            json=payload,
+            headers=headers,
+            stream=True,
+            timeout=self.timeout,
+        ) as r:
+            if r.status_code >= 400:
+                body = (r.text or "").strip()
+                raise RuntimeError(f"Camb.ai HTTP {r.status_code}: {body[:500]}")
+            chunks = [chunk for chunk in r.iter_content(chunk_size=64 * 1024) if chunk]
+
+        data = b"".join(chunks)
+        if not data:
+            raise RuntimeError("Camb.ai returned empty audio")
+        return data
+
+    @staticmethod
+    def _camb_voice_id(voice: str, params: dict) -> int:
+        for candidate in (voice, params.get("voice_id"), params.get("default_voice_id")):
+            if candidate is None:
+                continue
+            s = str(candidate).strip()
+            for prefix in ("camb:", "voice_id:"):
+                if s.lower().startswith(prefix):
+                    s = s[len(prefix):].strip()
+            if s.isdigit():
+                return int(s)
+        raise RuntimeError("Camb.ai voice_id is not configured")
+
+    @staticmethod
+    def _camb_language_from_voice(voice: str) -> str:
+        if not voice:
+            return "en-us"
+        parts = voice.split("-")
+        if len(parts) >= 2 and len(parts[0]) == 2 and len(parts[1]) == 2:
+            return f"{parts[0]}-{parts[1]}".lower()
+        return "en-us"
+
+    @classmethod
+    def _drop_none(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            cleaned = {}
+            for k, v in value.items():
+                if v is None:
+                    continue
+                nested = cls._drop_none(v)
+                if nested != {}:
+                    cleaned[k] = nested
+            return cleaned
+        return value
 
     # ------------------------------------------------------------------ edge
 
@@ -105,7 +212,7 @@ class TTSRouter:
     def _gtts(self, text: str, voice: str, params: dict) -> bytes:
         """Google Translate TTS — robust no-key fallback.
 
-        gTTS has no rate parameter; post-processing applies our +12%.
+        gTTS has no rate parameter; post-processing can apply a configured rate.
         Voice is mapped from Edge-style IDs to gtts (lang, tld) pairs:
             en-US-XxxNeural -> lang='en', tld='com'
             en-GB-XxxNeural -> lang='en', tld='co.uk'

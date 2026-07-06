@@ -1,11 +1,11 @@
 # All external service endpoints, models, and their default parameters.
-# Add or reorder providers here — no code changes needed.
-# `chain` = order in which providers are tried (first match wins on failure).
+# Add or reorder providers here; no code changes needed.
+# `chain` = order in which providers are tried.
 
 llm:
   chain: [nvidia_nim, cerebras, groq, openrouter]
   request_timeout_sec: 120
-  # gpt-oss reasoning consumes tokens internally. Auto-bump max_tokens to at least:
+  # gpt-oss reasoning consumes tokens internally. Auto-bump max_tokens to at least
   # these values to leave room for the actual answer after reasoning completes.
   reasoning_token_floor:
     low: 3000
@@ -74,29 +74,55 @@ video:
       cold_start_retry_sec: 30
 
 tts:
-  # edge -> gtts. Both are no-API-key. Microsoft's Edge endpoint refuses ~5-10%
-  # of cloud-runner requests; gTTS hits Google Translate from a different host,
-  # so the two providers are independent failure modes.
-  # `nim_magpie` is intentionally NOT in the chain — NVIDIA's URL 404s; re-enable
-  # this entry only after confirming the new endpoint path on the NIM catalog.
-  chain: [edge, gtts]
-  # Speed-up is applied via ffmpeg `atempo` in audio.py post-processing, NOT via
-  # SSML. SSML rate triggers extra rejections from Microsoft's endpoint, and
-  # gTTS has no rate parameter at all. Post-processing works for both.
-  default_rate: "+12%"             # +12% on top of natural TTS speed
-  default_pitch: "+0Hz"            # kept for future TTS providers; ignored today
-  trim_silence: true               # trim leading/trailing silence per segment
-  silence_threshold_db: -45        # silence detection threshold
-  silence_keep_sec: 0.05           # leave a tiny breath so cuts don't sound clipped
+  # Camb.ai is primary for ultra-natural narration. Edge and gTTS remain
+  # no-key fallbacks so local dry runs can still produce audio if CAMB_API_KEY
+  # is not configured.
+  chain: [camb, edge, gtts]
+  # Camb controls pace natively through voice_settings.speaking_rate. Keep
+  # ffmpeg atempo neutral so the voice stays human instead of artificially sped.
+  default_rate: "+0%"
+  default_pitch: "+0Hz"
+  continuous_narration: true
+  normalize_output: true
+  trim_silence: true
+  silence_threshold_db: -45
+  silence_keep_sec: 0.05
   request_timeout_sec: 120
   providers:
-    edge:
-      backend: edge_tts             # uses the edge-tts python lib (no key, no URL)
-    gtts:
-      backend: gtts                 # google translate TTS (no key, very reliable)
+    camb:
+      backend: camb_tts
+      url: https://client.camb.ai/apis/tts-stream
+      api_key_env: CAMB_API_KEY
       params:
-        slow: false                 # natural speed (we apply rate via atempo)
-    nim_magpie:                     # NOT in chain — endpoint 404s as of 2026-05.
+        language: en-us
+        voice_id: 147320
+        speech_model: mars-instruct
+        user_instructions: >-
+          Speak like a calm friend explaining something fascinating. Keep the
+          delivery ultra-natural, continuous, clear, subtly expressive, brisk
+          but comfortable, and never robotic, theatrical, dramatic, or like a
+          news anchor. Preserve the supplied text exactly; do not rewrite,
+          summarize, add, remove, repeat, or skip any words. Use natural
+          emphasis on important words, slight pacing variation for hooks,
+          facts, reveals, and endings, and only tiny human-like pauses where
+          they feel natural.
+        enhance_named_entities_pronunciation: true
+        output_configuration:
+          format: wav
+          apply_enhancement: true
+        voice_settings:
+          enhance_reference_audio_quality: false
+          maintain_source_accent: false
+          speaking_rate: 1.08
+        inference_options:
+          inference_steps: 60
+    edge:
+      backend: edge_tts
+    gtts:
+      backend: gtts
+      params:
+        slow: false
+    nim_magpie:
       url: https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual
       api_key_env: NVIDIA_NIM_API_KEY
       params:
@@ -120,7 +146,7 @@ stock:
       safesearch: true
 
 youtube:
-  category_id: "28"                # 28 = Science & Technology
+  category_id: "28"
   upload_chunk_size_mb: 8
   scopes: ["https://www.googleapis.com/auth/youtube.upload"]
   default_made_for_kids: false

@@ -101,6 +101,7 @@ jobs:
           CEREBRAS_API_KEY:   ${{ secrets.CEREBRAS_API_KEY }}
           GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CAMB_API_KEY:       ${{ secrets.CAMB_API_KEY }}
           HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
           PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}

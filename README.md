@@ -34,14 +34,14 @@ discover  →  research  →  script  →  TTS  →  SDXL images
 
 Edit `config/niches.yaml` to retune sources, voices, palettes, schedule.
 
-## Provider stack (all free)
+## Provider stack
 
 | Component  | Primary                        | Fallback 1                  | Fallback 2 |
 |---|---|---|---|
 | LLM        | NVIDIA NIM `gpt-oss-120b`      | Cerebras `gpt-oss-120b`     | Groq / OpenRouter |
 | Images     | NIM SDXL                       | Pollinations.ai (no key)    | HuggingFace FLUX |
 | Video (SVD)| NIM Stable-Video-Diffusion     | HuggingFace SVD-XT-1.1      | — |
-| TTS        | edge-tts (no key, unlimited)   | NIM Magpie TTS              | — |
+| TTS        | Camb.ai MARS Instruct          | edge-tts (no key)           | gTTS |
 | Captions   | faster-whisper (CPU)           | —                           | — |
 | Stock B-roll | Pexels API                   | Pixabay API                 | — |
 | Upload     | YouTube Data API v3 OAuth      | —                           | — |
@@ -59,6 +59,7 @@ The pipeline self-heals: if a provider is rate-limited or down, the next one in 
 | NVIDIA NIM    | https://build.nvidia.com         | recommended |
 | Cerebras      | https://cloud.cerebras.ai        | recommended (LLM fallback, 14,400 req/day) |
 | Groq          | https://console.groq.com         | optional (LLM fallback) |
+| Camb.ai       | https://studio.camb.ai           | recommended (primary TTS) |
 | Pexels        | https://pexels.com/api           | recommended (B-roll) |
 | Pixabay       | https://pixabay.com/api/docs     | optional (B-roll) |
 | HuggingFace   | https://huggingface.co/settings/tokens | optional (image/video fallback) |
@@ -96,6 +97,7 @@ You only need **one LLM provider** to start; more = better resilience.
 | `CEREBRAS_API_KEY`       |   |
 | `GROQ_API_KEY`           |   |
 | `OPENROUTER_API_KEY`     |   |
+| `CAMB_API_KEY`           | primary TTS narration |
 | `HUGGINGFACE_API_KEY`    | optional |
 | `PEXELS_API_KEY`         | recommended |
 | `PIXABAY_API_KEY`        | optional |
@@ -167,7 +169,7 @@ pipeline/
     llm.py                # NIM → Cerebras → Groq → OpenRouter
     image.py              # NIM SDXL → Pollinations → HF FLUX
     video.py              # NIM SVD → HF SVD-XT
-    tts.py                # edge-tts → NIM Magpie
+    tts.py                # Camb.ai -> edge-tts -> gTTS
     stock.py              # Pexels → Pixabay
     youtube.py            # OAuth refresh-token uploader, publishAt scheduling
   stages/
@@ -199,6 +201,7 @@ ledger.json               # auto-committed by daily workflow
 
 - **GitHub Actions:** public repo = unlimited minutes; private = 2,000 min/mo (~12 daily runs/min × 30 days fits easily).
 - **YouTube quota:** 1 upload + thumbnail ≈ 1,650 units. 5 uploads/day = 8,250 / 10,000 units. Comfortable.
+- **Camb.ai:** set `CAMB_API_KEY` for the primary natural narration path. Without it, the pipeline falls back to edge-tts and gTTS.
 - **NIM trial credits** deplete over weeks. Once they do, Pollinations + Cerebras + edge-tts keep the pipeline alive at zero cost.
 - **YouTube channel limit:** ~100 uploads/day (undocumented). Won't matter at 5/day.
 
