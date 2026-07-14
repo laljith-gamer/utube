@@ -182,7 +182,10 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
             f"OutlineColour=&H{cs.get('outline_color_hex', '00000000')},"
             f"Outline={int(cs.get('outline_width', 3))},"
             f"Alignment={int(cs.get('alignment', 2))},"
-            f"MarginV={int(cs.get('margin_v', 110))}"
+            f"MarginL={int(cs.get('margin_l', 80))},"
+            f"MarginR={int(cs.get('margin_r', 80))},"
+            f"MarginV={int(cs.get('margin_v', 110))},"
+            f"WrapStyle={int(cs.get('wrap_style', 0))}"
         )
         filter_parts.append(f"[0:v]subtitles='{sub_path}':force_style='{style}'[v]")
     else:

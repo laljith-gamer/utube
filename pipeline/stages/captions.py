@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
 
 from ..config import get_config
 
@@ -21,7 +22,7 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
     beam = int(cfg.get("beam_size", 1))
     word_ts = bool(cfg.get("word_timestamps", True))
     vad = bool(cfg.get("vad_filter", True))
-    chunk_size = int(cfg.get("words_per_chunk", 3))
+    layout = _layout_cfg(cfg)
 
     try:
         from faster_whisper import WhisperModel
@@ -34,33 +35,128 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
             word_timestamps=word_ts,
             vad_filter=vad,
         )
-        lines: list[str] = []
-        idx = 1
+        timed_cues: list[tuple[float, float, str]] = []
         for seg in segments:
             words = list(seg.words or [])
             if not words:
-                lines.append(_srt_block(idx, seg.start, seg.end, seg.text.strip()))
-                idx += 1
+                timed_cues.extend(
+                    _plain_text_cues(seg.start, seg.end, seg.text.strip(), layout)
+                )
                 continue
-            chunk: list = []
-            for w in words:
-                chunk.append(w)
-                if len(chunk) >= chunk_size:
-                    lines.append(_srt_block(idx, chunk[0].start, chunk[-1].end,
-                                            " ".join(c.word for c in chunk).strip()))
-                    idx += 1
-                    chunk = []
-            if chunk:
-                lines.append(_srt_block(idx, chunk[0].start, chunk[-1].end,
-                                        " ".join(c.word for c in chunk).strip()))
-                idx += 1
+            timed_cues.extend(_word_cues(words, layout))
+
+        lines = [_srt_block(i, start, end, text) for i, (start, end, text) in enumerate(timed_cues, 1)]
         srt_path.write_text("\n".join(lines), encoding="utf-8")
-        LOG.info("Captions: %d cues from %.1fs audio", idx - 1, info.duration)
+        LOG.info("Captions: %d cues from %.1fs audio", len(timed_cues), info.duration)
         return srt_path
     except Exception as e:  # noqa: BLE001
         LOG.warning("Whisper transcription failed (%s); writing empty SRT", e)
         srt_path.write_text("", encoding="utf-8")
         return srt_path
+
+
+def _layout_cfg(cfg: dict) -> dict[str, int]:
+    return {
+        "chunk_size": int(cfg.get("words_per_chunk", 3)),
+        "max_chars": int(cfg.get("max_chars_per_line", 24)),
+        "max_lines": max(1, int(cfg.get("max_lines_per_cue", 2))),
+    }
+
+
+def _word_cues(words: list[Any], layout: dict[str, int]) -> list[tuple[float, float, str]]:
+    cues: list[tuple[float, float, str]] = []
+    chunk_size = layout["chunk_size"]
+    for i in range(0, len(words), chunk_size):
+        chunk = words[i:i + chunk_size]
+        for tokens, text in _group_wrapped_lines(_wrap_tokens(chunk, layout["max_chars"]), layout["max_lines"]):
+            if not tokens:
+                continue
+            cues.append((float(tokens[0].start), float(tokens[-1].end), text))
+    return cues
+
+
+def _plain_text_cues(
+    start: float,
+    end: float,
+    text: str,
+    layout: dict[str, int],
+) -> list[tuple[float, float, str]]:
+    words = text.split()
+    if not words:
+        return [(start, end, text.strip())]
+
+    cue_texts: list[str] = []
+    chunk_size = layout["chunk_size"]
+    max_lines = layout["max_lines"]
+    max_chars = layout["max_chars"]
+    for i in range(0, len(words), chunk_size):
+        wrapped = _wrap_strings(words[i:i + chunk_size], max_chars)
+        for j in range(0, len(wrapped), max_lines):
+            cue_texts.append("\n".join(wrapped[j:j + max_lines]))
+
+    if not cue_texts:
+        return [(start, end, text.strip())]
+
+    duration = max(float(end) - float(start), 0.01)
+    word_counts = [max(1, len(cue.replace("\n", " ").split())) for cue in cue_texts]
+    total_words = sum(word_counts)
+    t = float(start)
+    cues: list[tuple[float, float, str]] = []
+    for cue_text, count in zip(cue_texts, word_counts):
+        cue_end = t + duration * count / total_words
+        cues.append((t, cue_end, cue_text))
+        t = cue_end
+    cues[-1] = (cues[-1][0], float(end), cues[-1][2])
+    return cues
+
+
+def _wrap_tokens(tokens: list[Any], max_chars: int) -> list[tuple[list[Any], str]]:
+    lines: list[tuple[list[Any], str]] = []
+    current: list[Any] = []
+    current_text = ""
+    for tok in tokens:
+        word = str(getattr(tok, "word", tok)).strip()
+        if not word:
+            continue
+        candidate = f"{current_text} {word}".strip() if current_text else word
+        if not current_text or len(candidate) <= max_chars:
+            current.append(tok)
+            current_text = candidate
+        else:
+            lines.append((current, current_text))
+            current = [tok]
+            current_text = word
+    if current:
+        lines.append((current, current_text))
+    return lines
+
+
+def _wrap_strings(words: list[str], max_chars: int) -> list[str]:
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        candidate = f"{current} {word}".strip() if current else word
+        if not current or len(candidate) <= max_chars:
+            current = candidate
+        else:
+            lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines
+
+
+def _group_wrapped_lines(
+    wrapped: list[tuple[list[Any], str]],
+    max_lines: int,
+) -> list[tuple[list[Any], str]]:
+    cues: list[tuple[list[Any], str]] = []
+    for i in range(0, len(wrapped), max_lines):
+        batch = wrapped[i:i + max_lines]
+        tokens = [tok for batch_tokens, _ in batch for tok in batch_tokens]
+        text = "\n".join(line_text for _, line_text in batch)
+        cues.append((tokens, text))
+    return cues
 
 
 def _srt_block(idx: int, start: float, end: float, text: str) -> str:
