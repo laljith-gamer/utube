@@ -16,7 +16,7 @@ llm:
     nvidia_nim:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: openai/gpt-oss-120b
+      model: nvidia/nemotron-3-ultra-550b-a55b
       supports_reasoning_effort: true
     cerebras:
       base_url: https://api.cerebras.ai/v1
