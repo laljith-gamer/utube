@@ -94,7 +94,7 @@ tts:
       api_key_env: ELEVENLABS_API_KEY_1
       params:
         model_id: eleven_multilingual_v2
-        voice_id: cGPeaH1igUGjrc8U1XlB  # Default male voice, can be overridden by scene
+        voice_id: pNInz6obpgDQGcFmaJgB  # Default male voice, can be overridden by scene
         voice_settings:
           stability: 0.35
           similarity_boost: 0.85
@@ -106,7 +106,7 @@ tts:
       api_key_env: ELEVENLABS_API_KEY_2
       params:
         model_id: eleven_multilingual_v2
-        voice_id: cGPeaH1igUGjrc8U1XlB
+        voice_id: pNInz6obpgDQGcFmaJgB
         voice_settings:
           stability: 0.35
           similarity_boost: 0.85
