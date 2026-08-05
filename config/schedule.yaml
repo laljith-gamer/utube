@@ -7,5 +7,5 @@
 publish_strategy: immediate            # "immediate" -> public on upload (no publishAt)
 default_privacy: public                # public | unlisted | private
 videos_min: 1                          # minimum videos per window
-videos_max: 2                          # maximum videos per window
+videos_max: 1                          # maximum videos per window
 dedup_days: 30                         # don't reuse a topic_hash OR theme_id within N days

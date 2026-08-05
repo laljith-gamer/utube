@@ -11,7 +11,6 @@ name: Daily Random Uploads
 on:
   schedule:
     - cron: "30 23 * * *"   # 05:00 IST window starts
-    - cron: "30 0 * * *"    # 06:00 IST window starts
   workflow_dispatch:
     inputs:
       videos_min:
@@ -21,7 +20,7 @@ on:
       videos_max:
         description: "Max videos this run (overrides schedule.yaml)"
         required: false
-        default: "2"
+        default: "1"
       lane:
         description: "Optional: restrict random pick to this lane id"
         required: false
