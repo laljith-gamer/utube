@@ -20,6 +20,7 @@ class StockRouter:
         self.chain: list[str] = self.cfg.get("chain", []) or []
         self.providers: dict[str, dict[str, Any]] = self.cfg.get("providers", {}) or {}
         self.timeout = self.cfg.get("request_timeout_sec", 120)
+        self.used_ids: set[str] = set()
 
     def find_video(self, keywords: list[str], *, orientation: str = "portrait") -> bytes | None:
         for kw in keywords:
@@ -55,9 +56,11 @@ class StockRouter:
         )
         r.raise_for_status()
         videos = r.json().get("videos", [])
+        videos = [v for v in videos if str(v.get("id")) not in self.used_ids]
         if not videos:
             return None
         v = random.choice(videos[: min(3, len(videos))])
+        self.used_ids.add(str(v.get("id")))
         target_w = 1080 if orientation == "portrait" else 1920
         files = sorted(
             [f for f in v.get("video_files", []) if f.get("file_type") == "video/mp4"],
@@ -78,9 +81,11 @@ class StockRouter:
         r = requests.get(p["url"], params=params, timeout=self.timeout)
         r.raise_for_status()
         hits = r.json().get("hits", [])
+        hits = [h for h in hits if str(h.get("id")) not in self.used_ids]
         if not hits:
             return None
         v = random.choice(hits[: min(3, len(hits))])
+        self.used_ids.add(str(v.get("id")))
         for size_key in ("medium", "large", "small", "tiny"):
             sized = v.get("videos", {}).get(size_key, {})
             if sized.get("url"):

@@ -65,6 +65,8 @@ class TTSRouter:
             p = self.providers.get(name) or {}
             try:
                 backend = p.get("backend") or name
+                if backend == "elevenlabs":
+                    return self._elevenlabs(p, text, voice)
                 if backend == "camb_tts" or name == "camb":
                     return self._camb_tts(p, text, voice)
                 if backend == "edge_tts":
@@ -83,6 +85,49 @@ class TTSRouter:
         # Surface every error so the next debugging session doesn't need
         # another round-trip through the workflow logs.
         raise RuntimeError("All TTS providers failed.\n  - " + "\n  - ".join(errors))
+
+    # ------------------------------------------------------------------ elevenlabs
+
+    def _elevenlabs(self, p: dict, text: str, voice: str) -> bytes:
+        """Synthesize with ElevenLabs TTS API."""
+        api_key = env(p.get("api_key_env", ""))
+        if not api_key:
+            raise RuntimeError(f"ElevenLabs key not set for {p.get('api_key_env')}")
+
+        params = p.get("params", {}) or {}
+        # If the stage passes a specific voice string, use it. Otherwise, use config default.
+        voice_id = voice if voice and voice != "en-US-AriaNeural" else params.get("voice_id")
+        
+        url = f"{p.get('url', 'https://api.elevenlabs.io/v1/text-to-speech')}/{voice_id}"
+        
+        headers = {
+            "Accept": "audio/mpeg",
+            "Content-Type": "application/json",
+            "xi-api-key": api_key,
+        }
+
+        payload = {
+            "text": text,
+            "model_id": params.get("model_id", "eleven_multilingual_v2"),
+        }
+        
+        if "voice_settings" in params:
+            payload["voice_settings"] = params["voice_settings"]
+
+        LOG.info("TTS via ElevenLabs (voice_id=%s)", voice_id)
+        
+        r = requests.post(url, json=payload, headers=headers, timeout=self.timeout)
+        
+        if r.status_code >= 400:
+            body = (r.text or "").strip()
+            # Status 401 usually means quota exceeded (or invalid key)
+            raise RuntimeError(f"ElevenLabs HTTP {r.status_code}: {body[:500]}")
+            
+        data = r.content
+        if not data:
+            raise RuntimeError("ElevenLabs returned empty audio")
+            
+        return data
 
     # ------------------------------------------------------------------ camb
 

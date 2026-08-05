@@ -76,7 +76,7 @@ tts:
   # Camb.ai is primary for ultra-natural narration. Edge and gTTS remain
   # no-key fallbacks so local dry runs can still produce audio if CAMB_API_KEY
   # is not configured.
-  chain: [camb, edge, gtts]
+  chain: [elevenlabs1, elevenlabs2]
   # Camb controls pace natively through voice_settings.speaking_rate. Keep
   # ffmpeg atempo neutral so the voice stays human instead of artificially sped.
   default_rate: "+0%"
@@ -88,6 +88,30 @@ tts:
   silence_keep_sec: 0.05
   request_timeout_sec: 120
   providers:
+    elevenlabs1:
+      backend: elevenlabs
+      url: https://api.elevenlabs.io/v1/text-to-speech
+      api_key_env: ELEVENLABS_API_KEY_1
+      params:
+        model_id: eleven_multilingual_v2
+        voice_id: cGPeaH1igUGjrc8U1XlB  # Default male voice, can be overridden by scene
+        voice_settings:
+          stability: 0.35
+          similarity_boost: 0.85
+          style: 0.4
+          use_speaker_boost: true
+    elevenlabs2:
+      backend: elevenlabs
+      url: https://api.elevenlabs.io/v1/text-to-speech
+      api_key_env: ELEVENLABS_API_KEY_2
+      params:
+        model_id: eleven_multilingual_v2
+        voice_id: cGPeaH1igUGjrc8U1XlB
+        voice_settings:
+          stability: 0.35
+          similarity_boost: 0.85
+          style: 0.4
+          use_speaker_boost: true
     camb:
       backend: camb_tts
       url: https://client.camb.ai/apis/tts-stream

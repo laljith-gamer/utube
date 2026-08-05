@@ -48,6 +48,11 @@ HARD WRITING RULES
   "did you know that", "in this video", "let me tell you", "so basically".
 - Do not start consecutive scenes with the same word.
 - Use present tense, active voice. Cut every adverb you can.
+- TONE & DELIVERY: Write in an extremely conversational, friendly, and natural 
+  tone. DO NOT sound like an encyclopedia. Heavily use punctuation to control 
+  the AI voice pacing: use ellipses (`...`) for dramatic pauses, em-dashes 
+  (`—`) for cut-offs or quick stutters, and ALL CAPS for words that need intense 
+  vocal emphasis or shouting.
 - The hook MUST contain a number, a contradiction, or a forbidden-question shape
   ("What if I told you...", "Why does X...", "How is X possible...").
 - The CTA must reference a specific element from the script (not generic).
