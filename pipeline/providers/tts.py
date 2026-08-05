@@ -95,8 +95,12 @@ class TTSRouter:
             raise RuntimeError(f"ElevenLabs key not set for {p.get('api_key_env')}")
 
         params = p.get("params", {}) or {}
-        # If the stage passes a specific voice string, use it. Otherwise, use config default.
-        voice_id = voice if voice and voice != "en-US-AriaNeural" else params.get("voice_id")
+        # The slot config might pass an Edge/Azure TTS voice string (like en-US-AvaMultilingualNeural).
+        # ElevenLabs voice IDs are exactly 20-character alphanumeric strings without hyphens.
+        if not voice or "-" in voice or len(voice) != 20:
+            voice_id = params.get("voice_id")
+        else:
+            voice_id = voice
         
         url = f"{p.get('url', 'https://api.elevenlabs.io/v1/text-to-speech')}/{voice_id}"
         
