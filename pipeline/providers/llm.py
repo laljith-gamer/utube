@@ -22,9 +22,9 @@ LOG = logging.getLogger("utube.llm")
 class LLMRouter:
     """Tries each provider in `llm.chain` until one succeeds."""
 
-    def __init__(self) -> None:
+    def __init__(self, config_key: str = "llm") -> None:
         cfg = get_config()
-        self.cfg = cfg.get_path("llm", {}) or {}
+        self.cfg = cfg.get_path(config_key, {}) or {}
         chain = self.cfg.get("chain", [])
         providers_block = self.cfg.get("providers", {}) or {}
         self.timeout = self.cfg.get("request_timeout_sec", 120)
@@ -64,12 +64,15 @@ class LLMRouter:
             try:
                 LOG.info("LLM call → %s (%s)", p["name"], p["model"])
                 client = OpenAI(api_key=p["api_key"], base_url=p["base_url"], timeout=self.timeout)
+                provider_params = p.get("params", {})
                 kwargs: dict[str, Any] = {
                     "model": p["model"],
                     "messages": messages,
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
+                    "max_tokens": provider_params.get("max_tokens", max_tokens),
+                    "temperature": provider_params.get("temperature", temperature),
                 }
+                if "top_p" in provider_params:
+                    kwargs["top_p"] = provider_params["top_p"]
                 if json_mode:
                     kwargs["response_format"] = {"type": "json_object"}
                 if reasoning_effort and p.get("supports_reasoning_effort"):

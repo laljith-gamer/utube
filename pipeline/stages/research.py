@@ -33,8 +33,11 @@ def select_topic(
     rcfg = _research_cfg().get("topic_select", {}) or {}
     template = (repo_root() / "prompts" / "topic_select.txt").read_text(encoding="utf-8")
 
+    # Sort candidates by normalized score descending so the hottest topics are at the top
+    candidates.sort(key=lambda x: x.get('score', 0), reverse=True)
+
     rendered = "\n".join(
-        f"[{i}] ({c.get('source','')}, score={c.get('score',0)}) {c.get('title','')}\n    URL: {c.get('url','')}"
+        f"[{i}] ({c.get('source','')}, normalized hotness: {c.get('score',0)}/100) {c.get('title','')}\n    URL: {c.get('url','')}"
         for i, c in enumerate(candidates)
     )
     prompt = template.format(

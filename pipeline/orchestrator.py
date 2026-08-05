@@ -42,7 +42,7 @@ from .utils import env_bool, repo_root, run_date, run_dir, setup_logging, slugif
 LOG = logging.getLogger("utube.orchestrator")
 
 
-def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> dict:
+def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger) -> dict:
     cfg = get_config()
     slot_id = slot["id"]                        # unique per video (theme id)
     lane_id = slot.get("lane", slot_id)         # for per-lane topic dedup
@@ -53,7 +53,8 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
     LOG.info("Output dir: %s", out)
     LOG.info("=" * 72)
 
-    llm = LLMRouter()
+    llm_research = LLMRouter("llm_research")
+    llm_script = LLMRouter("llm_script")
     img = ImageRouter()
     vid = VideoRouter()
     tts = TTSRouter()
@@ -80,7 +81,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
 
         # 2. Research / pick
         topic = research.select_topic(
-            llm,
+            llm_research,
             candidates,
             niche_title=slot.get("title", lane_id),
             sources_label=", ".join(s.get("type", "") for s in slot.get("sources", [])),
@@ -89,12 +90,20 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, ledger: Ledger) -> 
         write_json(out / "topic.json", topic)
         ledger.record_topic(lane_id, topic["topic_hash"])
 
-        brief = research.build_research_brief(llm, topic)
+        brief = research.build_research_brief(llm_research, topic)
         write_json(out / "research.json", brief)
 
         # 3. Script
-        sc = script.generate_script(llm, slot=slot, topic=topic, research=brief)
+        sc = script.generate_script(llm_script, slot=slot, topic=topic, research=brief)
         write_json(out / "script.json", sc)
+
+        if script_only:
+            LOG.info("--script-only set; stopping after script generation")
+            result["ok"] = True
+            result["title"] = sc.get("title")
+            result["script"] = sc
+            write_json(out / "result.json", result)
+            return result
 
         # 4. Audio
         audio_summary = audio.synthesize_narration(tts, script=sc, slot=slot, out_dir=out)
@@ -239,6 +248,8 @@ def _select_slots(cfg, ledger: Ledger, args) -> list[dict]:
 # ---------- entry point ----------
 
 def main(argv: list[str] | None = None) -> int:
+    from dotenv import load_dotenv
+    load_dotenv()
     setup_logging(level="INFO")
     parser = argparse.ArgumentParser(description="utube — produce daily videos")
     parser.add_argument("--random-batch", action="store_true",
@@ -254,6 +265,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-upload", action="store_true", help="Skip YouTube upload")
     parser.add_argument("--skip-svd", action="store_true",
                         help="Skip SDXL+SVD; visuals stage uses only stock video and motion filler")
+    parser.add_argument("--script-only", action="store_true",
+                        help="Stop immediately after generating the JSON script (for testing)")
     args = parser.parse_args(argv)
 
     upload = not args.no_upload and not env_bool("DRY_RUN")
@@ -272,7 +285,7 @@ def main(argv: list[str] | None = None) -> int:
 
     results = []
     for slot in slots:
-        results.append(produce_one(slot, upload=upload, skip_svd=args.skip_svd, ledger=ledger))
+        results.append(produce_one(slot, upload=upload, skip_svd=args.skip_svd, script_only=args.script_only, ledger=ledger))
         ledger.save()
 
     write_json(repo_root() / "runs" / run_date() / "batch_summary.json", results)

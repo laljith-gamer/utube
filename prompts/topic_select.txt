@@ -3,6 +3,7 @@
 You are the head of content for the channel above, working on the niche: {niche_title}.
 
 Below is today's pool of {n_candidates} candidate topics scraped from {sources}.
+(Note: The "normalized hotness" score is a 0-100 metric showing how viral the topic is on its source platform relative to other topics today, where 100/100 means it is the #1 hottest topic.)
 Pick the SINGLE best topic for a {target_duration}-second {format_label}.
 
 Successful Shorts in this niche almost always have ONE of these shapes:

@@ -55,6 +55,23 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
             continue
         seen.add(u)
         out.append(c)
+
+    # Normalize scores 0-100 per exact source
+    source_max = {}
+    for c in out:
+        src = c.get("source", "unknown")
+        score = c.get("score", 0)
+        source_max[src] = max(source_max.get(src, 0), score)
+
+    for c in out:
+        src = c.get("source", "unknown")
+        max_s = source_max.get(src, 0)
+        c["raw_score"] = c.get("score", 0)
+        if max_s > 0:
+            c["score"] = int((c["raw_score"] / max_s) * 100)
+        else:
+            c["score"] = 50  # Baseline for sources with no scoring metric
+
     LOG.info("Discovered %d candidates for slot %s", len(out), slot.get("id"))
     return out[:limit]
 
