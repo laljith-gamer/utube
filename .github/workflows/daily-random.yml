@@ -45,7 +45,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.chance.outputs.run }}
+    steps:
+      - name: 50% chance to run
+        id: chance
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            if [ $((RANDOM % 2)) -eq 0 ]; then
+              echo "Skipping this run (50% chance)."
+              echo "run=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Running this time (50% chance)."
+              echo "run=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "Manual run, always running."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   produce:
+    needs: check
+    if: needs.check.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
