@@ -42,8 +42,10 @@ def generate_visuals(
     visuals_dir.mkdir(parents=True, exist_ok=True)
 
     scenes = script["scenes"]
-    out: list[dict] = []
-    for i, scene in enumerate(scenes):
+
+    import concurrent.futures
+
+    def _generate_scene(i: int, scene: dict) -> dict:
         scene_dir = visuals_dir / f"scene_{i:02d}"
         scene_dir.mkdir(exist_ok=True)
         prompt = scene.get("visual_prompt", "")
@@ -95,7 +97,13 @@ def generate_visuals(
                 "scene %d: no SVD or stock available; assemble will render motion filler",
                 i,
             )
+        return record
 
-        out.append(record)
+    out: list[dict] = [{} for _ in scenes]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(10, len(scenes))) as executor:
+        futures = {executor.submit(_generate_scene, i, scene): i for i, scene in enumerate(scenes)}
+        for future in concurrent.futures.as_completed(futures):
+            i = futures[future]
+            out[i] = future.result()
 
     return out

@@ -41,17 +41,23 @@ def assemble_video(
 
     seg_durations = _scene_durations(audio_summary, num_scenes=len(visuals))
 
-    scene_clips: list[Path] = []
-    for i, v in enumerate(visuals):
+    import concurrent.futures
+
+    def _render_scene_clip(i: int, v: dict) -> Path:
         dur = max(seg_durations[i], 1.5)
         out_clip = work_dir / f"scene_{i:02d}.mp4"
         if "video" in v:
             _render_from_video(out_dir / v["video"], out_clip, dur, width, height, fps, acfg)
         else:
-            # No real footage was obtained for this scene. Synthesize motion
-            # (animated gradient) instead of falling back to a static image.
             _render_motion_filler(out_clip, dur, width, height, fps, acfg)
-        scene_clips.append(out_clip)
+        return out_clip
+
+    scene_clips: list[Path] = [Path()] * len(visuals)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(visuals))) as executor:
+        futures = {executor.submit(_render_scene_clip, i, v): i for i, v in enumerate(visuals)}
+        for future in concurrent.futures.as_completed(futures):
+            i = futures[future]
+            scene_clips[i] = future.result()
 
     silent_video = work_dir / "silent.mp4"
     _concat(scene_clips, silent_video, acfg)

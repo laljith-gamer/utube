@@ -105,28 +105,42 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
             write_json(out / "result.json", result)
             return result
 
-        # 4. Audio
-        audio_summary = audio.synthesize_narration(tts, script=sc, slot=slot, out_dir=out)
+        import concurrent.futures
 
-        # 5. Visuals
-        if skip_svd:
-            cfg["visuals"] = {**cfg.get("visuals", {}), "skip_svd": True}
-        vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
-        write_json(out / "visuals.json", vis)
+        # We can parallelize the generation of audio/captions, visuals, and the thumbnail.
+        # Captions depend on audio, so they are grouped together.
+        def _do_audio_and_captions():
+            a_sum = audio.synthesize_narration(tts, script=sc, slot=slot, out_dir=out)
+            srt_p = out / "captions.srt"
+            captions.transcribe_to_srt(out / a_sum["master"], srt_p)
+            return a_sum, srt_p
 
-        # 6. Captions
-        srt = out / "captions.srt"
-        captions.transcribe_to_srt(out / audio_summary["master"], srt)
+        def _do_visuals():
+            if skip_svd:
+                cfg["visuals"] = {**cfg.get("visuals", {}), "skip_svd": True}
+            v = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
+            write_json(out / "visuals.json", v)
+            return v
 
-        # 7. Thumbnail
-        thumb_path = out / "thumbnail.jpg"
-        thumbnail.make_thumbnail(
-            image=img,
-            prompt=sc.get("thumbnail_prompt", sc.get("title", "")),
-            text=sc.get("thumbnail_text", sc.get("title", "")[:30]),
-            out_path=thumb_path,
-            palette=slot.get("palette"),
-        )
+        def _do_thumbnail():
+            t_path = out / "thumbnail.jpg"
+            thumbnail.make_thumbnail(
+                image=img,
+                prompt=sc.get("thumbnail_prompt", sc.get("title", "")),
+                text=sc.get("thumbnail_text", sc.get("title", "")[:30]),
+                out_path=t_path,
+                palette=slot.get("palette"),
+            )
+            return t_path
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            future_audio = executor.submit(_do_audio_and_captions)
+            future_visuals = executor.submit(_do_visuals)
+            future_thumbnail = executor.submit(_do_thumbnail)
+
+            audio_summary, srt = future_audio.result()
+            vis = future_visuals.result()
+            thumb_path = future_thumbnail.result()
 
         # 8. Assemble
         video_out = out / f"{slugify(sc['title'])}.mp4"

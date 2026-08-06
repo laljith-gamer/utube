@@ -149,9 +149,9 @@ def _synthesize_segmented(
     normalize: bool,
     rate_label: str,
 ) -> dict:
-    per_scene: list[dict] = []
-    seg_files: list[Path] = []
-    for name, text in segments:
+    import concurrent.futures
+
+    def _generate_segment(name: str, text: str) -> dict:
         mp3 = audio_dir / f"{name}.mp3"
         data = tts.synthesize(text, voice=voice)
         mp3.write_bytes(data)
@@ -166,14 +166,25 @@ def _synthesize_segmented(
             force_reencode=normalize,
         )
         dur = _probe_duration(mp3)
-        per_scene.append({
+        LOG.info("  TTS %s -> %.2fs (atempo=%.3f)", name, dur, atempo_factor)
+        return {
             "name": name,
             "text": text,
             "file": str(mp3.relative_to(out_dir)),
             "duration": dur,
-        })
-        seg_files.append(mp3)
-        LOG.info("  TTS %s -> %.2fs (atempo=%.3f)", name, dur, atempo_factor)
+            "_path": mp3,
+        }
+
+    per_scene: list[dict] = [{}] * len(segments)
+    seg_files: list[Path] = [Path()] * len(segments)
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(5, len(segments))) as executor:
+        futures = {executor.submit(_generate_segment, name, text): i for i, (name, text) in enumerate(segments)}
+        for future in concurrent.futures.as_completed(futures):
+            i = futures[future]
+            res = future.result()
+            seg_files[i] = res.pop("_path")
+            per_scene[i] = res
 
     master = audio_dir / "narration.mp3"
     _ffmpeg_concat(seg_files, master, codec=codec, bitrate=bitrate)
