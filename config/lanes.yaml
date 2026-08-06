@@ -46,9 +46,6 @@ lanes:
       - type: reddit
         subreddits: [MachineLearning, LocalLLaMA, singularity]
         time_filter: day
-      - type: rss
-        urls:
-          - https://huggingface.co/blog/feed.xml
     voice: en-US-AriaNeural
     voice_style: curious
     style: clean_futuristic

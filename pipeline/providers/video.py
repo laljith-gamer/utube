@@ -37,8 +37,6 @@ class VideoRouter:
             try:
                 if name == "nvidia_nim_svd":
                     return self._nim_svd(p, image_png)
-                if name == "huggingface_svd":
-                    return self._hf_svd(p, image_png)
                 LOG.warning("Unknown video provider in chain: %s", name)
             except Exception as e:  # noqa: BLE001
                 LOG.warning("Video provider %s failed: %s", name, e)
@@ -75,18 +73,4 @@ class VideoRouter:
         LOG.info("SVD clip via NVIDIA NIM")
         return base64.b64decode(video_b64)
 
-    def _hf_svd(self, p: dict, image_png: bytes) -> bytes:
-        api_key = env(p.get("api_key_env", ""))
-        if not api_key:
-            raise RuntimeError("HuggingFace key not set")
-        cold_retry = p.get("cold_start_retry_sec", 30)
-        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "image/png"}
-        for attempt in range(2):
-            r = requests.post(p["url"], data=image_png, headers=headers, timeout=self.timeout)
-            if r.status_code == 503 and attempt == 0:
-                time.sleep(cold_retry)
-                continue
-            r.raise_for_status()
-            LOG.info("SVD clip via HuggingFace")
-            return r.content
-        raise RuntimeError("HF SVD timed out")
+

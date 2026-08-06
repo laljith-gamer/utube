@@ -34,7 +34,7 @@ llm_script:
 
 
 image:
-  chain: [nvidia_nim_sdxl, pollinations, huggingface_flux]
+  chain: [nvidia_nim_sdxl, pollinations]
   default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
   request_timeout_sec: 120
   providers:
@@ -49,15 +49,9 @@ image:
     pollinations:
       url_template: "https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true"
       min_response_bytes: 1000
-    huggingface_flux:
-      url: https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell
-      api_key_env: HUGGINGFACE_API_KEY
-      cold_start_retry_sec: 20
-      params:
-        num_inference_steps: 4
 
 video:
-  chain: [nvidia_nim_svd, huggingface_svd]
+  chain: [nvidia_nim_svd]
   request_timeout_sec: 300
   providers:
     nvidia_nim_svd:
@@ -67,10 +61,6 @@ video:
         cfg_scale: 1.8
         seed: 0
         motion_bucket_id: 127
-    huggingface_svd:
-      url: https://api-inference.huggingface.co/models/stabilityai/stable-video-diffusion-img2vid-xt-1-1
-      api_key_env: HUGGINGFACE_API_KEY
-      cold_start_retry_sec: 30
 
 tts:
   # Camb.ai is primary for ultra-natural narration. Edge and gTTS remain

@@ -43,8 +43,6 @@ class ImageRouter:
                     return self._nim_sdxl(p, prompt, width, height, negative)
                 if name == "pollinations":
                     return self._pollinations(p, prompt, width, height)
-                if name == "huggingface_flux":
-                    return self._huggingface(p, prompt, width, height)
                 LOG.warning("Unknown image provider in chain: %s", name)
             except Exception as e:  # noqa: BLE001
                 LOG.warning("Image provider %s failed: %s", name, e)
@@ -98,23 +96,4 @@ class ImageRouter:
         LOG.info("Image via Pollinations.ai")
         return r.content
 
-    def _huggingface(self, p: dict, prompt: str, w: int, h: int) -> bytes:
-        api_key = env(p.get("api_key_env", ""))
-        if not api_key:
-            raise RuntimeError("HuggingFace key not set")
-        cold_retry = p.get("cold_start_retry_sec", 20)
-        params = p.get("params", {}) or {}
-        payload = {
-            "inputs": prompt,
-            "parameters": {"width": w, "height": h, **params},
-        }
-        headers = {"Authorization": f"Bearer {api_key}"}
-        for attempt in range(2):
-            r = requests.post(p["url"], json=payload, headers=headers, timeout=self.timeout)
-            if r.status_code == 503 and attempt == 0:
-                time.sleep(cold_retry)
-                continue
-            r.raise_for_status()
-            LOG.info("Image via HuggingFace")
-            return r.content
-        raise RuntimeError("HuggingFace timed out")
+

@@ -8,7 +8,7 @@ video:                              # final output specs
   target_duration_sec: 35
   min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
   max_duration_sec: 45
-  num_scenes: 12                    # ~2.9s per scene = MrBeast/Cleo Abram cut rhythm
+  num_scenes: 18                    # ~1.9s per scene = fast modern TikTok/Shorts pacing
 
 # Visuals: every scene is motion-based.
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
@@ -64,9 +64,8 @@ captions:
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 3               # how many words per caption cue
-  max_chars_per_line: 24           # wrap to a second line when a line exceeds this width
-  max_lines_per_cue: 2             # overflow moves to the next on-screen caption cue
+  words_per_chunk: 1               # how many words per caption cue
+  fade_ms: 100                     # millisecond duration to fade in/out text
 
 thumbnail:
   width: 1080
@@ -118,14 +117,16 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize: 18                   # libass FontSize in points (relative to PlayResY=288). Lower = smaller captions.
-    primary_color_hex: "00FFFFFF"  # AABBGGRR for ASS
+    fontsize: 24                   # libass FontSize in points (relative to PlayResY=288). Lower = smaller captions.
+    primary_color_hex: "0000FFFF"  # AABBGGRR for ASS (Yellow)
     outline_color_hex: "00000000"
     outline_width: 3
+    back_color_hex: "80000000"
+    shadow: 2
     alignment: 2                   # 2 = bottom center
     margin_l: 80                   # horizontal wrap bounds for portrait Shorts
     margin_r: 80
-    margin_v: 110
+    margin_v: 180
     wrap_style: 0                  # 0 = smart word wrap at top/bottom line width
 
 stage_timeouts_sec:

@@ -22,6 +22,7 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
     beam = int(cfg.get("beam_size", 1))
     word_ts = bool(cfg.get("word_timestamps", True))
     vad = bool(cfg.get("vad_filter", True))
+    fade_ms = int(cfg.get("fade_ms", 100))
     layout = _layout_cfg(cfg)
 
     try:
@@ -45,7 +46,7 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
                 continue
             timed_cues.extend(_word_cues(words, layout))
 
-        lines = [_srt_block(i, start, end, text) for i, (start, end, text) in enumerate(timed_cues, 1)]
+        lines = [_srt_block(i, start, end, text, fade_ms) for i, (start, end, text) in enumerate(timed_cues, 1)]
         srt_path.write_text("\n".join(lines), encoding="utf-8")
         LOG.info("Captions: %d cues from %.1fs audio", len(timed_cues), info.duration)
         return srt_path
@@ -159,7 +160,9 @@ def _group_wrapped_lines(
     return cues
 
 
-def _srt_block(idx: int, start: float, end: float, text: str) -> str:
+def _srt_block(idx: int, start: float, end: float, text: str, fade_ms: int = 0) -> str:
+    if fade_ms > 0:
+        text = f"{{\\fad({fade_ms},{fade_ms})}}{text}"
     return f"{idx}\n{_ts(start)} --> {_ts(end)}\n{text}\n"
 
 
