@@ -82,7 +82,7 @@ Here are the latest channel metrics:
 Based on this, suggest 2-3 short, punchy sentences to update our `goal_summary` in config/goal.yaml. The goal summary dictates what topics the AI chooses and how it writes scripts. Focus on what might increase retention or CTR. 
 Respond ONLY with a JSON object containing one key: `new_goal_summary`.
 """
-    llm = LLMRouter()
+    llm = LLMRouter("llm_script")
     try:
         res = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=300)
         new_goal = res.get("new_goal_summary")
