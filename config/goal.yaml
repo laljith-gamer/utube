@@ -1,23 +1,24 @@
-# Channel mission, persona, and creative direction.
-# This is injected into every LLM prompt so all content stays on-brand.
-# Edit this file to redirect the entire channel's tone and goals — no code changes needed.
-
 channel:
-  name: "TechByte Daily"
-  language: en
-  audience: "tech-curious general public, 18-45"
-  goal: |
-    Make people 1% smarter about technology and the future every day,
-    with content that is fact-grounded, fun to watch, and impossible to scroll past.
-  tone:
-    - concise
-    - energetic
-    - fact-grounded
-    - no clickbait lies
-    - friendly authority
-  format: shorts                   # shorts | long_form
-  ai_disclosure: "AI-assisted"     # appears in every video description
+  ai_disclosure: AI-assisted
+  audience: tech-curious general public, 18-45
   branding:
-    intro_sting_seconds: 0         # set >0 to reserve space for an intro
+    intro_sting_seconds: 0
     outro_sting_seconds: 0
-    watermark_text: ""             # optional channel handle to overlay
+    watermark_text: ''
+  format: shorts
+  goal: 'Make people 1% smarter about technology and the future every day,
+
+    with content that is fact-grounded, fun to watch, and impossible to scroll past.
+
+    '
+  language: en
+  name: TechByte Daily
+  tone:
+  - concise
+  - energetic
+  - fact-grounded
+  - no clickbait lies
+  - friendly authority
+summary: Optimize for engaging, 15-30 second clips with attention-grabbing thumbnails.
+  Focus on trending topics and curiosity-driven titles to boost CTR. Prioritize concise,
+  snappy narratives to maintain the 21-second average view duration.
