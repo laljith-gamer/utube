@@ -46,15 +46,19 @@ def get_youtube_analytics():
             ids=f"channel==MINE",
             startDate=start_date.isoformat(),
             endDate=end_date.isoformat(),
-            metrics="views,estimatedMinutesWatched,averageViewDuration",
+            metrics="views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares,subscribersGained",
         ).execute()
         if not res.get("rows"):
-            return {"views": 0, "estimatedMinutesWatched": 0, "averageViewDuration": 0}
+            return {"views": 0, "estimatedMinutesWatched": 0, "averageViewDuration": 0, "likes": 0, "comments": 0, "shares": 0, "subscribersGained": 0}
         row = res["rows"][0]
         return {
             "views": row[0],
             "estimatedMinutesWatched": row[1],
-            "averageViewDuration": row[2]
+            "averageViewDuration": row[2],
+            "likes": row[3],
+            "comments": row[4],
+            "shares": row[5],
+            "subscribersGained": row[6]
         }
         
     monthly = get_metrics(thirty_days_ago, today)
@@ -73,21 +77,30 @@ def main():
         LOG.warning("Could not fetch analytics, exiting.")
         return
 
-    report = f"## YouTube Trends Report\n\n**Weekly**\n- Views: {stats['weekly']['views']}\n- Watch Time (min): {stats['weekly']['estimatedMinutesWatched']}\n- Avg View Duration (s): {stats['weekly']['averageViewDuration']}\n\n**Monthly**\n- Views: {stats['monthly']['views']}\n- Watch Time (min): {stats['monthly']['estimatedMinutesWatched']}\n- Avg View Duration (s): {stats['monthly']['averageViewDuration']}\n"
+    def format_stats(s):
+        return f"- Views: {s['views']}\n- Watch Time (min): {s['estimatedMinutesWatched']}\n- Avg View Duration (s): {s['averageViewDuration']}\n- Likes: {s['likes']}\n- Comments: {s['comments']}\n- Shares: {s['shares']}\n- Subs Gained: {s['subscribersGained']}"
+
+    report = f"## YouTube Trends Report\n\n**Weekly**\n{format_stats(stats['weekly'])}\n\n**Monthly**\n{format_stats(stats['monthly'])}\n"
     
-    prompt = f"""You are the AI producer for an automated YouTube Shorts channel.
+    prompt = f"""You are a Master YouTube Strategist analyzing an automated channel's performance.
 Here are the latest channel metrics:
 {report}
 
-Based on this, suggest 2-3 short, punchy sentences to update our `goal_summary` in config/goal.yaml. The goal summary dictates what topics the AI chooses and how it writes scripts. Focus on what might increase retention or CTR. 
-Respond ONLY with a JSON object containing one key: `new_goal_summary`.
+Based on these detailed metrics, perform a deep analysis. Think about audience engagement (likes/comments vs views), shareability, and viewer retention.
+Suggest a comprehensive, high-converting strategy update. We need a new `goal_summary` for config/goal.yaml. This dictates what topics the AI chooses and how it writes scripts. 
+Make the new summary detailed (4-5 sentences), focusing on specific script structures, pacing, hooks, and topic angles that will drastically improve our stats.
+
+Respond ONLY with a JSON object containing two keys:
+`analysis_rationale`: A short paragraph explaining your strategic reasoning based on the numbers.
+`new_goal_summary`: The detailed 4-5 sentence summary to use moving forward.
 """
     llm = LLMRouter("llm_script")
     try:
-        res = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=300)
+        res = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=600)
         new_goal = res.get("new_goal_summary")
+        rationale = res.get("analysis_rationale")
         if new_goal:
-            report += f"\n## AI Prompt Update\n**New Goal Summary:**\n{new_goal}\n"
+            report += f"\n## AI Deep Analysis\n**Rationale:**\n{rationale}\n\n**New Goal Summary:**\n{new_goal}\n"
             
             goal_yaml_path = repo_root() / "config" / "goal.yaml"
             with open(goal_yaml_path, "r", encoding="utf-8") as f:
