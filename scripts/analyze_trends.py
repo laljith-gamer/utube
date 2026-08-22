@@ -112,6 +112,48 @@ Respond ONLY with a JSON object containing two keys:
                 yaml.dump(goal_data, f, default_flow_style=False)
                 
             LOG.info("Updated goal.yaml with new summary.")
+            
+            # --- Auto-update prompts ---
+            prompt_dir = repo_root() / "prompts"
+            script_prompt_path = prompt_dir / "script.txt"
+            topic_prompt_path = prompt_dir / "topic_select.txt"
+            
+            if script_prompt_path.exists() and topic_prompt_path.exists():
+                script_txt = script_prompt_path.read_text(encoding="utf-8")
+                topic_txt = topic_prompt_path.read_text(encoding="utf-8")
+                
+                update_prompt_msg = f'''You are a Prompt Engineer. We just updated our YouTube channel strategy based on latest metrics.
+Rationale: {rationale}
+New Goal: {new_goal}
+
+Here is our current `script.txt` prompt:
+---
+{script_txt}
+---
+
+Here is our current `topic_select.txt` prompt:
+---
+{topic_txt}
+---
+
+Rewrite these two prompts. Keep ALL of the original structural constraints, output JSON formats, and strict rules intact.
+However, gracefully weave the New Goal and Rationale into the stylistic instructions, hook guidelines, and topic selection criteria.
+Make sure the updated prompts will naturally steer the AI to produce scripts and topics aligned with the new strategy.
+
+Respond ONLY with a JSON object containing two keys:
+`new_script_prompt`: The complete updated text for script.txt
+`new_topic_prompt`: The complete updated text for topic_select.txt
+'''
+                try:
+                    res_prompts = llm.chat_json([{"role": "user", "content": update_prompt_msg}], max_tokens=8000)
+                    new_script = res_prompts.get("new_script_prompt")
+                    new_topic = res_prompts.get("new_topic_prompt")
+                    if new_script and new_topic:
+                        script_prompt_path.write_text(new_script, encoding="utf-8")
+                        topic_prompt_path.write_text(new_topic, encoding="utf-8")
+                        LOG.info("Autonomously updated script.txt and topic_select.txt with new strategy.")
+                except Exception as e:
+                    LOG.error(f"Failed to auto-update prompts: {e}")
     except Exception as e:
         LOG.error(f"Failed to generate AI insights: {e}")
         
