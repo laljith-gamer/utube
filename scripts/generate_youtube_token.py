@@ -18,7 +18,10 @@ from pathlib import Path
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/yt-analytics.readonly",
+]
 
 
 def main() -> int:

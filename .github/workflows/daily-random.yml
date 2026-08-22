@@ -10,7 +10,7 @@ name: Daily Random Uploads
 
 on:
   schedule:
-    - cron: "30 23 * * *"   # 05:00 IST window starts
+    - cron: "30 23 * * 0-3,5-6"   # 05:00 IST window starts
   workflow_dispatch:
     inputs:
       videos_min:

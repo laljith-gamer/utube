@@ -64,7 +64,7 @@ captions:
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 1               # how many words per caption cue
+  words_per_chunk: 3               # how many words per caption cue
   fade_ms: 100                     # millisecond duration to fade in/out text
 
 thumbnail:
