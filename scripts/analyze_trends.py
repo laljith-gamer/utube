@@ -35,12 +35,7 @@ def get_youtube_analytics():
     youtube = build("youtube", "v3", credentials=creds)
     analytics = build("youtubeAnalytics", "v2", credentials=creds)
     
-    try:
-        channels_response = youtube.channels().list(mine=True, part="id").execute()
-        channel_id = channels_response["items"][0]["id"]
-    except Exception as e:
-        LOG.error(f"Failed to fetch channel ID: {e}")
-        return None
+    channel_id = "MINE"
 
     today = datetime.date.today()
     thirty_days_ago = today - datetime.timedelta(days=30)

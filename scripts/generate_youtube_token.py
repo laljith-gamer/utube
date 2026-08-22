@@ -32,7 +32,10 @@ def main() -> int:
         return 1
 
     flow = InstalledAppFlow.from_client_secrets_file(str(secret), SCOPES)
-    creds = flow.run_local_server(port=0, prompt="consent", access_type="offline")
+    print("Please visit the following URL to authorize the application:")
+    auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
+    print(auth_url)
+    creds = flow.run_local_server(port=0, open_browser=False, prompt="consent", access_type="offline")
 
     print("\n=== Add these to your .env / GitHub Secrets ===")
     print(f"YOUTUBE_CLIENT_ID={creds.client_id}")
