@@ -1,0 +1,11 @@
+# Daily run schedule.
+#
+# Cron is now defined in .github/workflows/daily-random.yml as TWO windows
+# (5-6 AM IST and 6-7 AM IST). Each window picks a random number of videos
+# in [videos_min, videos_max] and uploads each immediately.
+
+publish_strategy: immediate            # "immediate" -> public on upload (no publishAt)
+default_privacy: public                # public | unlisted | private
+videos_min: 1                          # minimum videos per window
+videos_max: 1                          # maximum videos per window
+dedup_days: 30                         # don't reuse a topic_hash OR theme_id within N days

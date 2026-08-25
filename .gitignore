@@ -17,6 +17,8 @@ runs/*/
 *.mp4
 *.mp3
 *.wav
+# F5-TTS reference voice — must stay in repo despite *.wav above
+!assets/voice_ref.wav
 *.tmp
 tmp/
 output/

@@ -1,0 +1,99 @@
+name: Manual Test (single video, no upload)
+
+on:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: "Lane preset to use (random theme picked from this lane)"
+        required: false
+        default: "tech_news"
+        type: choice
+        options:
+          - did_you_know
+          - tech_news
+          - ai_breakthrough
+          - cybersecurity
+          - viral_science
+      theme:
+        description: "Optional: force a specific theme id (overrides lane)"
+        required: false
+        default: ""
+      skip_svd:
+        description: "Skip SVD animation (faster build)"
+        required: false
+        default: "true"
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install ffmpeg + fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Cache F5-TTS model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: f5tts-v1-base-${{ runner.os }}
+          restore-keys: f5tts-v1-base-
+
+      - name: Install PyTorch (CPU)
+        run: |
+          python -m pip install --upgrade pip uv
+          uv pip install --system "numpy<2" torch torchvision torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install Python deps
+        run: |
+          uv pip install --system -r requirements.txt
+
+      - name: Build args
+        id: args
+        env:
+          LANE:    ${{ inputs.lane }}
+          THEME:   ${{ inputs.theme }}
+          SKIPSVD: ${{ inputs.skip_svd }}
+        run: |
+          ARGS="--no-upload"
+          if [ -n "$THEME" ]; then
+            ARGS="$ARGS --theme $THEME"
+          else
+            ARGS="$ARGS --lane $LANE"
+          fi
+          if [ "$SKIPSVD" = "true" ]; then ARGS="$ARGS --skip-svd"; fi
+          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
+
+      - name: Run pipeline (no upload)
+        env:
+          NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          F5_REF_AUDIO: assets/voice_ref.wav
+          F5_REF_TEXT:  ${{ secrets.F5_REF_TEXT }}
+          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
+          DRY_RUN: "1"
+        run: |
+          python -m pipeline.orchestrator ${{ steps.args.outputs.args }}
+
+      - name: Upload built video + thumbnail
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ inputs.lane }}-${{ github.run_id }}
+          path: |
+            runs/**/*.mp4
+            runs/**/thumbnail.jpg
+            runs/**/script.json
+            runs/**/result.json
+          retention-days: 7
+          if-no-files-found: warn

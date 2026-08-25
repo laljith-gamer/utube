@@ -1,0 +1,141 @@
+# Per-stage tunables. Every "magic number" lives here, not in code.
+# Edit any value and the next pipeline run picks it up — no code changes.
+
+video:                              # final output specs
+  width: 1080
+  height: 1920
+  fps: 30
+  target_duration_sec: 32
+  min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
+  max_duration_sec: 45
+  num_scenes: 15                    # ~2.1s per scene = fast modern TikTok/Shorts pacing
+
+# Visuals: every scene is motion-based.
+# Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
+# There is NO static-image / Ken Burns slideshow path.
+visuals:
+  skip_svd: false                   # set to true to skip SDXL+SVD (uses stock + filler only)
+
+discover:
+  user_agent: "utube-bot/1.0 (+https://github.com/laljith-gamer/utube)"
+  total_candidates_limit: 25
+  per_source_limits:
+    hackernews: 15
+    reddit_per_subreddit: 8
+    rss: 8
+    wikipedia_otd: 10
+    github_trending: 10
+    devto: 10
+  request_timeout_sec: 20
+
+research:
+  source_text_max_chars: 6000
+  topic_select:
+    max_tokens: 2000
+    temperature: 0.5
+    reasoning_effort: null         # null = no reasoning (fast, cheap)
+  brief:
+    max_tokens: 2500
+    temperature: 0.4
+    reasoning_effort: null
+
+script:
+  max_tokens: 8000
+  temperature: 0.8
+  # "low" works well for a 35s narration: enough internal planning, plenty of
+  # tokens left for the actual JSON output. "high" causes truncation where the
+  # model spends the entire budget reasoning and never writes the answer.
+  reasoning_effort: low
+  # 3.0 wps written with Camb speaking_rate ~= 1.08 gives a brisk Shorts pace.
+  # If videos sound rushed, drop to 2.7. If too slow, push to 3.2.
+  words_per_second: 2.5
+  hook_max_seconds: 2              # first 2s decides retention on Shorts
+  hashtags_count: 20               # exact number of dynamic hashtags the LLM must produce
+
+audio:
+  bitrate: "128k"
+  codec: libmp3lame
+
+captions:
+  enabled: true
+  whisper_model_size: base         # tiny | base | small | medium | large-v3
+  whisper_device: cpu
+  whisper_compute_type: int8
+  beam_size: 1
+  word_timestamps: true
+  vad_filter: true
+  words_per_chunk: 3               # how many words per caption cue
+  fade_ms: 100                     # millisecond duration to fade in/out text
+
+thumbnail:
+  width: 1080
+  height: 1920
+  jpeg_quality: 92
+  prompt_suffix: "vertical 9:16 YouTube Shorts thumbnail, cinematic close-up, high contrast, dramatic lighting, sharp subject, clean negative space for bold title text, premium viral thumbnail composition, no text, no watermark"
+  enhance_contrast: 1.12
+  enhance_color: 1.08
+  enhance_sharpness: 1.15
+  text_height_ratio: 0.135
+  text_min_height_ratio: 0.07
+  text_y_ratio: 0.66
+  text_line_spacing_ratio: 0.08
+  text_max_width_ratio: 0.86
+  text_max_lines: 3
+  text_align: center
+  margin_left: 72
+  stroke_width: 5
+  darken_overlay_alpha: 165        # 0-255, lower-half darkening for portrait readability
+  top_overlay_alpha: 60
+  vignette_alpha: 110
+  accent_bar_height_ratio: 0.012
+  text_panel_alpha: 145
+  text_panel_padding_ratio: 0.028
+  text_panel_radius_ratio: 0.028
+  text_shadow_offset_ratio: 0.006
+  badge_text: ""
+  badge_height_ratio: 0.042
+  font_paths:
+    - /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+    - /usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf
+    - /Library/Fonts/Arial Bold.ttf
+
+assemble:
+  motion_filler:                     # used only when SVD AND stock both fail for a scene
+    speed: 0.02
+    colors: ["0x0a0a2a", "0x4f1eb1", "0x111122", "0x222244"]
+  music:
+    volume: 0.18                   # bg music level (1.0 = original)
+    loop: true
+  ffmpeg:
+    video_codec: libx264
+    audio_codec: aac
+    crf: 20
+    preset: medium
+    audio_bitrate: 128k
+    pix_fmt: yuv420p
+    movflags: "+faststart"
+  caption_subtitle_style:
+    fontname: "DejaVu Sans"
+    bold: 1
+    fontsize: 24                   # libass FontSize in points (relative to PlayResY=288). Lower = smaller captions.
+    primary_color_hex: "0000FFFF"  # AABBGGRR for ASS (Yellow)
+    outline_color_hex: "00000000"
+    outline_width: 3
+    back_color_hex: "80000000"
+    shadow: 2
+    alignment: 5                   # 5 = center center (for middle-of-screen captions)
+    margin_l: 120                  # horizontal wrap bounds for portrait Shorts
+    margin_r: 120
+    margin_v: 0
+    wrap_style: 1                  # 1 = end-of-line word wrapping
+
+stage_timeouts_sec:
+  discover: 60
+  research: 90
+  script: 120
+  tts: 180
+  visuals: 600
+  captions: 120
+  thumbnail: 90
+  assemble: 240
+  upload: 300

@@ -1,0 +1,85 @@
+# Lane presets: visual + voice + sources for each video style.
+#
+# A "lane" is the reusable preset (voice, palette, music mood, discovery sources).
+# A "theme" (see pipeline/themes.py) is the topic seed picked daily.
+# Each daily run = pick N random themes -> each theme is rendered using its lane preset.
+#
+# Per-slot publish times have been removed: uploads now happen immediately when each
+# video finishes, and run timing is controlled by .github/workflows/daily-random.yml.
+
+lanes:
+  - id: did_you_know
+    title: "Did You Know? Tech Facts"
+    default_keywords: [history, fact, surprising, origin, story, technology]
+    sources:
+      - type: wikipedia_otd
+      - type: reddit
+        subreddits: [todayilearned, technology]
+        time_filter: day
+      - type: github_trending
+    voice: en-US-AvaMultilingualNeural
+    voice_style: friendly
+    style: cozy_reveal
+    palette: ["#FFB347", "#2B2D42"]
+    music_mood: chill
+
+  - id: tech_news
+    title: "Tech News of the Day"
+    default_keywords: [news, today, breaking, industry, technology]
+    sources:
+      - type: hackernews
+        front_page: true
+      - type: rss
+        urls:
+          - https://techcrunch.com/feed/
+          - https://www.theverge.com/rss/index.xml
+    voice: en-US-GuyNeural
+    voice_style: newscast
+    style: fast_news_ticker
+    palette: ["#E63946", "#1D3557"]
+    music_mood: corporate_upbeat
+
+  - id: ai_breakthrough
+    title: "AI Breakthrough"
+    default_keywords: [ai, machine learning, breakthrough, model, future]
+    sources:
+      - type: reddit
+        subreddits: [MachineLearning, LocalLLaMA, singularity]
+        time_filter: day
+    voice: en-US-AriaNeural
+    voice_style: curious
+    style: clean_futuristic
+    palette: ["#7B61FF", "#0F0F23"]
+    music_mood: futuristic
+
+  - id: cybersecurity
+    title: "Cybersecurity Bite"
+    default_keywords: [cybersecurity, hack, breach, threat, defense]
+    sources:
+      - type: reddit
+        subreddits: [netsec, cybersecurity]
+        time_filter: day
+      - type: rss
+        urls:
+          - https://feeds.feedburner.com/TheHackersNews
+    voice: en-US-DavisNeural
+    voice_style: serious
+    style: dark_suspense
+    palette: ["#00FF41", "#0D0208"]
+    music_mood: tense
+
+  - id: viral_science
+    title: "Viral Science / Future Tech"
+    default_keywords: [science, future, breakthrough, frontier, discovery]
+    sources:
+      - type: reddit
+        subreddits: [Futurology, Damnthatsinteresting, science]
+        time_filter: day
+      - type: rss
+        urls:
+          - https://www.arstechnica.com/feed/
+    voice: en-US-JennyNeural
+    voice_style: cinematic
+    style: cinematic_dramatic
+    palette: ["#06FFA5", "#011627"]
+    music_mood: epic

@@ -1,0 +1,35 @@
+{goal}
+
+You are a fact-checker preparing a research brief for a {target_duration}-second
+{format_label} on the channel above. The brief must serve the channel's stated
+goal and tone, AND give the scriptwriter the raw material for a pro-grade Short:
+a hook fact, three to five specific beats, a payoff reveal, and a comment-bait
+question.
+
+Topic: {topic_title}
+Angle: {angle}
+Source URL: {source_url}
+Source excerpt:
+---
+{source_text}
+---
+
+Rules:
+- Use ONLY facts supportable from the excerpt. If the excerpt is thin, mark gaps
+  in `open_questions` instead of inventing.
+- Every fact in `key_facts` must be SPECIFIC: a number, a name, a date, a place,
+  a percentage, a dollar figure. Reject vague "many people / a lot / often".
+- `reveal_fact` is the single most counterintuitive, surprising, or "I didn't
+  know that" fact — the scriptwriter will use it as the payoff at the end.
+- `comment_bait_question` must reference a specific element from the brief, not
+  a generic "what do you think?".
+
+Respond with ONLY a JSON object:
+{{
+  "key_facts":             ["<5-8 specific bullets, each one short sentence with a number/name/date>"],
+  "reveal_fact":           "<the single most counterintuitive fact — used as the script payoff>",
+  "context":               "<one short paragraph of background a viewer needs>",
+  "comment_bait_question": "<question that references something specific from the brief>",
+  "open_questions":        ["<questions the source did NOT answer — the script must avoid these>"],
+  "citations":             ["<URL or short source label per fact>"]
+}}

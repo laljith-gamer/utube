@@ -1,0 +1,30 @@
+channel:
+  ai_disclosure: AI-assisted
+  audience: tech-curious general public, 18-45
+  branding:
+    intro_sting_seconds: 0
+    outro_sting_seconds: 0
+    watermark_text: ''
+  format: shorts
+  goal: 'Make people 1% smarter about technology and the future every day,
+
+    with content that is fact-grounded, fun to watch, and impossible to scroll past.
+
+    '
+  language: en
+  name: TechByte Daily
+  tone:
+  - concise
+  - energetic
+  - fact-grounded
+  - no clickbait lies
+  - friendly authority
+summary: Create informative, 10-minute videos that focus on solving a specific problem
+  or answering a common question in the niche. Scripts should follow a structured
+  format, starting with a hook that grabs the viewer's attention within the first
+  30 seconds, followed by a brief introduction, and then a detailed, step-by-step
+  explanation of the solution. The pacing should be moderate, with a mix of fast-paced
+  and slow sections to keep viewers engaged. Topics should be chosen based on their
+  relevance, search volume, and potential for sparking meaningful conversations. By
+  incorporating these elements, our content will be more likely to resonate with viewers,
+  increase watch time, and encourage audience interaction.

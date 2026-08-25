@@ -1,0 +1,156 @@
+# All external service endpoints, models, and their default parameters.
+# Add or reorder providers here; no code changes needed.
+# `chain` = order in which providers are tried.
+
+llm_research:
+  chain: [nvidia_nim_research]
+  request_timeout_sec: 120
+  reasoning_token_floor:
+    low: 3000
+    medium: 8000
+    high: 16000
+  retry_on_rate_limit_seconds: 10
+  providers:
+    nvidia_nim_research:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 1.00
+        top_p: 0.95
+        max_tokens: 32768
+
+llm_script:
+  chain: [nvidia_nim_script]
+  request_timeout_sec: 300
+  retry_on_rate_limit_seconds: 10
+  providers:
+    nvidia_nim_script:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: meta/llama-3.1-70b-instruct
+      supports_reasoning_effort: false
+
+
+image:
+  chain: [nvidia_nim_sdxl, pollinations]
+  default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
+  request_timeout_sec: 120
+  providers:
+    nvidia_nim_sdxl:
+      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        cfg_scale: 5
+        sampler: K_DPM_2_ANCESTRAL
+        seed: 0
+        steps: 25
+    pollinations:
+      url_template: "https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true"
+      min_response_bytes: 1000
+
+video:
+  chain: [nvidia_nim_svd]
+  request_timeout_sec: 300
+  providers:
+    nvidia_nim_svd:
+      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-video-diffusion
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        cfg_scale: 1.8
+        seed: 0
+        motion_bucket_id: 127
+
+tts:
+  # F5-TTS is the sole TTS provider. No fallbacks — if it fails, the run fails.
+  # A reference WAV file must be committed to the repo (5–15 s of clean speech).
+  # Set F5_REF_AUDIO to its path (e.g. assets/voice_ref.wav).
+  # Optionally set F5_REF_TEXT to its transcript for better quality; if empty,
+  # F5-TTS runs built-in ASR (uses more RAM, adds ~30 s on first call).
+  chain: [f5tts]
+  default_rate: "+0%"
+  default_pitch: "+0Hz"
+  continuous_narration: false
+  normalize_output: true
+  trim_silence: true
+  silence_threshold_db: -45
+  silence_keep_sec: 0.25
+  request_timeout_sec: 1800   # CPU inference can take 15-30 min
+  providers:
+    f5tts:
+      backend: f5_tts
+      ref_audio_env: F5_REF_AUDIO   # env var holding path to reference WAV
+      ref_text_env:  F5_REF_TEXT    # env var holding transcript (empty = ASR)
+      params:
+        model: F5TTS_v1_Base
+        device: cpu
+        speed: 0.9
+    camb:
+      backend: camb_tts
+      url: https://client.camb.ai/apis/tts-stream
+      api_key_env: CAMB_API_KEY
+      params:
+        language: en-us
+        voice_id: 147320
+        speech_model: mars-instruct
+        user_instructions: >-
+          Speak like a calm friend explaining something fascinating. Keep the
+          delivery ultra-natural, continuous, clear, subtly expressive, brisk
+          but comfortable, and never robotic, theatrical, dramatic, or like a
+          news anchor. Preserve the supplied text exactly; do not rewrite,
+          summarize, add, remove, repeat, or skip any words. Use natural
+          emphasis on important words, slight pacing variation for hooks,
+          facts, reveals, and endings, and only tiny human-like pauses where
+          they feel natural.
+        enhance_named_entities_pronunciation: true
+        output_configuration:
+          format: wav
+          apply_enhancement: true
+        voice_settings:
+          enhance_reference_audio_quality: false
+          maintain_source_accent: false
+          speaking_rate: 1.08
+        inference_options:
+          inference_steps: 60
+    edge:
+      backend: edge_tts
+    gtts:
+      backend: gtts
+      params:
+        slow: false
+    nim_magpie:
+      url: https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual
+      api_key_env: NVIDIA_NIM_API_KEY
+      params:
+        encoding: mp3
+        sample_rate_hz: 22050
+        default_voice: "Magpie-Multilingual.EN-US.Ray"
+
+stock:
+  chain: [pexels, pixabay]
+  request_timeout_sec: 120
+  providers:
+    pexels:
+      url: https://api.pexels.com/videos/search
+      api_key_env: PEXELS_API_KEY
+      per_page: 5
+      size: medium
+    pixabay:
+      url: https://pixabay.com/api/videos/
+      api_key_env: PIXABAY_API_KEY
+      per_page: 5
+      safesearch: true
+
+youtube:
+  category_id: "28"
+  upload_chunk_size_mb: 8
+  scopes: ["https://www.googleapis.com/auth/youtube.upload"]
+  default_made_for_kids: false
+  token_uri: "https://oauth2.googleapis.com/token"
+  client_id_env: YOUTUBE_CLIENT_ID
+  client_secret_env: YOUTUBE_CLIENT_SECRET
+  refresh_token_env: YOUTUBE_REFRESH_TOKEN
+  title_max_chars: 100
+  description_max_chars: 5000
+  tags_max: 30

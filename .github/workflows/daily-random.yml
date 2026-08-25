@@ -1,0 +1,198 @@
+name: Daily Random Uploads
+
+# Optimized IST Schedule (Skips Thursday entirely for research day)
+#
+# Weekdays (Mon, Tue, Wed, Fri):
+#   - 7:00 PM IST (13:30 UTC) - Hits the 7:00-8:00 PM peak starting window
+#
+# Weekends (Sat, Sun): Two windows per day
+#   - Sat Morning: 11:00 AM IST (05:30 UTC)
+#   - Sun Morning: 10:00 AM IST (04:30 UTC)
+#   - Sat/Sun Evening: 6:30 PM IST (13:00 UTC)
+#
+# In each window, video count (0-3) is chosen randomly at runtime.
+# Each video is uploaded individually with random gaps (20-40 min)
+# to maintain organic publish timestamps.
+
+on:
+  schedule:
+    # Weekdays (Mon, Tue, Wed, Fri) @ 7:00 PM IST
+    - cron: "30 13 * * 1-3,5"
+    # Saturday Morning @ 11:00 AM IST
+    - cron: "30 5 * * 6"
+    # Sunday Morning @ 10:00 AM IST
+    - cron: "30 4 * * 0"
+    # Weekend Evenings (Sat, Sun) @ 6:30 PM IST
+    - cron: "0 13 * * 0,6"
+  workflow_dispatch:
+    inputs:
+      video_count:
+        description: "Videos to produce (0-3). Leave empty for random."
+        required: false
+        default: ""
+      lane:
+        description: "Optional: restrict random pick to this lane id"
+        required: false
+        default: ""
+      no_upload:
+        description: "Build but skip YouTube upload"
+        required: false
+        default: "false"
+      skip_svd:
+        description: "Skip SVD animation (faster build)"
+        required: false
+        default: "false"
+      skip_random_sleep:
+        description: "Skip random delays between videos (manual runs)"
+        required: false
+        default: "true"
+
+concurrency:
+  group: utube-daily
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    # Budget: 3 videos × ~55 min each + 2 gaps × 40 min = ~245 min
+    timeout-minutes: 260
+    permissions:
+      contents: write   # commit ledger.json + run artifacts back to repo
+      issues:   write   # auto-open an issue on failure
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install ffmpeg + fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg fonts-dejavu-core
+
+      - name: Cache F5-TTS model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: f5tts-v1-base-${{ runner.os }}
+          restore-keys: f5tts-v1-base-
+
+      - name: Install PyTorch (CPU)
+        run: |
+          python -m pip install --upgrade pip uv
+          uv pip install --system "numpy<2" torch torchvision torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install Python deps
+        run: |
+          uv pip install --system -r requirements.txt
+
+      - name: Produce and upload videos with random gaps
+        env:
+          NVIDIA_NIM_API_KEY:    ${{ secrets.NVIDIA_NIM_API_KEY }}
+          OPENROUTER_API_KEY:    ${{ secrets.OPENROUTER_API_KEY }}
+          F5_REF_AUDIO:          assets/voice_ref.wav
+          F5_REF_TEXT:           ${{ secrets.F5_REF_TEXT }}
+          PEXELS_API_KEY:        ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:       ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # ── 1. Decide how many videos to produce today (0-3) ─────────────
+          INPUT_COUNT="${{ inputs.video_count }}"
+          if [ -n "$INPUT_COUNT" ]; then
+            N=$INPUT_COUNT
+            echo "Manual override: $N video(s)."
+          else
+            N=$((RANDOM % 4))   # 0, 1, 2, or 3 — equal 25% chance each
+            echo "Random draw: $N video(s) today."
+          fi
+
+          if [ "$N" -eq 0 ]; then
+            echo "Zero videos chosen — skipping today. See you tomorrow!"
+            exit 0
+          fi
+
+          # ── 2. Build base orchestrator args ──────────────────────────────
+          LANE="${{ inputs.lane }}"
+          NO_UPLOAD="${{ inputs.no_upload || 'false' }}"
+          SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
+          SKIP_SLEEP="${{ inputs.skip_random_sleep || 'false' }}"
+
+          BASE="--random-batch --videos-min 1 --videos-max 1"
+          [ -n "$LANE" ]             && BASE="$BASE --lane $LANE"
+          [ "$NO_UPLOAD" = "true" ]  && BASE="$BASE --no-upload"
+          [ "$SKIP_SVD"  = "true" ]  && BASE="$BASE --skip-svd"
+
+          # ── 3. Initial random offset — scatter first upload 0-20 min ─────
+          if [ "$SKIP_SLEEP" != "true" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            OFFSET=$((RANDOM % 1201))   # 0-1200 s = 0-20 min
+            echo "Initial offset: ${OFFSET}s (~$((OFFSET/60)) min) → spreads within 05:00-05:20 IST."
+            sleep "$OFFSET"
+          fi
+
+          # ── 4. Produce each video, sleep a random gap between them ────────
+          for i in $(seq 1 "$N"); do
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "  VIDEO $i / $N   $(date '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            python -m pipeline.orchestrator $BASE
+
+            # Sleep a random gap between videos (20-40 min), skip after last
+            if [ "$i" -lt "$N" ] && [ "$SKIP_SLEEP" != "true" ]; then
+              GAP=$(( (RANDOM % 1201) + 1200 ))   # 1200-2400 s = 20-40 min
+              echo ""
+              echo "Cooling down ${GAP}s (~$((GAP/60)) min) before video $((i+1))…"
+              sleep "$GAP"
+            fi
+          done
+
+          echo ""
+          echo "✓ All $N video(s) done — $(date '+%H:%M:%S UTC')"
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-${{ github.run_id }}
+          path: |
+            runs/**/*.json
+            runs/**/captions.srt
+            runs/**/thumbnail.jpg
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Commit ledger + run summaries
+        if: always()
+        run: |
+          git config user.name  "utube-bot"
+          git config user.email "utube-bot@users.noreply.github.com"
+          git add ledger.json runs/**/*.json runs/**/captions.srt 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin HEAD:${{ github.ref_name }} || true
+          else
+            echo "Nothing to commit."
+          fi
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().slice(0, 10);
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `Daily run failed (${today})`,
+              body:  `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              labels: ["daily-batch-failure"],
+            });

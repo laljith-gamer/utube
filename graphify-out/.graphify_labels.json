@@ -1,0 +1,21 @@
+{
+  "0": "get_config",
+  "1": "orchestrator.py",
+  "2": "TTSRouter",
+  "3": "ImageRouter",
+  "4": "thumbnail.py",
+  "5": "themes.py",
+  "6": "audio.py",
+  "7": "discover.py",
+  "8": "captions.py",
+  "9": "Ledger",
+  "10": "assemble.py",
+  "11": "Config",
+  "12": "generate_youtube_token.py",
+  "13": "providers/__init__.py",
+  "14": "scripts/__init__.py",
+  "15": "env",
+  "16": "CLAUDE.md",
+  "17": "AGENT.md",
+  "18": "README.md"
+}
