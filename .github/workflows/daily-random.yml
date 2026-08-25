@@ -1,26 +1,28 @@
 name: Daily Random Uploads
 
-# Two random windows per day (IST), 1 or 2 videos each.
+# Single morning window: 05:00 IST (23:30 UTC), targets 05:00-08:00 IST.
 #
-#   Window 1 cron:  23:30 UTC  =>  05:00 IST   (random sleep 0-59min => fires anywhere in 05:00-06:00 IST)
-#   Window 2 cron:  00:30 UTC  =>  06:00 IST   (random sleep 0-59min => fires anywhere in 06:00-07:00 IST)
+# Video count (0-3) is chosen randomly at runtime:
+#   0  → skip today entirely
+#   1  → one video, published somewhere in 05:00-05:20 IST
+#   2  → two videos, 20-40 min gap between them
+#   3  → three videos, 20-40 min gaps between each
 #
-# Per-window video count (1 or 2) is chosen by the orchestrator from
-# config/schedule.yaml > videos_min / videos_max.
+# Each video is produced and uploaded individually so publish timestamps
+# appear organic. A small random initial offset (0-20 min) further
+# scatters the first upload within the window.
+#
+# Skip Thursday — reserved for the thursday-analysis.yml workflow.
 
 on:
   schedule:
-    - cron: "30 23 * * 0-3,5-6"   # 05:00 IST window starts
+    - cron: "30 23 * * 0-3,5-6"   # 05:00 IST, Mon-Wed, Fri-Sun
   workflow_dispatch:
     inputs:
-      videos_min:
-        description: "Min videos this run (overrides schedule.yaml)"
+      video_count:
+        description: "Videos to produce (0-3). Leave empty for random."
         required: false
-        default: "1"
-      videos_max:
-        description: "Max videos this run (overrides schedule.yaml)"
-        required: false
-        default: "1"
+        default: ""
       lane:
         description: "Optional: restrict random pick to this lane id"
         required: false
@@ -34,46 +36,22 @@ on:
         required: false
         default: "false"
       skip_random_sleep:
-        description: "Skip the 0-59 min random delay (manual runs)"
+        description: "Skip random delays between videos (manual runs)"
         required: false
         default: "true"
 
-# Each window gets its own concurrency lane so they don't cancel each other,
-# but two of the same window can't double-fire.
 concurrency:
-  group: utube-random-${{ github.event.schedule || 'manual' }}
+  group: utube-daily
   cancel-in-progress: false
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      should_run: ${{ steps.chance.outputs.run }}
-    steps:
-      - name: 50% chance to run
-        id: chance
-        run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ $((RANDOM % 2)) -eq 0 ]; then
-              echo "Skipping this run (50% chance)."
-              echo "run=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "Running this time (50% chance)."
-              echo "run=true" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "Manual run, always running."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
-
   produce:
-    needs: check
-    if: needs.check.outputs.should_run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Budget: 3 videos × ~55 min each + 2 gaps × 40 min = ~245 min
+    timeout-minutes: 260
     permissions:
       contents: write   # commit ledger.json + run artifacts back to repo
-      issues:   write   # auto-open an issue when the run fails (see last step)
+      issues:   write   # auto-open an issue on failure
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,13 +62,6 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-
-      - name: Random delay within the hour
-        if: github.event_name == 'schedule' || inputs.skip_random_sleep != 'true'
-        run: |
-          DELAY=$((RANDOM % 3600))
-          echo "Sleeping ${DELAY}s to randomize publish time within the window."
-          sleep "$DELAY"
 
       - name: Install ffmpeg + fonts
         run: |
@@ -113,34 +84,72 @@ jobs:
         run: |
           uv pip install --system -r requirements.txt
 
-      - name: Build args
-        id: args
+      - name: Produce and upload videos with random gaps
         env:
-          VIDEOS_MIN: ${{ inputs.videos_min || '1' }}
-          VIDEOS_MAX: ${{ inputs.videos_max || '2' }}
-          LANE:       ${{ inputs.lane || '' }}
-          NO_UPLOAD:  ${{ inputs.no_upload || 'false' }}
-          SKIP_SVD:   ${{ inputs.skip_svd || 'false' }}
-        run: |
-          ARGS="--random-batch --videos-min $VIDEOS_MIN --videos-max $VIDEOS_MAX"
-          if [ -n "$LANE" ];        then ARGS="$ARGS --lane $LANE"; fi
-          if [ "$NO_UPLOAD" = "true" ]; then ARGS="$ARGS --no-upload"; fi
-          if [ "$SKIP_SVD" = "true" ];  then ARGS="$ARGS --skip-svd"; fi
-          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
-
-      - name: Run orchestrator
-        env:
-          NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          F5_REF_AUDIO: assets/voice_ref.wav
-          F5_REF_TEXT:  ${{ secrets.F5_REF_TEXT }}
-          PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY:    ${{ secrets.PIXABAY_API_KEY }}
+          NVIDIA_NIM_API_KEY:    ${{ secrets.NVIDIA_NIM_API_KEY }}
+          OPENROUTER_API_KEY:    ${{ secrets.OPENROUTER_API_KEY }}
+          F5_REF_AUDIO:          assets/voice_ref.wav
+          F5_REF_TEXT:           ${{ secrets.F5_REF_TEXT }}
+          PEXELS_API_KEY:        ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY:       ${{ secrets.PIXABAY_API_KEY }}
           YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
-          python -m pipeline.orchestrator ${{ steps.args.outputs.args }}
+          set -euo pipefail
+
+          # ── 1. Decide how many videos to produce today (0-3) ─────────────
+          INPUT_COUNT="${{ inputs.video_count }}"
+          if [ -n "$INPUT_COUNT" ]; then
+            N=$INPUT_COUNT
+            echo "Manual override: $N video(s)."
+          else
+            N=$((RANDOM % 4))   # 0, 1, 2, or 3 — equal 25% chance each
+            echo "Random draw: $N video(s) today."
+          fi
+
+          if [ "$N" -eq 0 ]; then
+            echo "Zero videos chosen — skipping today. See you tomorrow!"
+            exit 0
+          fi
+
+          # ── 2. Build base orchestrator args ──────────────────────────────
+          LANE="${{ inputs.lane }}"
+          NO_UPLOAD="${{ inputs.no_upload || 'false' }}"
+          SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
+          SKIP_SLEEP="${{ inputs.skip_random_sleep || 'false' }}"
+
+          BASE="--random-batch --videos-min 1 --videos-max 1"
+          [ -n "$LANE" ]             && BASE="$BASE --lane $LANE"
+          [ "$NO_UPLOAD" = "true" ]  && BASE="$BASE --no-upload"
+          [ "$SKIP_SVD"  = "true" ]  && BASE="$BASE --skip-svd"
+
+          # ── 3. Initial random offset — scatter first upload 0-20 min ─────
+          if [ "$SKIP_SLEEP" != "true" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            OFFSET=$((RANDOM % 1201))   # 0-1200 s = 0-20 min
+            echo "Initial offset: ${OFFSET}s (~$((OFFSET/60)) min) → spreads within 05:00-05:20 IST."
+            sleep "$OFFSET"
+          fi
+
+          # ── 4. Produce each video, sleep a random gap between them ────────
+          for i in $(seq 1 "$N"); do
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "  VIDEO $i / $N   $(date '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            python -m pipeline.orchestrator $BASE
+
+            # Sleep a random gap between videos (20-40 min), skip after last
+            if [ "$i" -lt "$N" ] && [ "$SKIP_SLEEP" != "true" ]; then
+              GAP=$(( (RANDOM % 1201) + 1200 ))   # 1200-2400 s = 20-40 min
+              echo ""
+              echo "Cooling down ${GAP}s (~$((GAP/60)) min) before video $((i+1))…"
+              sleep "$GAP"
+            fi
+          done
+
+          echo ""
+          echo "✓ All $N video(s) done — $(date '+%H:%M:%S UTC')"
 
       - name: Upload run artifacts
         if: always()
@@ -161,7 +170,7 @@ jobs:
           git config user.email "utube-bot@users.noreply.github.com"
           git add ledger.json runs/**/*.json runs/**/captions.srt 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "chore(run): random batch $(date -u +%Y-%m-%dT%H:%MZ)"
+            git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin HEAD:${{ github.ref_name }} || true
           else
             echo "Nothing to commit."
@@ -176,7 +185,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo:  context.repo.repo,
-              title: `Daily random run failed (${today})`,
+              title: `Daily run failed (${today})`,
               body:  `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               labels: ["daily-batch-failure"],
             });
