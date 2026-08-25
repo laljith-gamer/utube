@@ -1,20 +1,19 @@
-"""TTS router - config-driven multi-provider chain with full error visibility.
+"""TTS router - config-driven single-provider chain with full error visibility.
 
 Providers
 ---------
-camb   : Camb.ai streaming TTS. High-quality MARS voices with instruction-based
-         delivery control. Requires CAMB_API_KEY.
-edge   : Microsoft Edge TTS via the edge-tts python lib. No API key. High quality
-         but flaky from cloud runners (~5-10% empty-response rate).
-gtts   : Google Translate TTS via the gTTS python lib. No API key. Lower quality
-         voice but extremely reliable; used as the no-network-key fallback.
+f5_tts : F5-TTS local inference (https://github.com/SWivid/F5-TTS).
+         Zero-shot voice cloning from a reference WAV. Runs on CPU (slow) or
+         GPU (fast). No API key, no quota. Primary and only provider.
+         Requires: pip install f5-tts soundfile torch torchaudio
+         Requires: F5_REF_AUDIO env var pointing to a reference WAV file.
+camb   : Camb.ai streaming TTS. Kept in code for optional future use. Requires CAMB_API_KEY.
+edge   : Microsoft Edge TTS. Kept in code for optional future use. No API key.
+gtts   : Google Translate TTS. Kept in code for optional future use. No API key.
 
+If F5-TTS fails the pipeline raises immediately — there are no silent fallbacks.
 Optional speed control is applied after synthesis via ffmpeg's `atempo` filter
-(see pipeline/stages/audio.py). Camb should generally use native
-`voice_settings.speaking_rate`; Edge and gTTS stay at neutral provider speed.
-
-If you re-introduce another paid provider (NVIDIA NIM Magpie etc.), follow the
-existing `_xxx()` pattern: synthesize at natural speed and return audio bytes.
+(see pipeline/stages/audio.py).
 """
 from __future__ import annotations
 
@@ -65,8 +64,8 @@ class TTSRouter:
             p = self.providers.get(name) or {}
             try:
                 backend = p.get("backend") or name
-                if backend == "elevenlabs":
-                    return self._elevenlabs(p, text, voice)
+                if backend == "f5_tts":
+                    return self._f5_tts(p, text, voice)
                 if backend == "camb_tts" or name == "camb":
                     return self._camb_tts(p, text, voice)
                 if backend == "edge_tts":
@@ -86,52 +85,73 @@ class TTSRouter:
         # another round-trip through the workflow logs.
         raise RuntimeError("All TTS providers failed.\n  - " + "\n  - ".join(errors))
 
-    # ------------------------------------------------------------------ elevenlabs
+    # ------------------------------------------------------------------ f5_tts
 
-    def _elevenlabs(self, p: dict, text: str, voice: str) -> bytes:
-        """Synthesize with ElevenLabs TTS API."""
-        api_key = env(p.get("api_key_env", ""))
-        if not api_key:
-            raise RuntimeError(f"ElevenLabs key not set for {p.get('api_key_env')}")
+    def _f5_tts(self, p: dict, text: str, voice: str) -> bytes:  # noqa: ARG002
+        """Synthesize with F5-TTS (local, zero-shot voice cloning).
+
+        Reads the reference audio path from the env var named in
+        ``ref_audio_env`` (default ``F5_REF_AUDIO``). An optional reference
+        text transcript can be supplied via ``ref_text_env`` (default
+        ``F5_REF_TEXT``); if empty, F5-TTS runs its built-in ASR instead.
+
+        The ``voice`` argument is ignored — F5-TTS derives the voice style
+        entirely from the reference audio file.
+        """
+        import soundfile as sf  # lazy import — large dep
+        from f5_tts.api import F5TTS  # lazy import — very large dep
 
         params = p.get("params", {}) or {}
-        # The slot config might pass an Edge/Azure TTS voice string (like en-US-AvaMultilingualNeural).
-        # ElevenLabs voice IDs are exactly 20-character alphanumeric strings without hyphens.
-        if not voice or "-" in voice or len(voice) != 20:
-            voice_id = params.get("voice_id")
-        else:
-            voice_id = voice
-        
-        url = f"{p.get('url', 'https://api.elevenlabs.io/v1/text-to-speech')}/{voice_id}"
-        
-        headers = {
-            "Accept": "audio/mpeg",
-            "Content-Type": "application/json",
-            "xi-api-key": api_key,
-        }
 
-        payload = {
-            "text": text,
-            "model_id": params.get("model_id", "eleven_multilingual_v2"),
-        }
-        
-        if "voice_settings" in params:
-            payload["voice_settings"] = params["voice_settings"]
+        ref_audio_env = p.get("ref_audio_env", "F5_REF_AUDIO")
+        ref_audio = env(ref_audio_env) or params.get("ref_audio", "")
+        if not ref_audio:
+            raise RuntimeError(
+                f"F5-TTS: reference audio not configured. "
+                f"Set the {ref_audio_env!r} env var to a WAV file path."
+            )
 
-        LOG.info("TTS via ElevenLabs (voice_id=%s)", voice_id)
-        
-        r = requests.post(url, json=payload, headers=headers, timeout=self.timeout)
-        
-        if r.status_code >= 400:
-            body = (r.text or "").strip()
-            # Status 401 usually means quota exceeded (or invalid key)
-            raise RuntimeError(f"ElevenLabs HTTP {r.status_code}: {body[:500]}")
-            
-        data = r.content
-        if not data:
-            raise RuntimeError("ElevenLabs returned empty audio")
-            
-        return data
+        from pathlib import Path as _Path
+        if not _Path(ref_audio).exists():
+            raise RuntimeError(
+                f"F5-TTS: reference audio file not found: {ref_audio!r}. "
+                "Commit a WAV file (5–15 s of speech) at that path."
+            )
+
+        ref_text_env = p.get("ref_text_env", "F5_REF_TEXT")
+        ref_text = env(ref_text_env) or params.get("ref_text", "")
+
+        model = params.get("model", "F5TTS_v1_Base")
+        device = params.get("device", "cpu")
+        speed = float(params.get("speed", 1.0))
+
+        LOG.info(
+            "TTS via F5-TTS (model=%s, device=%s, ref=%s, ref_text=%s)",
+            model,
+            device,
+            ref_audio,
+            repr(ref_text[:40]) if ref_text else "<ASR>",
+        )
+
+        tts_engine = F5TTS(model=model, device=device)
+        wav, sr, _ = tts_engine.infer(
+            ref_file=ref_audio,
+            ref_text=ref_text,
+            gen_text=text,
+            speed=speed,
+        )
+
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            tmp = Path(f.name)
+        try:
+            sf.write(str(tmp), wav, sr)
+            data = tmp.read_bytes()
+            if not data:
+                raise RuntimeError("F5-TTS returned empty audio")
+            LOG.info("F5-TTS synthesis complete (%d bytes)", len(data))
+            return data
+        finally:
+            tmp.unlink(missing_ok=True)
 
     # ------------------------------------------------------------------ camb
 

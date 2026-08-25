@@ -8,9 +8,12 @@ pydantic>=2.5.0
 # LLM clients (OpenAI-compatible works for NIM, Cerebras, Groq, OpenRouter)
 openai>=1.40.0
 
-# TTS fallbacks. Camb.ai primary uses the existing requests dependency.
-edge-tts>=6.1.12
-gTTS>=2.5.0
+# TTS — F5-TTS local inference (zero-shot voice cloning, no API key).
+# torch + torchaudio are installed separately in CI via the CPU wheel:
+#   uv pip install --system torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+# For local GPU runs, install the matching CUDA wheel manually.
+f5-tts>=1.0.0
+soundfile>=0.12.1
 
 # Audio / Video
 faster-whisper>=1.0.3
