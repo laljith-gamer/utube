@@ -1,22 +1,29 @@
 name: Daily Random Uploads
 
-# Single morning window: 05:00 IST (23:30 UTC), targets 05:00-08:00 IST.
+# Optimized IST Schedule (Skips Thursday entirely for research day)
 #
-# Video count (0-3) is chosen randomly at runtime:
-#   0  → skip today entirely
-#   1  → one video, published somewhere in 05:00-05:20 IST
-#   2  → two videos, 20-40 min gap between them
-#   3  → three videos, 20-40 min gaps between each
+# Weekdays (Mon, Tue, Wed, Fri):
+#   - 7:00 PM IST (13:30 UTC) - Hits the 7:00-8:00 PM peak starting window
 #
-# Each video is produced and uploaded individually so publish timestamps
-# appear organic. A small random initial offset (0-20 min) further
-# scatters the first upload within the window.
+# Weekends (Sat, Sun): Two windows per day
+#   - Sat Morning: 11:00 AM IST (05:30 UTC)
+#   - Sun Morning: 10:00 AM IST (04:30 UTC)
+#   - Sat/Sun Evening: 6:30 PM IST (13:00 UTC)
 #
-# Skip Thursday — reserved for the thursday-analysis.yml workflow.
+# In each window, video count (0-3) is chosen randomly at runtime.
+# Each video is uploaded individually with random gaps (20-40 min)
+# to maintain organic publish timestamps.
 
 on:
   schedule:
-    - cron: "30 23 * * 0-3,5-6"   # 05:00 IST, Mon-Wed, Fri-Sun
+    # Weekdays (Mon, Tue, Wed, Fri) @ 7:00 PM IST
+    - cron: "30 13 * * 1-3,5"
+    # Saturday Morning @ 11:00 AM IST
+    - cron: "30 5 * * 6"
+    # Sunday Morning @ 10:00 AM IST
+    - cron: "30 4 * * 0"
+    # Weekend Evenings (Sat, Sun) @ 6:30 PM IST
+    - cron: "0 13 * * 0,6"
   workflow_dispatch:
     inputs:
       video_count:
