@@ -78,7 +78,7 @@ jobs:
       - name: Install PyTorch (CPU)
         run: |
           python -m pip install --upgrade pip uv
-          uv pip install --system "numpy<2" torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+          uv pip install --system "numpy<2" torch torchvision torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
 
       - name: Install Python deps
         run: |
