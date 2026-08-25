@@ -71,11 +71,11 @@ tts:
   chain: [f5tts]
   default_rate: "+0%"
   default_pitch: "+0Hz"
-  continuous_narration: true
+  continuous_narration: false
   normalize_output: true
   trim_silence: true
   silence_threshold_db: -45
-  silence_keep_sec: 0.05
+  silence_keep_sec: 0.25
   request_timeout_sec: 1800   # CPU inference can take 15-30 min
   providers:
     f5tts:
@@ -85,7 +85,7 @@ tts:
       params:
         model: F5TTS_v1_Base
         device: cpu
-        speed: 1.0
+        speed: 0.9
     camb:
       backend: camb_tts
       url: https://client.camb.ai/apis/tts-stream

@@ -64,15 +64,71 @@ def _layout_cfg(cfg: dict) -> dict[str, int]:
     }
 
 
+def _highlighted_cues(lines: list[tuple[list[Any], str]]) -> list[tuple[float, float, str]]:
+    all_tokens = [tok for line_tokens, _ in lines for tok in line_tokens]
+    if not all_tokens:
+        return []
+        
+    cues = []
+    for i, active_tok in enumerate(all_tokens):
+        t_start = float(active_tok.start)
+        t_end = float(all_tokens[i+1].start) if i + 1 < len(all_tokens) else float(all_tokens[-1].end)
+        # Prevent 0-duration cues
+        t_end = max(t_start + 0.01, t_end)
+        
+        formatted_lines = []
+        for line_tokens, _ in lines:
+            line_str = ""
+            for tok in line_tokens:
+                raw_word = str(getattr(tok, "word", tok))
+                word_strip = raw_word.strip()
+                
+                if not line_str:
+                    part = word_strip
+                elif raw_word.startswith(" "):
+                    part = " " + word_strip
+                else:
+                    part = word_strip
+                    
+                if tok is active_tok:
+                    part = f'<font color="#FFFF00">{part}</font>'
+                line_str += part
+            formatted_lines.append(line_str)
+            
+        cues.append((t_start, t_end, "\n".join(formatted_lines)))
+    return cues
+
+
 def _word_cues(words: list[Any], layout: dict[str, int]) -> list[tuple[float, float, str]]:
     cues: list[tuple[float, float, str]] = []
     chunk_size = layout["chunk_size"]
-    for i in range(0, len(words), chunk_size):
-        chunk = words[i:i + chunk_size]
-        for tokens, text in _group_wrapped_lines(_wrap_tokens(chunk, layout["max_chars"]), layout["max_lines"]):
-            if not tokens:
-                continue
-            cues.append((float(tokens[0].start), float(tokens[-1].end), text))
+    
+    current_chunk = []
+    word_count = 0
+    
+    def _flush(chunk):
+        wrapped = _wrap_tokens(chunk, layout["max_chars"])
+        # _group_wrapped_lines groups lines into batches of max_lines
+        for i in range(0, len(wrapped), layout["max_lines"]):
+            batch = wrapped[i:i + layout["max_lines"]]
+            cues.extend(_highlighted_cues(batch))
+
+    for w in words:
+        raw = str(getattr(w, "word", w))
+        is_new_word = raw.startswith(" ") or not current_chunk
+        
+        if is_new_word and word_count >= chunk_size:
+            _flush(current_chunk)
+            current_chunk = []
+            word_count = 0
+            
+        current_chunk.append(w)
+        if is_new_word:
+            word_count += 1
+            
+    if current_chunk:
+        _flush(current_chunk)
+                
     return cues
 
 
@@ -116,17 +172,28 @@ def _wrap_tokens(tokens: list[Any], max_chars: int) -> list[tuple[list[Any], str
     current: list[Any] = []
     current_text = ""
     for tok in tokens:
-        word = str(getattr(tok, "word", tok)).strip()
-        if not word:
+        raw_word = str(getattr(tok, "word", tok))
+        word_strip = raw_word.strip()
+        if not word_strip:
             continue
-        candidate = f"{current_text} {word}".strip() if current_text else word
+        # Use the raw word (which usually has a leading space if needed)
+        # unless it's the first word on the line, then we strip it.
+        if not current_text:
+            candidate = word_strip
+        else:
+            # If the raw word didn't have a leading space, don't add one (e.g., punctuation or split numbers)
+            if raw_word.startswith(" "):
+                candidate = current_text + " " + word_strip
+            else:
+                candidate = current_text + word_strip
+
         if not current_text or len(candidate) <= max_chars:
             current.append(tok)
             current_text = candidate
         else:
             lines.append((current, current_text))
             current = [tok]
-            current_text = word
+            current_text = word_strip
     if current:
         lines.append((current, current_text))
     return lines

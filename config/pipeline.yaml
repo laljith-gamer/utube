@@ -5,10 +5,10 @@ video:                              # final output specs
   width: 1080
   height: 1920
   fps: 30
-  target_duration_sec: 35
+  target_duration_sec: 32
   min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
   max_duration_sec: 45
-  num_scenes: 18                    # ~1.9s per scene = fast modern TikTok/Shorts pacing
+  num_scenes: 15                    # ~2.1s per scene = fast modern TikTok/Shorts pacing
 
 # Visuals: every scene is motion-based.
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
@@ -48,7 +48,7 @@ script:
   reasoning_effort: low
   # 3.0 wps written with Camb speaking_rate ~= 1.08 gives a brisk Shorts pace.
   # If videos sound rushed, drop to 2.7. If too slow, push to 3.2.
-  words_per_second: 3.0
+  words_per_second: 2.5
   hook_max_seconds: 2              # first 2s decides retention on Shorts
   hashtags_count: 20               # exact number of dynamic hashtags the LLM must produce
 
@@ -123,11 +123,11 @@ assemble:
     outline_width: 3
     back_color_hex: "80000000"
     shadow: 2
-    alignment: 2                   # 2 = bottom center
-    margin_l: 80                   # horizontal wrap bounds for portrait Shorts
-    margin_r: 80
-    margin_v: 180
-    wrap_style: 0                  # 0 = smart word wrap at top/bottom line width
+    alignment: 5                   # 5 = center center (for middle-of-screen captions)
+    margin_l: 120                  # horizontal wrap bounds for portrait Shorts
+    margin_r: 120
+    margin_v: 0
+    wrap_style: 1                  # 1 = end-of-line word wrapping
 
 stage_timeouts_sec:
   discover: 60

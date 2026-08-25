@@ -43,8 +43,12 @@ def assemble_video(
 
     import concurrent.futures
 
+    fade_dur = float(acfg.get("transition_duration_sec", 0.3))
+    
     def _render_scene_clip(i: int, v: dict) -> Path:
-        dur = max(seg_durations[i], 1.5)
+        # Extend the clip by the fade duration so the overlap doesn't desync audio
+        added_dur = fade_dur if i < len(visuals) - 1 else 0.0
+        dur = max(seg_durations[i], 1.5) + added_dur
         out_clip = work_dir / f"scene_{i:02d}.mp4"
         if "video" in v:
             _render_from_video(out_dir / v["video"], out_clip, dur, width, height, fps, acfg)
@@ -60,7 +64,7 @@ def assemble_video(
             scene_clips[i] = future.result()
 
     silent_video = work_dir / "silent.mp4"
-    _concat(scene_clips, silent_video, acfg)
+    _concat(scene_clips, silent_video, acfg, seg_durations, fade_dur)
 
     narration = out_dir / audio_summary["master"]
     _final_mux(
@@ -145,18 +149,12 @@ def _render_motion_filler(out: Path, dur: float, w: int, h: int, fps: int, acfg:
 
 # ---------- composition ----------
 
-def _concat(clips: list[Path], out: Path, acfg: dict) -> None:
-    listfile = out.with_suffix(".txt")
-    listfile.write_text("\n".join(f"file '{c.resolve()}'" for c in clips), encoding="utf-8")
-    cmd = [
-        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", str(listfile),
-        "-c", "copy",
-        str(out),
-    ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    if res.returncode != 0:
-        f = acfg.get("ffmpeg", {}) or {}
+def _concat(clips: list[Path], out: Path, acfg: dict, seg_durations: list[float], fade_dur: float) -> None:
+    f = acfg.get("ffmpeg", {}) or {}
+    
+    if fade_dur <= 0.001 or len(clips) < 2:
+        listfile = out.with_suffix(".txt")
+        listfile.write_text("\n".join(f"file '{c.resolve()}'" for c in clips), encoding="utf-8")
         cmd = [
             "ffmpeg", "-y", "-f", "concat", "-safe", "0",
             "-i", str(listfile),
@@ -165,7 +163,33 @@ def _concat(clips: list[Path], out: Path, acfg: dict) -> None:
             str(out),
         ]
         subprocess.run(cmd, check=True, capture_output=True, text=True)
-    listfile.unlink(missing_ok=True)
+        listfile.unlink(missing_ok=True)
+        return
+
+    inputs = []
+    for c in clips:
+        inputs.extend(["-i", str(c)])
+
+    filter_parts = []
+    last_out = "[0:v]"
+    current_offset = 0.0
+    
+    for i in range(1, len(clips)):
+        current_offset += max(seg_durations[i-1], 1.5)
+        out_pad = f"[v{i}]" if i < len(clips) - 1 else "[outv]"
+        # Using a smooth crossfade transition
+        filter_parts.append(f"{last_out}[{i}:v]xfade=transition=fade:duration={fade_dur}:offset={current_offset:.3f}{out_pad}")
+        last_out = out_pad
+
+    cmd = [
+        "ffmpeg", "-y", *inputs,
+        "-filter_complex", ";".join(filter_parts),
+        "-map", "[outv]",
+        "-c:v", f.get("video_codec", "libx264"),
+        "-pix_fmt", f.get("pix_fmt", "yuv420p"),
+        str(out),
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 
 def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
