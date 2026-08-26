@@ -64,8 +64,8 @@ captions:
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 5               # how many words per caption cue (5 = complete phrases)
-  fade_ms: 200                     # smooth fade in/out when caption chunks appear/disappear
+  words_per_chunk: 2               # energetic pacing
+  fade_ms: 0                       # snap in/out for a humanic pop effect
 
 thumbnail:
   width: 1080
@@ -117,16 +117,16 @@ assemble:
   caption_subtitle_style:
     fontname: "DejaVu Sans"
     bold: 1
-    fontsize: 18                   # compact, clean text — not oversized, consistent positioning
-    primary_color_hex: "0000FFFF"  # AABBGGRR for ASS (Yellow)
+    fontsize: 20                   # roughly 7% of screen height
+    primary_color_hex: "00FFFFFF"  # AABBGGRR for ASS (White) - so yellow highlights pop
     outline_color_hex: "00000000"
-    outline_width: 3
+    outline_width: 2
     back_color_hex: "80000000"
-    shadow: 2
-    alignment: 5                   # SSA 5 = center-center (middle of screen)
-    margin_l: 140                  # equal L/R margins for true horizontal centering on portrait
-    margin_r: 140
-    margin_v: 0                    # 0 = dead center (alignment=5 centers vertically; non-zero pushes off-screen in libass coords)
+    shadow: 1.5
+    alignment: 2                   # 2 = bottom-center (standard ASS alignment)
+    margin_l: 25                   # small margins to allow text to spread horizontally
+    margin_r: 25
+    margin_v: 110                  # ~38% up from the bottom in 288p resolution
     wrap_style: 1                  # 1 = end-of-line word wrapping
 
 stage_timeouts_sec:
