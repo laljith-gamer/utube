@@ -100,7 +100,7 @@ def generate_visuals(
         return record
 
     out: list[dict] = [{} for _ in scenes]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         futures = {executor.submit(_generate_scene, i, scene): i for i, scene in enumerate(scenes)}
         for future in concurrent.futures.as_completed(futures):
             i = futures[future]

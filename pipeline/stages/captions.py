@@ -49,6 +49,12 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
         lines = [_srt_block(i, start, end, text, fade_ms) for i, (start, end, text) in enumerate(timed_cues, 1)]
         srt_path.write_text("\n".join(lines), encoding="utf-8")
         LOG.info("Captions: %d cues from %.1fs audio", len(timed_cues), info.duration)
+
+        # Free memory explicitly
+        del model
+        import gc
+        gc.collect()
+
         return srt_path
     except Exception as e:  # noqa: BLE001
         LOG.warning("Whisper transcription failed (%s); writing empty SRT", e)

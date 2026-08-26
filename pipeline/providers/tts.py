@@ -141,6 +141,10 @@ class TTSRouter:
             speed=speed,
         )
 
+        del tts_engine
+        import gc
+        gc.collect()
+
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
             tmp = Path(f.name)
         try:

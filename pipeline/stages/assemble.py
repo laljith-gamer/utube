@@ -57,9 +57,9 @@ def assemble_video(
         return out_clip
 
     scene_clips: list[Path] = [Path()] * len(visuals)
-    # ffmpeg already multithreads internally. Running 8 parallel ffmpeg video scaling
-    # jobs on a GitHub Actions runner (7GB RAM, 2 cores) causes an immediate OOM kill.
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+    # ffmpeg already multithreads internally. Running parallel ffmpeg video scaling
+    # jobs on a GitHub Actions runner (7GB RAM, 2 cores) alongside cached PyTorch models causes OOM.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         futures = {executor.submit(_render_scene_clip, i, v): i for i, v in enumerate(visuals)}
         for future in concurrent.futures.as_completed(futures):
             i = futures[future]

@@ -178,7 +178,9 @@ def _synthesize_segmented(
     per_scene: list[dict] = [{}] * len(segments)
     seg_files: list[Path] = [Path()] * len(segments)
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(5, len(segments))) as executor:
+    # PyTorch already multithreads internally. Running parallel inferences on CPU
+    # causes severe thread contention and memory spikes. Run sequentially.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         futures = {executor.submit(_generate_segment, name, text): i for i, (name, text) in enumerate(segments)}
         for future in concurrent.futures.as_completed(futures):
             i = futures[future]
