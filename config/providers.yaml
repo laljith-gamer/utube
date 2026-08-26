@@ -38,12 +38,12 @@ llm_script:
     nvidia_nim_script:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: meta/llama-3.1-70b-instruct   # 3.3-70b reached EOL 2026-08-26 on NIM
       supports_reasoning_effort: false
     openrouter_script:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.1-70b-instruct
       supports_reasoning_effort: false
 
 

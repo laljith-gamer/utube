@@ -8,7 +8,7 @@ video:                              # final output specs
   target_duration_sec: 32
   min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
   max_duration_sec: 45
-  num_scenes: 15                    # ~2.1s per scene = fast modern TikTok/Shorts pacing
+  num_scenes: 10                    # reduced from 15: fewer scenes = smaller JSON, no truncation
 
 # Visuals: every scene is motion-based.
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
@@ -40,8 +40,8 @@ research:
     reasoning_effort: null
 
 script:
-  max_tokens: 8000
-  temperature: 0.8
+  max_tokens: 12000                 # raised from 8000: prevents mid-JSON truncation on 10-scene outputs
+  temperature: 0.7                  # slightly lower for more stable structured JSON
   # "low" works well for a 35s narration: enough internal planning, plenty of
   # tokens left for the actual JSON output. "high" causes truncation where the
   # model spends the entire budget reasoning and never writes the answer.

@@ -150,33 +150,66 @@ def _looks_like_json(s: str) -> bool:
     return s.startswith("{") or s.startswith("[")
 
 
-def _parse_json(text: str) -> dict[str, Any]:
-    """Strict json.loads → strip code fences → first {…} block → repair-truncated."""
+def _strip_fences(text: str) -> str:
+    """Remove leading/trailing markdown code fences (```json ... ```)."""
     text = text.strip()
+    # Remove opening fence: ```json or ```
+    text = re.sub(r"^```(?:json)?\s*", "", text)
+    # Remove closing fence
+    text = re.sub(r"\s*```\s*$", "", text)
+    return text.strip()
+
+
+def _parse_json(text: str) -> dict[str, Any]:
+    """Robust JSON extraction: strip fences → parse → find block → repair truncated.
+
+    Order of attempts:
+    1. Direct json.loads on raw text.
+    2. Strip markdown code fences, try again.
+    3. Extract first {...} block, try again.
+    4. Repair truncated JSON (open brackets/strings) and try again.
+    If all fail, raise ValueError with the first 400 chars for debugging.
+    """
+    original = text
+    text = text.strip()
+
+    # Attempt 1: raw parse
     try:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-    fenced = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
+
+    # Attempt 2: strip code fences, then parse
+    clean = _strip_fences(text)
     try:
-        return json.loads(fenced)
+        return json.loads(clean)
     except json.JSONDecodeError:
         pass
-    m = re.search(r"\{.*\}", text, flags=re.DOTALL)
+
+    # Attempt 3: find first { ... } (greedy) block and parse
+    m = re.search(r"\{.*\}", clean, flags=re.DOTALL)
     if m:
         try:
             return json.loads(m.group(0))
         except json.JSONDecodeError:
             pass
-    m = re.search(r"\{.*", text, flags=re.DOTALL)
+
+    # Attempt 4: find opening brace and try to repair truncation
+    m = re.search(r"\{.*", clean, flags=re.DOTALL)
     if m:
-        repaired = _try_repair_truncated(m.group(0))
+        truncated = m.group(0)
+        LOG.warning(
+            "_parse_json: output appears truncated at %d chars, attempting repair …",
+            len(original),
+        )
+        repaired = _try_repair_truncated(truncated)
         if repaired is not None:
             try:
                 return json.loads(repaired)
             except json.JSONDecodeError:
                 pass
-    raise ValueError(f"Could not parse JSON from LLM output: {text[:200]}")
+
+    raise ValueError(f"Could not parse JSON from LLM output: {original[:400]}")
 
 
 def _try_repair_truncated(s: str) -> str | None:
