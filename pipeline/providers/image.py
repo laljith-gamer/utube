@@ -86,14 +86,26 @@ class ImageRouter:
         return base64.b64decode(b64)
 
     def _pollinations(self, p: dict, prompt: str, w: int, h: int) -> bytes:
+        import time
+        import random
         url_template = p.get("url_template", "")
-        url = url_template.format(prompt=quote(prompt), w=w, h=h)
-        r = requests.get(url, timeout=self.timeout)
-        r.raise_for_status()
-        min_bytes = p.get("min_response_bytes", 1000)
-        if not r.content or len(r.content) < min_bytes:
-            raise RuntimeError(f"Pollinations returned tiny payload: {len(r.content)} bytes")
-        LOG.info("Image via Pollinations.ai")
-        return r.content
+        # Add random seed to avoid caching issues on Pollinations
+        seed = random.randint(1, 99999)
+        url = url_template.format(prompt=quote(prompt), w=w, h=h) + f"&seed={seed}"
+        
+        for attempt in range(4):
+            r = requests.get(url, timeout=self.timeout)
+            if r.status_code == 429 and attempt < 3:
+                wait = 2 ** attempt + random.random()
+                LOG.warning("Pollinations 429, backing off %.1fs", wait)
+                time.sleep(wait)
+                continue
+            r.raise_for_status()
+            min_bytes = p.get("min_response_bytes", 1000)
+            if not r.content or len(r.content) < min_bytes:
+                raise RuntimeError(f"Pollinations returned tiny payload: {len(r.content)} bytes")
+            LOG.info("Image via Pollinations.ai")
+            return r.content
+        raise RuntimeError("Pollinations failed after retries")
 
 
