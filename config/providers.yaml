@@ -3,7 +3,7 @@
 # `chain` = order in which providers are tried.
 
 llm_research:
-  chain: [nvidia_nim_research]
+  chain: [nvidia_nim_research, openrouter_research]
   request_timeout_sec: 120
   reasoning_token_floor:
     low: 3000
@@ -20,16 +20,30 @@ llm_research:
         temperature: 1.00
         top_p: 0.95
         max_tokens: 32768
+    openrouter_research:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 1.00
+        top_p: 0.95
+        max_tokens: 32768
 
 llm_script:
-  chain: [nvidia_nim_script]
+  chain: [nvidia_nim_script, openrouter_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
     nvidia_nim_script:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-70b-instruct
+      model: meta/llama-3.3-70b-instruct
+      supports_reasoning_effort: false
+    openrouter_script:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
 
 
