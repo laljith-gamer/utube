@@ -162,7 +162,28 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
         if upload:
             publish_strategy = (cfg.get_path("publish_strategy", "immediate") or "immediate").lower()
             tags_max = int(cfg.get_path("youtube.tags_max", 30))
-            tags = [h.lstrip("#") for h in sc.get("hashtags", [])][:tags_max]
+            hashtags_list: list[str] = sc.get("hashtags", [])
+            tags = [h.lstrip("#") for h in hashtags_list][:tags_max]
+
+            # Build description: append hashtags as clickable #tags if not already present
+            desc = sc.get("description", "")
+            hashtag_str = " ".join(
+                h if h.startswith("#") else f"#{h}" for h in hashtags_list
+            )
+            if hashtag_str and hashtag_str not in desc:
+                desc = f"{desc.rstrip()}\n\n{hashtag_str}"
+            desc_max = int(cfg.get_path("youtube.description_max_chars", 5000))
+            desc = desc[:desc_max]
+
+            # Pre-upload validation: ensure video file exists and is non-empty
+            if not video_out.exists() or video_out.stat().st_size < 1024:
+                raise RuntimeError(
+                    f"Output video missing or too small ({video_out.stat().st_size if video_out.exists() else 0} bytes): {video_out}"
+                )
+            LOG.info("Pre-upload check OK: %s (%.1f MB, captions=%s)",
+                     video_out.name,
+                     video_out.stat().st_size / 1_048_576,
+                     "yes" if srt.exists() and srt.stat().st_size > 0 else "NO — captions missing!")
 
             if publish_strategy == "scheduled":
                 publish_at = _publish_at_for_slot(slot.get("schedule_utc"))
@@ -174,7 +195,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
             up = upload_video(
                 video_out,
                 title=sc["title"],
-                description=sc.get("description", ""),
+                description=desc,
                 tags=tags,
                 publish_at_iso=publish_at,
                 thumbnail_path=thumb_path,

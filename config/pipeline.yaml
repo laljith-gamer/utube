@@ -14,7 +14,7 @@ video:                              # final output specs
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
 # There is NO static-image / Ken Burns slideshow path.
 visuals:
-  skip_svd: false                   # set to true to skip SDXL+SVD (uses stock + filler only)
+  skip_svd: true                    # NIM SVD/SDXL endpoints are 404 — skip to save ~8 min per video
 
 discover:
   user_agent: "script:utube-automation:v1.0 (by /u/laljith-gamer)"
@@ -126,7 +126,7 @@ assemble:
     alignment: 5                   # SSA 5 = center-center (middle of screen)
     margin_l: 140                  # equal L/R margins for true horizontal centering on portrait
     margin_r: 140
-    margin_v: 350                  # push captions toward vertical center of 1920px portrait frame
+    margin_v: 0                    # 0 = dead center (alignment=5 centers vertically; non-zero pushes off-screen in libass coords)
     wrap_style: 1                  # 1 = end-of-line word wrapping
 
 stage_timeouts_sec:

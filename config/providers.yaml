@@ -31,50 +31,38 @@ llm_research:
         max_tokens: 32768
 
 llm_script:
-  chain: [nvidia_nim_script, openrouter_script]
+  # OpenRouter is first — NIM llama models (3.3 and 3.1) both hit EOL 2026-08-26
+  chain: [openrouter_script, nvidia_nim_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    nvidia_nim_script:
-      base_url: https://integrate.api.nvidia.com/v1
-      api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-70b-instruct   # 3.3-70b reached EOL 2026-08-26 on NIM
-      supports_reasoning_effort: false
     openrouter_script:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.1-70b-instruct
       supports_reasoning_effort: false
+    nvidia_nim_script:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: nvidia/llama-3.1-nemotron-70b-instruct   # NVIDIA's own model, more stable than Meta llama on NIM
+      supports_reasoning_effort: false
 
 
 image:
-  chain: [nvidia_nim_sdxl, pollinations]
+  # nvidia_nim_sdxl removed — endpoint 404 as of 2026-08-26. Pollinations only.
+  chain: [pollinations]
   default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
   request_timeout_sec: 120
   providers:
-    nvidia_nim_sdxl:
-      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl
-      api_key_env: NVIDIA_NIM_API_KEY
-      params:
-        cfg_scale: 5
-        sampler: K_DPM_2_ANCESTRAL
-        seed: 0
-        steps: 25
     pollinations:
       url_template: "https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true"
       min_response_bytes: 1000
 
 video:
-  chain: [nvidia_nim_svd]
+  # nvidia_nim_svd removed — endpoint 404 as of 2026-08-26. skip_svd=true in pipeline.yaml.
+  chain: []
   request_timeout_sec: 300
-  providers:
-    nvidia_nim_svd:
-      url: https://ai.api.nvidia.com/v1/genai/stabilityai/stable-video-diffusion
-      api_key_env: NVIDIA_NIM_API_KEY
-      params:
-        cfg_scale: 1.8
-        seed: 0
-        motion_bucket_id: 127
+  providers: {}
 
 tts:
   # F5-TTS is the sole TTS provider. No fallbacks — if it fails, the run fails.
