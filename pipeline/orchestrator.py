@@ -111,9 +111,9 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
         # Captions depend on audio, so they are grouped together.
         def _do_audio_and_captions():
             a_sum = audio.synthesize_narration(tts, script=sc, slot=slot, out_dir=out)
-            srt_p = out / "captions.srt"
-            captions.transcribe_to_srt(out / a_sum["master"], srt_p)
-            return a_sum, srt_p
+            captions_path = out / "captions.ass"
+            captions_path = captions.transcribe_to_srt(out / a_sum["master"], captions_path)
+            return a_sum, captions_path
 
         def _do_visuals():
             if skip_svd:
@@ -138,7 +138,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
             future_visuals = executor.submit(_do_visuals)
             future_thumbnail = executor.submit(_do_thumbnail)
 
-            audio_summary, srt = future_audio.result()
+            audio_summary, captions_file = future_audio.result()
             vis = future_visuals.result()
             thumb_path = future_thumbnail.result()
 
@@ -147,7 +147,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
         assemble.assemble_video(
             visuals=vis,
             audio_summary=audio_summary,
-            srt_path=srt,
+            srt_path=captions_file,
             out_dir=out,
             output_path=video_out,
             music_path=_pick_music(slot.get("music_mood")),
@@ -183,7 +183,7 @@ def produce_one(slot: dict, *, upload: bool, skip_svd: bool, script_only: bool, 
             LOG.info("Pre-upload check OK: %s (%.1f MB, captions=%s)",
                      video_out.name,
                      video_out.stat().st_size / 1_048_576,
-                     "yes" if srt.exists() and srt.stat().st_size > 0 else "NO — captions missing!")
+                     "yes" if captions_file.exists() and captions_file.stat().st_size > 0 else "NO — captions missing!")
 
             if publish_strategy == "scheduled":
                 publish_at = _publish_at_for_slot(slot.get("schedule_utc"))

@@ -196,7 +196,6 @@ def _concat(clips: list[Path], out: Path, acfg: dict, seg_durations: list[float]
 
 def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
                srt: Path, out: Path, cfg: dict) -> None:
-    cs = cfg.get("caption_subtitle_style", {}) or {}
     f = cfg.get("ffmpeg", {}) or {}
     music_cfg = cfg.get("music", {}) or {}
 
@@ -206,22 +205,8 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
     inputs = ["-i", str(silent_video), "-i", str(narration)]
     filter_parts: list[str] = []
     if has_subs:
-        style = (
-            f"FontName={cs.get('fontname', 'DejaVu Sans')},"
-            f"Bold={int(cs.get('bold', 1))},"
-            f"FontSize={int(cs.get('fontsize', 18))},"
-            f"PrimaryColour=&H{cs.get('primary_color_hex', '00FFFFFF')},"
-            f"BackColour=&H{cs.get('back_color_hex', '80000000')},"
-            f"OutlineColour=&H{cs.get('outline_color_hex', '00000000')},"
-            f"Outline={int(cs.get('outline_width', 3))},"
-            f"Shadow={int(cs.get('shadow', 2))},"
-            f"Alignment={int(cs.get('alignment', 2))},"
-            f"MarginL={int(cs.get('margin_l', 80))},"
-            f"MarginR={int(cs.get('margin_r', 80))},"
-            f"MarginV={int(cs.get('margin_v', 110))},"
-            f"WrapStyle={int(cs.get('wrap_style', 0))}"
-        )
-        filter_parts.append(f"[0:v]subtitles='{sub_path}':force_style='{style}'[v]")
+        # ASS file contains full cinematic styling — no force_style needed
+        filter_parts.append(f"[0:v]subtitles='{sub_path}'[v]")
     else:
         filter_parts.append("[0:v]copy[v]")
 

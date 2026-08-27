@@ -1,12 +1,14 @@
-"""Whisper captions — model size, device, words-per-cue from pipeline.yaml > captions.
+"""Whisper captions — cinematic ASS subtitles with professional styling.
 
-Dynamic word-by-word highlighting with chunk-level fade transitions:
-  • When a NEW chunk of words appears → smooth fade IN
-  • As each word is spoken → instant color highlight (yellow), no fade flicker
-  • When the chunk finishes → smooth fade OUT
-  • Next chunk fades in cleanly
+Output is ASS (Advanced SubStation Alpha) for full cinematic control:
+  • PlayResX/Y match the video resolution → 1:1 pixel coordinates
+  • Per-cue \\fad() for smooth fade in/out at chunk boundaries
+  • Per-cue \\move() for subtle float-up entrance on new chunks
+  • Word-by-word yellow highlight via ASS \\c override tags
+  • Embedded Default style (font, outline, shadow, alignment, spacing)
+  • Mid-chunk word swaps are instant — no fade, no flicker
 
-This prevents text from "dancing" or flickering between word highlights.
+The old SRT + force_style approach is replaced entirely.
 """
 from __future__ import annotations
 
@@ -23,19 +25,39 @@ CueT = tuple[float, float, str, int, int]
 
 
 def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
-    cfg = get_config().get_path("captions", {}) or {}
-    if not cfg.get("enabled", True):
-        srt_path.write_text("", encoding="utf-8")
-        return srt_path
+    """Transcribe audio and write cinematic ASS captions.
 
-    model_size = cfg.get("whisper_model_size", "base")
-    device = cfg.get("whisper_device", "cpu")
-    compute_type = cfg.get("whisper_compute_type", "int8")
-    beam = int(cfg.get("beam_size", 1))
-    word_ts = bool(cfg.get("word_timestamps", True))
-    vad = bool(cfg.get("vad_filter", True))
-    fade_ms = int(cfg.get("fade_ms", 200))
-    layout = _layout_cfg(cfg)
+    Despite the legacy function name (kept for API compatibility), output
+    is now ASS format.  The file extension is changed to .ass automatically.
+    """
+    cfg = get_config()
+    cap_cfg = cfg.get_path("captions", {}) or {}
+
+    # Switch the output path to .ass
+    ass_path = srt_path.with_suffix(".ass")
+
+    if not cap_cfg.get("enabled", True):
+        ass_path.write_text("", encoding="utf-8")
+        return ass_path
+
+    model_size = cap_cfg.get("whisper_model_size", "base")
+    device = cap_cfg.get("whisper_device", "cpu")
+    compute_type = cap_cfg.get("whisper_compute_type", "int8")
+    beam = int(cap_cfg.get("beam_size", 1))
+    word_ts = bool(cap_cfg.get("word_timestamps", True))
+    vad = bool(cap_cfg.get("vad_filter", True))
+    fade_ms = int(cap_cfg.get("fade_ms", 150))
+    layout = _layout_cfg(cap_cfg)
+
+    # Video dimensions for ASS PlayRes (1:1 pixel mapping)
+    vcfg = cfg.get_path("video", {}) or {}
+    video_w = int(vcfg.get("width", 1080))
+    video_h = int(vcfg.get("height", 1920))
+
+    # Cinematic caption style
+    acfg = cfg.get_path("assemble", {}) or {}
+    style_cfg = acfg.get("cinematic_caption_style", {}) or {}
+    float_px = int(style_cfg.get("float_pixels", 6))
 
     try:
         from faster_whisper import WhisperModel
@@ -58,28 +80,130 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
                 continue
             timed_cues.extend(_word_cues(words, layout, fade_ms))
 
-        lines = [
-            _srt_block(i, start, end, text, fade_in, fade_out)
-            for i, (start, end, text, fade_in, fade_out) in enumerate(timed_cues, 1)
+        # Build ASS file
+        header = _ass_header(style_cfg, video_w, video_h)
+        cx, cy = video_w // 2, video_h // 2
+        dialogues = [
+            _ass_dialogue(s, e, txt, fi, fo, float_px, cx, cy)
+            for s, e, txt, fi, fo in timed_cues
         ]
-        srt_path.write_text("\n".join(lines), encoding="utf-8")
-        LOG.info("Captions: %d cues from %.1fs audio", len(timed_cues), info.duration)
+        ass_path.write_text(header + "".join(dialogues), encoding="utf-8")
+        LOG.info("Captions: %d cues from %.1fs audio → %s", len(timed_cues), info.duration, ass_path.name)
 
         # Free memory explicitly
         del model
         import gc
         gc.collect()
 
-        return srt_path
+        return ass_path
     except Exception as e:  # noqa: BLE001
-        LOG.warning("Whisper transcription failed (%s); writing empty SRT", e)
-        srt_path.write_text("", encoding="utf-8")
-        return srt_path
+        LOG.warning("Whisper transcription failed (%s); writing empty ASS", e)
+        ass_path.write_text("", encoding="utf-8")
+        return ass_path
 
+
+# ────────────────────────────────────────────────────────────────
+#  ASS file structure
+# ────────────────────────────────────────────────────────────────
+
+def _ass_header(style_cfg: dict, w: int = 1080, h: int = 1920) -> str:
+    """Generate ASS header with cinematic Default style.
+
+    PlayResX/Y match the video so coordinates are 1:1 with pixels.
+    ScaledBorderAndShadow ensures outline/shadow scale when the player
+    up- or down-scales the video.
+    """
+    fn = style_cfg.get("fontname", "DejaVu Sans")
+    # Default font size ≈ 3.8% of video height — large and readable on phones
+    fs = int(style_cfg.get("fontsize", max(48, int(h * 0.038))))
+    pc = style_cfg.get("primary_color", "&H00FFFFFF")       # White
+    sc = style_cfg.get("secondary_color", "&H000000FF")     # Red (karaoke, unused)
+    oc = style_cfg.get("outline_color", "&H00000000")       # Black outline
+    bc = style_cfg.get("back_color", "&H80000000")          # Semi-transparent shadow
+    bd = int(style_cfg.get("bold", -1))                     # -1 = true in ASS
+    ol = float(style_cfg.get("outline", 3.5))
+    sh = float(style_cfg.get("shadow", 1.5))
+    sp = float(style_cfg.get("spacing", 1.5))               # Slight letter spacing
+    al = int(style_cfg.get("alignment", 5))                  # 5 = center-center
+    # Margins control text wrapping width: ~76% of video width
+    ml = int(style_cfg.get("margin_l", int(w * 0.12)))
+    mr = int(style_cfg.get("margin_r", int(w * 0.12)))
+    mv = int(style_cfg.get("margin_v", 0))
+    bs = int(style_cfg.get("border_style", 1))               # 1 = outline + drop shadow
+
+    return (
+        "[Script Info]\n"
+        "ScriptType: v4.00+\n"
+        f"PlayResX: {w}\n"
+        f"PlayResY: {h}\n"
+        "WrapStyle: 0\n"
+        "ScaledBorderAndShadow: yes\n"
+        "\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
+        "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
+        "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+        "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        f"Style: Default,{fn},{fs},{pc},{sc},{oc},{bc},{bd},0,0,0,"
+        f"100,100,{sp},0,{bs},{ol},{sh},{al},{ml},{mr},{mv},1\n"
+        "\n"
+        "[Events]\n"
+        "Format: Layer, Start, End, Style, Name, MarginL, MarginR, "
+        "MarginV, Effect, Text\n"
+    )
+
+
+def _ass_dialogue(
+    start: float,
+    end: float,
+    text: str,
+    fade_in: int = 0,
+    fade_out: int = 0,
+    float_px: int = 6,
+    cx: int = 540,
+    cy: int = 960,
+) -> str:
+    """Build one ASS Dialogue line with cinematic animation.
+
+    fade_in > 0  →  float-up + fade-in  (first word of chunk)
+    fade_out > 0 →  fade-out, static    (last word of chunk)
+    both == 0    →  instant display      (mid-chunk highlight swap)
+    """
+    parts: list[str] = []
+
+    # Fade envelope
+    if fade_in > 0 or fade_out > 0:
+        parts.append(f"\\fad({fade_in},{fade_out})")
+
+    # Position / float-up movement
+    if fade_in > 0 and float_px > 0:
+        # Glide from float_px below center to center over fade_in ms
+        parts.append(
+            f"\\move({cx},{cy + float_px},{cx},{cy},0,{fade_in})"
+        )
+    else:
+        parts.append(f"\\pos({cx},{cy})")
+
+    tags = "".join(parts)
+    return f"Dialogue: 0,{_ass_ts(start)},{_ass_ts(end)},Default,,0,0,0,,{{{tags}}}{text}\n"
+
+
+def _ass_ts(t: float) -> str:
+    """Format seconds → ASS timestamp ``H:MM:SS.CC`` (centiseconds)."""
+    h = int(t // 3600)
+    m = int((t % 3600) // 60)
+    s = int(t % 60)
+    cs = int(round((t - int(t)) * 100))
+    return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
+
+
+# ────────────────────────────────────────────────────────────────
+#  Cue generation (Whisper word timestamps → timed cues)
+# ────────────────────────────────────────────────────────────────
 
 def _layout_cfg(cfg: dict) -> dict[str, int]:
     return {
-        "chunk_size": int(cfg.get("words_per_chunk", 5)),
+        "chunk_size": int(cfg.get("words_per_chunk", 2)),
         "max_chars": int(cfg.get("max_chars_per_line", 30)),
         "max_lines": max(1, int(cfg.get("max_lines_per_cue", 2))),
     }
@@ -89,13 +213,14 @@ def _highlighted_cues(
     lines: list[tuple[list[Any], str]],
     fade_ms: int = 0,
 ) -> list[CueT]:
-    """Build one SRT cue per word, highlighting the active word in yellow.
+    """Build one cue per word, highlighting the active word in yellow.
 
+    Uses ASS override tags ``\\c`` for color instead of HTML ``<font>`` tags.
     Fade is applied ONLY at chunk boundaries:
-      • First word in the chunk → fade IN (fade_in=fade_ms, fade_out=0)
-      • Last word in the chunk  → fade OUT (fade_in=0, fade_out=fade_ms)
-      • Single-word chunk       → both fade in and out
-      • Middle words            → no fade (instant highlight swap)
+      • First word  → fade IN  (+ float-up handled by _ass_dialogue)
+      • Last word   → fade OUT
+      • Single-word → both
+      • Middle      → instant highlight swap
     """
     all_tokens = [tok for line_tokens, _ in lines for tok in line_tokens]
     if not all_tokens:
@@ -124,17 +249,19 @@ def _highlighted_cues(
                     part = word_strip
 
                 if tok is active_tok:
-                    part = f'<font color="#FFFF00">{part}</font>'
+                    # ASS override: bright yellow highlight, then reset to white
+                    part = "{\\c&H00FFFF&}" + part + "{\\c&HFFFFFF&}"
                 line_str += part
             formatted_lines.append(line_str)
 
-        # Determine per-cue fade based on position within chunk
+        # Per-cue fade at chunk boundaries
         is_first = (i == 0)
         is_last = (i == total - 1)
         fade_in = fade_ms if is_first else 0
         fade_out = fade_ms if is_last else 0
 
-        cues.append((t_start, t_end, "\n".join(formatted_lines), fade_in, fade_out))
+        # ASS uses \\N for hard line breaks
+        cues.append((t_start, t_end, "\\N".join(formatted_lines), fade_in, fade_out))
     return cues
 
 
@@ -146,7 +273,7 @@ def _word_cues(
     """Group words into chunks, then build highlighted cues per chunk.
 
     fade_ms is passed through so each chunk gets fade-in on its first word
-    and fade-out on its last word. Mid-chunk word highlights are instant.
+    and fade-out on its last word.  Mid-chunk word highlights are instant.
     """
     cues: list[CueT] = []
     chunk_size = layout["chunk_size"]
@@ -188,7 +315,7 @@ def _plain_text_cues(
 ) -> list[CueT]:
     """Fallback for segments without word-level timestamps.
 
-    Each cue is standalone, so it gets full fade in and out.
+    Each cue is standalone → full fade in and out.
     """
     words = text.split()
     if not words:
@@ -201,25 +328,28 @@ def _plain_text_cues(
     for i in range(0, len(words), chunk_size):
         wrapped = _wrap_strings(words[i:i + chunk_size], max_chars)
         for j in range(0, len(wrapped), max_lines):
-            cue_texts.append("\n".join(wrapped[j:j + max_lines]))
+            cue_texts.append("\\N".join(wrapped[j:j + max_lines]))
 
     if not cue_texts:
         return [(start, end, text.strip(), fade_ms, fade_ms)]
 
     duration = max(float(end) - float(start), 0.01)
-    word_counts = [max(1, len(cue.replace("\n", " ").split())) for cue in cue_texts]
+    word_counts = [max(1, len(cue.replace("\\N", " ").split())) for cue in cue_texts]
     total_words = sum(word_counts)
     t = float(start)
     cues: list[CueT] = []
     for cue_text, count in zip(cue_texts, word_counts):
         cue_end = t + duration * count / total_words
-        # Each plain-text cue is standalone → full fade in + out
         cues.append((t, cue_end, cue_text, fade_ms, fade_ms))
         t = cue_end
     # Fix last cue end time
     cues[-1] = (cues[-1][0], float(end), cues[-1][2], cues[-1][3], cues[-1][4])
     return cues
 
+
+# ────────────────────────────────────────────────────────────────
+#  Text wrapping helpers
+# ────────────────────────────────────────────────────────────────
 
 def _wrap_tokens(tokens: list[Any], max_chars: int) -> list[tuple[list[Any], str]]:
     lines: list[tuple[list[Any], str]] = []
@@ -230,12 +360,9 @@ def _wrap_tokens(tokens: list[Any], max_chars: int) -> list[tuple[list[Any], str
         word_strip = raw_word.strip()
         if not word_strip:
             continue
-        # Use the raw word (which usually has a leading space if needed)
-        # unless it's the first word on the line, then we strip it.
         if not current_text:
             candidate = word_strip
         else:
-            # If the raw word didn't have a leading space, don't add one (e.g., punctuation or split numbers)
             if raw_word.startswith(" "):
                 candidate = current_text + " " + word_strip
             else:
@@ -266,42 +393,3 @@ def _wrap_strings(words: list[str], max_chars: int) -> list[str]:
     if current:
         lines.append(current)
     return lines
-
-
-def _group_wrapped_lines(
-    wrapped: list[tuple[list[Any], str]],
-    max_lines: int,
-) -> list[tuple[list[Any], str]]:
-    cues: list[tuple[list[Any], str]] = []
-    for i in range(0, len(wrapped), max_lines):
-        batch = wrapped[i:i + max_lines]
-        tokens = [tok for batch_tokens, _ in batch for tok in batch_tokens]
-        text = "\n".join(line_text for _, line_text in batch)
-        cues.append((tokens, text))
-    return cues
-
-
-def _srt_block(
-    idx: int,
-    start: float,
-    end: float,
-    text: str,
-    fade_in: int = 0,
-    fade_out: int = 0,
-) -> str:
-    """Build one SRT block with independent fade-in and fade-out values.
-
-    Only adds the \\fad tag when at least one fade value is > 0.
-    This means mid-chunk word highlights get NO fade (instant swap).
-    """
-    if fade_in > 0 or fade_out > 0:
-        text = f"{{\\fad({fade_in},{fade_out})}}{text}"
-    return f"{idx}\n{_ts(start)} --> {_ts(end)}\n{text}\n"
-
-
-def _ts(t: float) -> str:
-    h = int(t // 3600)
-    m = int((t % 3600) // 60)
-    s = int(t % 60)
-    ms = int((t - int(t)) * 1000)
-    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
