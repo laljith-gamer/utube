@@ -64,7 +64,8 @@ captions:
   beam_size: 1
   word_timestamps: true
   vad_filter: true
-  words_per_chunk: 2               # energetic pacing — 2 words at a time
+  words_per_chunk: 4               # 3-4 words per screen
+  max_chars_per_line: 18           # lower this to force words onto a second line
   fade_ms: 150                     # cinematic fade in/out + float-up entrance (ms)
 
 thumbnail:
