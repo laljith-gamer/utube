@@ -104,32 +104,38 @@ def collect_performance_data(published_videos: list[dict], api_key: str | None =
 
 
 def _classify_performance(videos: list[dict]) -> None:
-    """Add a 'performance_label' to each video based on relative stats."""
-    # Only classify videos that have been out for at least 24h
-    valid = [v for v in videos if v.get("age_days", 0) >= 1.0 and "views_per_day" in v]
-    if len(valid) < 5:
-        # Not enough baseline data to classify
-        for v in videos:
-            if "performance_label" not in v:
-                v["performance_label"] = "unknown"
-        return
-
-    # Sort by velocity
-    valid.sort(key=lambda x: x["views_per_day"])
-    
-    n = len(valid)
-    p20 = valid[int(n * 0.2)]["views_per_day"]
-    p40 = valid[int(n * 0.4)]["views_per_day"]
-    p60 = valid[int(n * 0.6)]["views_per_day"]
-    p80 = valid[int(n * 0.8)]["views_per_day"]
+    """Add a 'performance_label' to each video based on relative stats within age cohorts."""
+    cohorts = {
+        "new": [v for v in videos if 1.0 <= v.get("age_days", 0) < 7.0 and "views_per_day" in v],
+        "mid": [v for v in videos if 7.0 <= v.get("age_days", 0) < 30.0 and "views_per_day" in v],
+        "old": [v for v in videos if v.get("age_days", 0) >= 30.0 and "views_per_day" in v],
+    }
     
     for v in videos:
-        # Don't re-classify if already labeled, unless we want to dynamically update
-        # Actually, dynamic update is good as older videos might die off
         if v.get("age_days", 0) < 1.0:
             v["performance_label"] = "too_new"
             continue
             
+        age = v.get("age_days", 0)
+        if age < 7.0:
+            cohort = cohorts["new"]
+        elif age < 30.0:
+            cohort = cohorts["mid"]
+        else:
+            cohort = cohorts["old"]
+            
+        if len(cohort) < 3:
+            v["performance_label"] = "average"  # Not enough data in cohort
+            continue
+            
+        cohort.sort(key=lambda x: x["views_per_day"])
+        n = len(cohort)
+        
+        p20 = cohort[int(n * 0.2)]["views_per_day"]
+        p40 = cohort[int(n * 0.4)]["views_per_day"]
+        p60 = cohort[int(n * 0.6)]["views_per_day"]
+        p80 = cohort[int(n * 0.8)]["views_per_day"]
+        
         vel = v.get("views_per_day", 0)
         if vel >= p80:
             label = "winner"
@@ -143,6 +149,58 @@ def _classify_performance(videos: list[dict]) -> None:
             label = "failure"
             
         v["performance_label"] = label
+
+
+def collect_video_analytics(video_ids: list[str]) -> dict:
+    """Fetch retention metrics using YouTube Analytics API."""
+    client_id = env("YOUTUBE_CLIENT_ID")
+    client_secret = env("YOUTUBE_CLIENT_SECRET")
+    refresh_token = env("YOUTUBE_REFRESH_TOKEN")
+    
+    if not client_id or not client_secret or not refresh_token:
+        LOG.warning("Missing OAuth credentials for YouTube Analytics API.")
+        return {}
+        
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    import datetime
+    
+    creds = Credentials(
+        token=None,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=client_id,
+        client_secret=client_secret,
+    )
+    
+    analytics = build("youtubeAnalytics", "v2", credentials=creds)
+    
+    end_date = datetime.date.today()
+    start_date = end_date - datetime.timedelta(days=60)
+    
+    stats_map = {}
+    for i in range(0, len(video_ids), 50):
+        batch = video_ids[i:i + 50]
+        try:
+            res = analytics.reports().query(
+                ids="channel==MINE",
+                startDate=start_date.isoformat(),
+                endDate=end_date.isoformat(),
+                metrics="averageViewDuration,estimatedMinutesWatched",
+                dimensions="video",
+                filters=f"video=={','.join(batch)}"
+            ).execute()
+            
+            for row in res.get("rows", []):
+                vid = row[0]
+                stats_map[vid] = {
+                    "averageViewDuration": row[1],
+                    "estimatedMinutesWatched": row[2]
+                }
+        except Exception as e:
+            LOG.error("YouTube Analytics API fetch failed: %s", e)
+            
+    return stats_map
 
 
 def update_performance_records(ledger_entries: list[dict]) -> None:
@@ -189,13 +247,33 @@ def update_performance_records(ledger_entries: list[dict]) -> None:
     if to_update:
         updated = collect_performance_data(to_update)
         
+        # Also fetch Analytics API stats for retention
+        vid_list = [u["video_id"] for u in updated if "video_id" in u]
+        retention_stats = collect_video_analytics(vid_list)
+        
         # Merge back
         for u in updated:
             vid = u["video_id"]
+            if vid in retention_stats:
+                u["retention_seconds"] = retention_stats[vid].get("averageViewDuration", 0)
+                u["minutes_watched"] = retention_stats[vid].get("estimatedMinutesWatched", 0)
             existing_videos[vid] = u
             
     data["videos"] = list(existing_videos.values())
     data["last_fetch_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Store snapshot
+    if "history" not in data:
+        data["history"] = []
+    snapshot = {
+        "timestamp": data["last_fetch_at"],
+        "videos": [dict(v) for v in data["videos"]]
+    }
+    data["history"].append(snapshot)
+    
+    # Keep only last 10 snapshots to avoid huge files
+    if len(data["history"]) > 10:
+        data["history"] = data["history"][-10:]
     
     # Save
     perf_path.parent.mkdir(parents=True, exist_ok=True)

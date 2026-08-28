@@ -38,6 +38,16 @@ def score_candidates(
     scoring_cfg = cfg.get_path("topic_scoring", {}) or {}
     weights = scoring_cfg.get("weights", {}) or {}
     recent_hashes = recent_hashes or []
+    
+    strategy_path = repo_root() / "data" / "dynamic_strategy.json"
+    dynamic_strategy = {}
+    if strategy_path.exists():
+        try:
+            import json
+            with open(strategy_path, "r", encoding="utf-8") as f:
+                dynamic_strategy = json.load(f)
+        except Exception as e:
+            LOG.warning("Failed to load dynamic_strategy.json: %s", e)
 
     # ── Phase 1: Heuristic scoring ──────────────────────────────────────
     for c in candidates:
@@ -87,6 +97,22 @@ def score_candidates(
             c["scores"]["evergreen_value"] = 80
         else:
             c["scores"]["evergreen_value"] = 50
+            
+        # Strategy Alignment: Boost/penalize based on dynamic strategy
+        focused_themes = dynamic_strategy.get("focused_themes", [])
+        avoid_themes = dynamic_strategy.get("avoid_themes", [])
+        
+        strat_score = 50
+        summary_text = (title + " " + c.get("summary", "")).lower()
+        
+        for theme in focused_themes:
+            if theme.lower() in summary_text:
+                strat_score += 20
+        for theme in avoid_themes:
+            if theme.lower() in summary_text:
+                strat_score -= 30
+                
+        c["scores"]["strategy_alignment"] = max(0, min(100, strat_score))
 
     # ── Phase 2: LLM-assisted batch scoring ─────────────────────────────
     batch_size = scoring_cfg.get("llm_batch_size", 10)
@@ -121,9 +147,9 @@ def score_candidates(
 
     # ── Phase 3: Weighted total ─────────────────────────────────────────
     default_weights = {
-        "audience_fit": 0.20, "curiosity_gap": 0.18, "story_potential": 0.15,
-        "visual_potential": 0.12, "freshness": 0.10, "specificity": 0.08,
-        "shareability": 0.07, "novelty": 0.05, "source_quality": 0.03,
+        "audience_fit": 0.18, "curiosity_gap": 0.16, "story_potential": 0.13,
+        "visual_potential": 0.10, "strategy_alignment": 0.12, "freshness": 0.08, "specificity": 0.07,
+        "shareability": 0.07, "novelty": 0.05, "source_quality": 0.02,
         "evergreen_value": 0.02,
     }
     w = {**default_weights, **weights}

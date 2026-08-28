@@ -77,6 +77,7 @@ def generate_concept(
     # Winning patterns from content memory
     winning_hooks = ""
     weak_hooks = ""
+    combinations_str = ""
     if content_memory:
         strong_hooks = content_memory.get("strong_hooks", [])
         if strong_hooks:
@@ -85,6 +86,26 @@ def generate_concept(
         weak_hooks_list = content_memory.get("weak_hooks", [])
         if weak_hooks_list:
             weak_hooks = "Hook types that performed poorly: " + ", ".join(weak_hooks_list[:5])
+            
+        strong_combs = content_memory.get("strong_combinations", [])
+        if strong_combs:
+            combs = [f"{c['combination'].replace('|', ' + ')} (conf: {c['confidence']:.2f})" for c in strong_combs[:3]]
+            combinations_str = "High confidence combinations (Hook + Emotion): " + ", ".join(combs)
+
+    strategy_path = repo_root() / "data" / "dynamic_strategy.json"
+    strategy_prompt = ""
+    if strategy_path.exists():
+        try:
+            import json
+            with open(strategy_path, "r", encoding="utf-8") as f:
+                dyn_strat = json.load(f)
+                direction = dyn_strat.get('overall_direction', '')
+                focus = ", ".join(dyn_strat.get('focused_themes', []))
+                avoid = ", ".join(dyn_strat.get('avoid_themes', []))
+                rec_hooks = ", ".join(dyn_strat.get('recommended_hooks', []))
+                strategy_prompt = f"[STRATEGIC DIRECTION]\n{direction}\nFocus on: {focus}\nAvoid: {avoid}\nRecommended Hooks: {rec_hooks}\n"
+        except Exception as e:
+            LOG.warning("Failed to load dynamic_strategy.json: %s", e)
 
     prompt = template.format(
         goal=goal,
@@ -95,6 +116,8 @@ def generate_concept(
         hook_types=", ".join(HOOK_TYPES),
         winning_hooks=winning_hooks,
         weak_hooks=weak_hooks,
+        combinations_str=combinations_str,
+        strategy_prompt=strategy_prompt,
     )
 
     try:
@@ -162,8 +185,10 @@ Summary: {topic_summary}
 Generate {n_angles} different angles for a YouTube Short about this topic.
 Each angle should use a DIFFERENT hook type from: {hook_types}
 
+{strategy_prompt}
 {winning_hooks}
 {weak_hooks}
+{combinations_str}
 
 For each angle, provide:
 - angle: One sentence describing the specific framing
