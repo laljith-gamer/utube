@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -30,7 +30,6 @@ def collect_performance_data(published_videos: list[dict], api_key: str | None =
     video_ids = [v.get("video_id") for v in published_videos if v.get("video_id")]
     if not video_ids:
         return published_videos
-
     stats_map: dict[str, dict] = {}
     service = _youtube_data_service(key)
     for i in range(0, len(video_ids), 50):
@@ -55,7 +54,6 @@ def collect_performance_data(published_videos: list[dict], api_key: str | None =
                 }
         except Exception as exc:
             LOG.error("YouTube Data API fetch failed: %s", exc)
-
     out = []
     now = datetime.now(timezone.utc)
     for original in published_videos:
@@ -115,7 +113,7 @@ def collect_video_analytics(video_ids: list[str]) -> dict:
     analytics = build("youtubeAnalytics", "v2", credentials=creds)
     result = {}
     today = datetime.now(timezone.utc).date()
-    start = today - __import__("datetime").timedelta(days=60)
+    start = today - timedelta(days=60)
     for i in range(0, len(video_ids), 50):
         batch = video_ids[i:i + 50]
         try:
@@ -137,8 +135,6 @@ def update_performance_records(ledger_entries: list[dict]) -> None:
     records = []
     for entry in ledger_entries:
         upload = entry.get("upload") or {}
-        # uploader returns the canonical YouTube ID as `id`; accept `video_id`
-        # too for backward compatibility with older ledger records.
         vid = upload.get("video_id") or upload.get("id")
         if not vid or vid == "dry-run":
             continue
