@@ -29,7 +29,7 @@ jobs:
           uv pip install --system -r requirements.txt
           uv pip install --system google-api-python-client google-auth-oauthlib google-auth-httplib2 requests
 
-      - name: Run Trend Analysis
+      - name: Run Thursday Learning Loop
         env:
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -40,7 +40,6 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/analyze_trends.py
-          python scripts/update_memory.py
 
       - name: Commit Trend Updates
         if: always()
