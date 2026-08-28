@@ -136,15 +136,18 @@ def update_performance_records(ledger_entries: list[dict]) -> None:
     existing = {v.get("video_id"): v for v in data.get("videos", []) if v.get("video_id")}
     records = []
     for entry in ledger_entries:
-        vid = (entry.get("upload") or {}).get("video_id")
-        if not vid:
+        upload = entry.get("upload") or {}
+        # uploader returns the canonical YouTube ID as `id`; accept `video_id`
+        # too for backward compatibility with older ledger records.
+        vid = upload.get("video_id") or upload.get("id")
+        if not vid or vid == "dry-run":
             continue
         topic, concept = entry.get("topic") or {}, entry.get("concept") or {}
         record = dict(existing.get(vid, {}))
         record.update({
             "video_id": vid,
-            "title": (entry.get("upload") or {}).get("title") or topic.get("title", ""),
-            "topic_hash": topic.get("topic_hash", entry.get("topic_hash", "")),
+            "title": upload.get("title") or topic.get("title", ""),
+            "topic_hash": topic.get("topic_hash", topic.get("content_hash", entry.get("topic_hash", ""))),
             "topic_family": topic.get("topic_family", topic.get("family", "")),
             "hook_type": concept.get("hook_type", "unknown"),
             "chosen_angle": concept.get("chosen_angle", ""),
