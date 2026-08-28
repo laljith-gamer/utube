@@ -10,7 +10,7 @@ name: Daily Random Uploads
 #   - Sun Morning: 10:00 AM IST (04:30 UTC)
 #   - Sat/Sun Evening: 6:30 PM IST (13:00 UTC)
 #
-# In each window, video count (0-3) is chosen randomly at runtime.
+# In each window, video count (0-2) is chosen randomly at runtime.
 # Each video is uploaded individually with random gaps (20-40 min)
 # to maintain organic publish timestamps.
 
@@ -27,7 +27,7 @@ on:
   workflow_dispatch:
     inputs:
       video_count:
-        description: "Videos to produce (0-3). Leave empty for random."
+        description: "Videos to produce (0-2). Leave empty for random."
         required: false
         default: ""
       lane:
@@ -54,8 +54,8 @@ concurrency:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    # Budget: 3 videos × ~55 min each + 2 gaps × 40 min = ~245 min
-    timeout-minutes: 260
+    # Budget: 2 videos × ~55 min each + 1 gap × 40 min = ~150 min
+    timeout-minutes: 160
     permissions:
       contents: write   # commit ledger.json + run artifacts back to repo
       issues:   write   # auto-open an issue on failure
@@ -111,7 +111,7 @@ jobs:
             N=$INPUT_COUNT
             echo "Manual override: $N video(s)."
           else
-            N=$((RANDOM % 4))   # 0, 1, 2, or 3 — equal 25% chance each
+            N=$((RANDOM % 3))   # 0, 1, or 2 — equal 33% chance each
             echo "Random draw: $N video(s) today."
           fi
 
