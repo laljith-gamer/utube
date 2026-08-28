@@ -3,12 +3,12 @@ name: Daily Random Uploads
 # Optimized IST Schedule (Skips Thursday entirely for research day)
 #
 # Weekdays (Mon, Tue, Wed, Fri):
-#   - 7:00 PM IST (13:30 UTC) - Hits the 7:00-8:00 PM peak starting window
+#   - 6:00 PM IST (12:30 UTC) - Hits the 7:00-8:00 PM peak starting window
 #
 # Weekends (Sat, Sun): Two windows per day
-#   - Sat Morning: 11:00 AM IST (05:30 UTC)
-#   - Sun Morning: 10:00 AM IST (04:30 UTC)
-#   - Sat/Sun Evening: 6:30 PM IST (13:00 UTC)
+#   - Sat Morning: 10:00 AM IST (04:30 UTC) - publishes ~11:00 AM
+#   - Sun Morning: 9:00 AM IST (03:30 UTC) - publishes ~10:00 AM
+#   - Sat/Sun Evening: 5:30 PM IST (12:00 UTC) - publishes ~6:30 PM
 #
 # In each window, video count (0-2) is chosen randomly at runtime.
 # Each video is uploaded individually with random gaps (20-40 min)
@@ -16,14 +16,14 @@ name: Daily Random Uploads
 
 on:
   schedule:
-    # Weekdays (Mon, Tue, Wed, Fri) @ 7:00 PM IST
-    - cron: "30 13 * * 1-3,5"
-    # Saturday Morning @ 11:00 AM IST
-    - cron: "30 5 * * 6"
-    # Sunday Morning @ 10:00 AM IST
-    - cron: "30 4 * * 0"
-    # Weekend Evenings (Sat, Sun) @ 6:30 PM IST
-    - cron: "0 13 * * 0,6"
+    # Weekdays (Mon, Tue, Wed, Fri) @ 6:00 PM IST (to publish ~7:00 PM)
+    - cron: "30 12 * * 1-3,5"
+    # Saturday Morning @ 10:00 AM IST (to publish ~11:00 AM)
+    - cron: "30 4 * * 6"
+    # Sunday Morning @ 9:00 AM IST (to publish ~10:00 AM)
+    - cron: "30 3 * * 0"
+    # Weekend Evenings (Sat, Sun) @ 5:30 PM IST (to publish ~6:30 PM)
+    - cron: "0 12 * * 0,6"
   workflow_dispatch:
     inputs:
       video_count:
