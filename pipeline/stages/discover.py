@@ -1,7 +1,13 @@
-"""Discover trending topics. All limits + UA + timeouts read from pipeline.yaml > discover."""
+"""Discover trending topics from multiple sources.
+
+All limits, UA, and timeouts read from pipeline.yaml > discover.
+Enriches each candidate with normalized metadata for the scoring engine.
+"""
 from __future__ import annotations
 
+import hashlib
 import logging
+import re
 from datetime import datetime, timezone
 from typing import Any
 
@@ -17,8 +23,91 @@ def _cfg() -> dict:
     return get_config().get_path("discover", {}) or {}
 
 
+def discover_candidates(*, limit: int | None = None) -> list[dict[str, Any]]:
+    """Collect candidates from ALL configured subtopic sources.
+
+    Unlike the old ``discover_for_niche`` (which collected per-slot), this
+    collects from every unique source across all subtopics, deduplicates,
+    normalises hotness per source, and returns the full enriched pool.
+    """
+    cfg = _cfg()
+    if limit is None:
+        limit = int(cfg.get("total_candidates_limit", 40))
+    per_limits = cfg.get("per_source_limits", {}) or {}
+
+    # Collect unique source configs from all subtopics
+    lanes_cfg = get_config().get_path("subtopics", []) or []
+    source_specs: list[dict] = []
+    seen_source_keys: set[str] = set()
+    for st in lanes_cfg:
+        for src in st.get("sources", []):
+            key = _source_key(src)
+            if key not in seen_source_keys:
+                seen_source_keys.add(key)
+                source_specs.append(src)
+
+    candidates: list[dict] = []
+    for src in source_specs:
+        try:
+            t = src["type"]
+            if t == "hackernews":
+                candidates += _hackernews(int(per_limits.get("hackernews", 15)))
+            elif t == "reddit":
+                n = int(per_limits.get("reddit_per_subreddit", 8))
+                for sub in src.get("subreddits", []):
+                    candidates += _reddit(sub, src.get("time_filter", "day"), n)
+            elif t == "rss":
+                n = int(per_limits.get("rss", 8))
+                for url in src.get("urls", []):
+                    candidates += _rss(url, n)
+            elif t == "wikipedia_otd":
+                candidates += _wikipedia_otd(int(per_limits.get("wikipedia_otd", 10)))
+            elif t == "github_trending":
+                candidates += _github_trending(int(per_limits.get("github_trending", 10)))
+            elif t == "devto":
+                candidates += _devto(int(per_limits.get("devto", 10)))
+        except Exception as e:  # noqa: BLE001
+            LOG.warning("Source %s failed: %s", src, e)
+
+    # Dedupe by URL
+    seen_urls: set[str] = set()
+    unique: list[dict] = []
+    for c in candidates:
+        u = c.get("url", "")
+        if u in seen_urls:
+            continue
+        seen_urls.add(u)
+        unique.append(c)
+
+    # Normalize scores 0-100 per source type
+    source_max: dict[str, float] = {}
+    for c in unique:
+        src = c.get("source", "unknown")
+        score = c.get("score", 0)
+        source_max[src] = max(source_max.get(src, 0), score)
+
+    for c in unique:
+        src = c.get("source", "unknown")
+        max_s = source_max.get(src, 0)
+        c["raw_score"] = c.get("score", 0)
+        if max_s > 0:
+            c["normalized_hotness"] = int((c["raw_score"] / max_s) * 100)
+        else:
+            c["normalized_hotness"] = 50  # Baseline for unscored sources
+
+        # Generate a stable content hash for dedup against ledger
+        c["content_hash"] = _content_hash(c.get("title", ""))
+
+        # Extract keywords from title
+        c["keywords"] = _extract_keywords(c.get("title", ""))
+
+    LOG.info("Discovered %d unique candidates from %d sources", len(unique), len(source_specs))
+    return unique[:limit]
+
+
+# Backward compatibility alias
 def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str, Any]]:
-    """Return up to N candidate topics from this slot's configured sources."""
+    """Legacy wrapper — collects from slot-specific sources only."""
     cfg = _cfg()
     if limit is None:
         limit = int(cfg.get("total_candidates_limit", 25))
@@ -47,7 +136,6 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
         except Exception as e:  # noqa: BLE001
             LOG.warning("Source %s failed: %s", src, e)
 
-    # Dedupe by URL
     seen, out = set(), []
     for c in candidates:
         u = c.get("url", "")
@@ -56,7 +144,6 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
         seen.add(u)
         out.append(c)
 
-    # Normalize scores 0-100 per exact source
     source_max = {}
     for c in out:
         src = c.get("source", "unknown")
@@ -70,10 +157,48 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
         if max_s > 0:
             c["score"] = int((c["raw_score"] / max_s) * 100)
         else:
-            c["score"] = 50  # Baseline for sources with no scoring metric
+            c["score"] = 50
 
     LOG.info("Discovered %d candidates for slot %s", len(out), slot.get("id"))
     return out[:limit]
+
+
+# ──────────────────────── Helpers ────────────────────────────────────────────
+
+
+def _source_key(src: dict) -> str:
+    """Unique key for a source config to avoid duplicate fetches."""
+    t = src.get("type", "")
+    if t == "reddit":
+        return f"reddit:{','.join(sorted(src.get('subreddits', [])))}"
+    if t == "rss":
+        return f"rss:{','.join(sorted(src.get('urls', [])))}"
+    return t
+
+
+def _content_hash(title: str) -> str:
+    """Short stable hash for dedup — slug-like."""
+    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:60]
+    h = hashlib.md5(slug.encode()).hexdigest()[:8]
+    return f"{slug[:40]}-{h}"
+
+
+def _extract_keywords(title: str) -> list[str]:
+    """Pull simple keywords from title for subtopic matching."""
+    stop = {
+        "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+        "have", "has", "had", "do", "does", "did", "will", "would", "shall",
+        "should", "may", "might", "must", "can", "could", "to", "of", "in",
+        "for", "on", "with", "at", "by", "from", "as", "into", "through",
+        "during", "before", "after", "above", "below", "between", "out",
+        "it", "its", "this", "that", "these", "those", "and", "but", "or",
+        "nor", "not", "no", "so", "yet", "both", "either", "neither", "each",
+        "every", "all", "any", "few", "more", "most", "other", "some", "such",
+        "than", "too", "very", "just", "how", "what", "which", "who", "whom",
+        "why", "when", "where", "new", "now", "also", "about", "over", "up",
+    }
+    words = re.findall(r"[a-z]+", title.lower())
+    return [w for w in words if w not in stop and len(w) > 2]
 
 
 def _ua() -> str:
@@ -100,6 +225,7 @@ def _hackernews(limit: int) -> list[dict]:
             "score": h.get("points") or 0,
             "summary": "",
             "source": "hackernews",
+            "num_comments": h.get("num_comments", 0),
         })
     return out
 
@@ -127,6 +253,7 @@ def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
             "score": d.get("score", 0),
             "summary": (d.get("selftext") or "")[:500],
             "source": f"reddit:{subreddit}",
+            "num_comments": d.get("num_comments", 0),
         })
     return out
 

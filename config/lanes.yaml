@@ -1,85 +1,135 @@
-# Lane presets: visual + voice + sources for each video style.
+# Subtopic presets under the unified channel identity:
+# "Surprising technology that matters to ordinary people."
 #
-# A "lane" is the reusable preset (voice, palette, music mood, discovery sources).
-# A "theme" (see pipeline/themes.py) is the topic seed picked daily.
-# Each daily run = pick N random themes -> each theme is rendered using its lane preset.
-#
-# Per-slot publish times have been removed: uploads now happen immediately when each
-# video finishes, and run timing is controlled by .github/workflows/daily-random.yml.
+# Each subtopic defines voice, palette, music mood, and discovery sources.
+# The scoring engine selects which subtopic a candidate belongs to; the
+# orchestrator uses the matching preset for rendering.
 
-lanes:
-  - id: did_you_know
-    title: "Did You Know? Tech Facts"
-    default_keywords: [history, fact, surprising, origin, story, technology]
+channel_identity: "Surprising technology that matters to ordinary people"
+
+subtopics:
+  - id: consumer_tech_hidden
+    title: "Hidden Tech Mechanics"
+    description: "How everyday tech actually works — the parts they don't tell you."
+    fit_keywords: [phone, wifi, bluetooth, GPS, camera, screen, battery, charger, app, update, notification]
     sources:
-      - type: wikipedia_otd
       - type: reddit
-        subreddits: [todayilearned, technology]
+        subreddits: [technology, explainlikeimfive, Damnthatsinteresting]
         time_filter: day
-      - type: github_trending
-    voice: en-US-AvaMultilingualNeural
-    voice_style: friendly
-    style: cozy_reveal
-    palette: ["#FFB347", "#2B2D42"]
-    music_mood: chill
-
-  - id: tech_news
-    title: "Tech News of the Day"
-    default_keywords: [news, today, breaking, industry, technology]
-    sources:
       - type: hackernews
         front_page: true
       - type: rss
         urls:
           - https://techcrunch.com/feed/
           - https://www.theverge.com/rss/index.xml
-    voice: en-US-GuyNeural
-    voice_style: newscast
-    style: fast_news_ticker
-    palette: ["#E63946", "#1D3557"]
-    music_mood: corporate_upbeat
+    voice: en-US-AvaMultilingualNeural
+    voice_style: friendly
+    palette: ["#FFB347", "#2B2D42"]
+    music_mood: chill
 
-  - id: ai_breakthrough
-    title: "AI Breakthrough"
-    default_keywords: [ai, machine learning, breakthrough, model, future]
+  - id: ai_surprises
+    title: "AI Surprises"
+    description: "AI facts that change how you think about your daily tools."
+    fit_keywords: [ai, machine learning, chatbot, deepfake, voice clone, recommendation, algorithm, model, training]
     sources:
       - type: reddit
-        subreddits: [MachineLearning, LocalLLaMA, singularity]
+        subreddits: [MachineLearning, LocalLLaMA, singularity, artificial]
         time_filter: day
+      - type: hackernews
+        front_page: true
     voice: en-US-AriaNeural
     voice_style: curious
-    style: clean_futuristic
     palette: ["#7B61FF", "#0F0F23"]
     music_mood: futuristic
 
-  - id: cybersecurity
-    title: "Cybersecurity Bite"
-    default_keywords: [cybersecurity, hack, breach, threat, defense]
+  - id: digital_safety
+    title: "Digital Safety Bites"
+    description: "Scams, hacks, and privacy traps that affect real people."
+    fit_keywords: [scam, phishing, hack, breach, password, privacy, tracking, data leak, ransomware, identity theft]
     sources:
       - type: reddit
-        subreddits: [netsec, cybersecurity]
+        subreddits: [netsec, cybersecurity, privacy, Scams]
         time_filter: day
       - type: rss
         urls:
           - https://feeds.feedburner.com/TheHackersNews
     voice: en-US-DavisNeural
     voice_style: serious
-    style: dark_suspense
     palette: ["#00FF41", "#0D0208"]
     music_mood: tense
 
-  - id: viral_science
-    title: "Viral Science / Future Tech"
-    default_keywords: [science, future, breakthrough, frontier, discovery]
+  - id: tech_money
+    title: "Tech & Money"
+    description: "How technology costs, saves, or wastes your money."
+    fit_keywords: [subscription, price, cost, billion, trillion, revenue, startup, investment, layoff, salary, fee]
+    sources:
+      - type: hackernews
+        front_page: true
+      - type: rss
+        urls:
+          - https://techcrunch.com/feed/
+    voice: en-US-GuyNeural
+    voice_style: newscast
+    palette: ["#E63946", "#1D3557"]
+    music_mood: corporate_upbeat
+
+  - id: future_science
+    title: "Future Science"
+    description: "Breakthroughs and discoveries that sound like science fiction."
+    fit_keywords: [space, quantum, fusion, biotech, gene, robot, drone, satellite, mars, brain, surgery, cure]
     sources:
       - type: reddit
-        subreddits: [Futurology, Damnthatsinteresting, science]
+        subreddits: [Futurology, science, space]
         time_filter: day
       - type: rss
         urls:
           - https://www.arstechnica.com/feed/
     voice: en-US-JennyNeural
     voice_style: cinematic
-    style: cinematic_dramatic
     palette: ["#06FFA5", "#011627"]
     music_mood: epic
+
+  - id: internet_mechanics
+    title: "Internet Mechanics"
+    description: "How the internet, apps, and platforms actually work behind the scenes."
+    fit_keywords: [internet, server, cloud, DNS, CDN, cable, fiber, 5G, download, streaming, buffer, latency]
+    sources:
+      - type: reddit
+        subreddits: [todayilearned, technology, InternetIsBeautiful]
+        time_filter: day
+      - type: hackernews
+        front_page: true
+    voice: en-US-AvaMultilingualNeural
+    voice_style: friendly
+    palette: ["#FF6B6B", "#1A1A2E"]
+    music_mood: chill
+
+  - id: tech_history
+    title: "Tech History Twists"
+    description: "Accidental inventions, forgotten origins, and tech stories nobody tells."
+    fit_keywords: [history, invention, origin, accident, patent, founder, first, 1990, 2000, old, forgotten]
+    sources:
+      - type: wikipedia_otd
+      - type: reddit
+        subreddits: [todayilearned, technology]
+        time_filter: week
+      - type: github_trending
+    voice: en-US-AvaMultilingualNeural
+    voice_style: friendly
+    palette: ["#FFB347", "#2B2D42"]
+    music_mood: chill
+
+  - id: consumer_myths
+    title: "Tech Myths Busted"
+    description: "Common tech beliefs that are completely wrong."
+    fit_keywords: [myth, misconception, wrong, actually, truth, believe, fake, real, urban legend]
+    sources:
+      - type: reddit
+        subreddits: [todayilearned, explainlikeimfive, technology]
+        time_filter: week
+      - type: hackernews
+        front_page: true
+    voice: en-US-GuyNeural
+    voice_style: newscast
+    palette: ["#FF9A3C", "#2D2D2D"]
+    music_mood: corporate_upbeat

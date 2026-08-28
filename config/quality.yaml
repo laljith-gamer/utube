@@ -1,0 +1,98 @@
+# Quality thresholds & scoring weights — the single source of truth for all
+# quality-related decisions. Every "magic number" that decides pass/fail lives
+# here, not scattered across Python files.
+
+# ── Topic Scoring ───────────────────────────────────────────────────────────
+topic_scoring:
+  # Multi-dimensional scoring weights (must sum to 1.0)
+  weights:
+    audience_fit:      0.20    # Does the same viewer from yesterday want this?
+    curiosity_gap:     0.18    # How strong is the "I need to know" pull?
+    story_potential:   0.15    # Can this be told as a 30s narrative arc?
+    visual_potential:  0.12    # Are there real, concrete visuals to show?
+    freshness:         0.10    # How recent / timely is this?
+    specificity:       0.08    # Numbers, names, dates — not vague
+    shareability:      0.07    # Would a viewer send this to a friend?
+    novelty:           0.05    # Has this angle been done to death?
+    source_quality:    0.03    # Is the source credible?
+    evergreen_value:   0.02    # Will this still be interesting in 30 days?
+
+  # Score (0-100) below which a candidate is rejected
+  min_topic_score: 72
+
+  # What fraction of the time we pick a lower-ranked topic for exploration
+  exploration_ratio: 0.20
+
+  # Max candidates to send to LLM for batch scoring (saves tokens)
+  llm_batch_size: 10
+
+  # LLM scoring config
+  llm:
+    max_tokens: 3000
+    temperature: 0.3
+    reasoning_effort: null
+
+# ── Concept Generation ──────────────────────────────────────────────────────
+concept:
+  angles_to_generate: 4       # How many angles to brainstorm per topic
+  min_concept_score: 70        # Reject concepts scoring below this
+  llm:
+    max_tokens: 3000
+    temperature: 0.6
+    reasoning_effort: null
+
+# ── Script Quality Control ──────────────────────────────────────────────────
+script_qc:
+  # Per-dimension scores (0-100). Script fails if ANY dimension is below its min.
+  min_scores:
+    hook_strength:      75
+    clarity:            72
+    specificity:        70
+    story_progression:  68
+    payoff_strength:    72
+    natural_voice:      65
+    channel_fit:        70
+
+  # Weighted overall score
+  min_overall_score: 72
+
+  # How many times the script can be regenerated with QC feedback
+  max_regenerations: 2
+
+  llm:
+    max_tokens: 2000
+    temperature: 0.3
+    reasoning_effort: null
+
+# ── Visual Quality Control ──────────────────────────────────────────────────
+visual_qc:
+  # Max scenes allowed to use animated-gradient filler
+  max_filler_scenes: 2
+  # Min visual relevance score (keyword match) for stock footage
+  min_relevance_score: 0.3
+
+# ── Content Output ──────────────────────────────────────────────────────────
+output:
+  hashtags_count: 5            # Down from 20 — quality over quantity
+  title_candidates: 3          # Generate N titles, pick the strongest
+
+# ── Content Memory ──────────────────────────────────────────────────────────
+content_memory:
+  # Minimum published videos before patterns are treated as statistically useful
+  min_samples_for_pattern: 5
+  # How many days of history to consider for dedup
+  dedup_window_days: 30
+  # How many recent videos to load for pattern learning
+  learning_window_videos: 50
+
+# ── Hard Rejection Criteria ─────────────────────────────────────────────────
+# If ANY of these is true, the topic is rejected regardless of score.
+hard_rejections:
+  - "No compelling viewer consequence"
+  - "No clear curiosity gap"
+  - "No concrete payoff sentence"
+  - "Generic explainer with no twist"
+  - "Pure announcement with no conflict"
+  - "Requires charts or code to explain"
+  - "Topic too broad — cannot payoff in one sentence"
+  - "Duplicates recent topic family"

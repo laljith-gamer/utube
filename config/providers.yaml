@@ -47,6 +47,56 @@ llm_script:
       model: nvidia/llama-3.1-nemotron-70b-instruct   # NVIDIA's own model, more stable than Meta llama on NIM
       supports_reasoning_effort: false
 
+# Concept angle generation — reuses research models (cheaper, fast)
+llm_concept:
+  chain: [openrouter_research, nvidia_nim_research]
+  request_timeout_sec: 120
+  retry_on_rate_limit_seconds: 10
+  providers:
+    openrouter_research:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.6
+        top_p: 0.95
+        max_tokens: 4000
+    nvidia_nim_research:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.6
+        top_p: 0.95
+        max_tokens: 4000
+
+# Script quality control — reuses research models (cheaper, fast)
+llm_qc:
+  chain: [openrouter_research, nvidia_nim_research]
+  request_timeout_sec: 120
+  retry_on_rate_limit_seconds: 10
+  providers:
+    openrouter_research:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.3
+        top_p: 0.95
+        max_tokens: 3000
+    nvidia_nim_research:
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: nvidia/ising-calibration-1.5-31b
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.3
+        top_p: 0.95
+        max_tokens: 3000
+
 
 image:
   # nvidia_nim_sdxl removed — endpoint 404 as of 2026-08-26. Pollinations only.

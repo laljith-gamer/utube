@@ -1,9 +1,9 @@
-"""Final FFmpeg assembly: motion-only scenes + caption burn-in + music duck.
+"""Final FFmpeg assembly: visuals + caption burn-in + music duck.
 
 Per scene we render either:
   * a real video clip (SVD or stock), scaled+cropped to portrait, looped to fit duration; or
-  * a synthesized animated gradient (motion filler) — used only when SVD AND stock both
-    failed for the scene. There is NO still-image / Ken Burns slideshow path.
+  * a static image with Ken Burns motion (zoom/pan); or
+  * a synthesized animated gradient (motion filler) — used only when SVD, stock, and image both failed.
 
 All ffmpeg knobs (codec, crf, preset, music volume, caption style, filler colors) live in
 pipeline.yaml > assemble.
@@ -52,6 +52,8 @@ def assemble_video(
         out_clip = work_dir / f"scene_{i:02d}.mp4"
         if "video" in v:
             _render_from_video(out_dir / v["video"], out_clip, dur, width, height, fps, acfg)
+        elif "image" in v:
+            _render_from_image(out_dir / v["image"], out_clip, dur, width, height, fps, acfg)
         else:
             _render_motion_filler(out_clip, dur, width, height, fps, acfg)
         return out_clip
@@ -77,6 +79,9 @@ def assemble_video(
         out=output_path,
         cfg=acfg,
     )
+    
+    _technical_validation(output_path, srt_path, audio_summary)
+    
     LOG.info("Final video -> %s", output_path)
     return output_path
 
@@ -102,18 +107,39 @@ def _render_from_video(src: Path, out: Path, dur: float, w: int, h: int, fps: in
     subprocess.run(cmd, check=True, capture_output=True, text=True)
 
 
-def _render_motion_filler(out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
-    """Synthesize a moving gradient as a no-real-footage fallback.
+def _render_from_image(src: Path, out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+    """Render a static image with Ken Burns (zoom/pan) effect."""
+    f = acfg.get("ffmpeg", {}) or {}
+    image_cfg = acfg.get("image_motion", {}) or {}
+    
+    # We'll use zoompan filter. We want a slight zoom in.
+    # zoom in from 1.0 to 1.15 over the duration.
+    # z='min(zoom+0.0015,1.15)':d={dur*fps}
+    zoom_rate = float(image_cfg.get("zoom_rate", 0.0015))
+    
+    vf = (
+        f"scale={w}:{h}:force_original_aspect_ratio=increase,"
+        f"crop={w}:{h},setsar=1,"
+        f"zoompan=z='min(zoom+{zoom_rate},1.15)':d={int(dur * fps)}:s={w}x{h}:fps={fps}"
+    )
+    cmd = [
+        "ffmpeg", "-y", "-loop", "1", "-i", str(src),
+        "-t", f"{dur:.2f}",
+        "-vf", vf, "-an",
+        "-c:v", f.get("video_codec", "libx264"),
+        "-pix_fmt", f.get("pix_fmt", "yuv420p"),
+        "-r", str(fps),
+        str(out),
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
 
-    Uses ffmpeg's `gradients` lavfi source (FFmpeg >= 5) for a smooth animated
-    multi-color gradient. If `gradients` is unavailable on the runner we fall back
-    to a `color`+`hue` rotation which is always present.
-    """
+
+def _render_motion_filler(out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+    """Synthesize a moving gradient as a no-real-footage fallback."""
     f = acfg.get("ffmpeg", {}) or {}
     mf = acfg.get("motion_filler", {}) or {}
     colors = mf.get("colors", ["0x0a0a2a", "0x4f1eb1", "0x111122", "0x222244"])
     speed = float(mf.get("speed", 0.02))
-    # Pick a different color seed every time so consecutive fillers don't look identical.
     random.shuffle(colors)
     c0, c1, c2, c3 = (colors + colors)[:4]
 
@@ -251,3 +277,18 @@ def _scene_durations(audio_summary: dict, num_scenes: int) -> list[float]:
             d += by_name.get("cta", 0.0)
         durs.append(max(d, 1.5))
     return durs
+
+
+def _technical_validation(output_path: Path, srt_path: Path, audio_summary: dict) -> None:
+    if not output_path.exists():
+        raise RuntimeError("Output video file was not created.")
+    
+    if output_path.stat().st_size < 100_000:
+        raise RuntimeError("Output video is unexpectedly small (less than 100KB).")
+        
+    if not srt_path.exists() or srt_path.stat().st_size == 0:
+        LOG.warning("No captions file found or file is empty.")
+    
+    # We could do an ffprobe check here for exact resolution and duration,
+    # but checking size is a good proxy for "did ffmpeg fail silently".
+    LOG.info("Technical validation passed for %s", output_path.name)

@@ -2,7 +2,9 @@
 
 Tracks:
 - recent topic hashes per niche (to avoid 30-day repeats)
+- recent topic families (to avoid similar semantic topics)
 - per-day usage counters per provider (best-effort, advisory)
+- full performance records
 """
 from __future__ import annotations
 
@@ -27,7 +29,7 @@ class Ledger:
                 return cls(path=path, data=json.loads(path.read_text(encoding="utf-8")))
             except Exception as e:  # noqa: BLE001
                 LOG.warning("Ledger %s corrupt (%s); starting fresh", path, e)
-        return cls(path=path, data={"topics": {}, "themes": {}, "usage": {}})
+        return cls(path=path, data={"topics": {}, "families": {}, "themes": {}, "usage": {}, "runs": []})
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -49,10 +51,31 @@ class Ledger:
     def record_topic(self, slot_id: str, topic_hash: str) -> None:
         topics = self.data.setdefault("topics", {}).setdefault(slot_id, {})
         topics[topic_hash] = datetime.now(timezone.utc).isoformat()
-        # Trim to last 200 per slot
         if len(topics) > 200:
             for k in list(topics.keys())[:-200]:
                 topics.pop(k, None)
+
+    # ----- families -----
+
+    def recent_families(self, *, days: int) -> list[str]:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        out = []
+        for f, ts in self.data.get("families", {}).items():
+            try:
+                if datetime.fromisoformat(ts) >= cutoff:
+                    out.append(f)
+            except ValueError:
+                continue
+        return out
+
+    def record_family(self, family: str) -> None:
+        if not family:
+            return
+        families = self.data.setdefault("families", {})
+        families[family] = datetime.now(timezone.utc).isoformat()
+        if len(families) > 500:
+            for k in list(families.keys())[:-500]:
+                families.pop(k, None)
 
     # ----- themes (global, not per-lane) -----
 
@@ -71,7 +94,6 @@ class Ledger:
     def record_theme(self, theme_id: str) -> None:
         themes = self.data.setdefault("themes", {})
         themes[theme_id] = datetime.now(timezone.utc).isoformat()
-        # Trim to last 2000 (covers ~3 years at 2 vids/day)
         if len(themes) > 2000:
             for k in list(themes.keys())[:-2000]:
                 themes.pop(k, None)
@@ -82,3 +104,14 @@ class Ledger:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         u = self.data.setdefault("usage", {}).setdefault(today, {})
         u[provider] = u.get(provider, 0) + count
+
+    # ----- full run records -----
+    
+    def record_run(self, metadata: dict) -> None:
+        runs = self.data.setdefault("runs", [])
+        runs.append({
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            **metadata
+        })
+        if len(runs) > 1000:
+            self.data["runs"] = runs[-1000:]

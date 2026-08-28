@@ -30,6 +30,7 @@ CONFIG_FILES = [
     "pipeline.yaml",
     "lanes.yaml",
     "schedule.yaml",
+    "quality.yaml",
 ]
 
 
@@ -99,6 +100,8 @@ def goal_summary() -> str:
     parts = []
     if ch.get("name"):
         parts.append(f"Channel: {ch['name']}")
+    if ch.get("identity"):
+        parts.append(f"Identity: {ch['identity'].strip()}")
     if ch.get("audience"):
         parts.append(f"Audience: {ch['audience']}")
     if ch.get("goal"):
@@ -108,3 +111,4 @@ def goal_summary() -> str:
     if ch.get("language"):
         parts.append(f"Language: {ch['language']}")
     return "\n".join(parts)
+

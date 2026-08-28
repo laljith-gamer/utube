@@ -1,1 +1,1 @@
-"""utube — YouTube automation pipeline (5 videos/day)."""
+"""utube — Data-Driven YouTube Shorts Content Engine."""

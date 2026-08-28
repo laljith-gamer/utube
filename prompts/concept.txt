@@ -1,0 +1,35 @@
+{goal}
+
+Topic: {topic_title}
+Source: {topic_source}
+Summary: {topic_summary}
+
+Generate {n_angles} different angles for a YouTube Short about this topic.
+Each angle should use a DIFFERENT hook type from: {hook_types}
+
+The channel identity is: "Surprising technology that matters to ordinary people."
+Every angle MUST answer: why would an ordinary person care about this?
+
+{winning_hooks}
+{weak_hooks}
+
+For each angle, provide:
+- angle: One sentence describing the specific framing (be SPECIFIC, not generic)
+- hook_type: Which type from the list above
+- core_claim: The central thesis in one sentence
+- viewer_problem: Why should THEY care? What does it mean for their daily life?
+- curiosity_gap: The question the viewer cannot resist (must be specific, not "did you know?")
+- emotional_driver: What emotion drives the watch? (curiosity, fear, surprise, outrage, relief, amusement)
+- payoff: The satisfying answer/reveal in one sentence — must match the curiosity gap
+- concept_score: 0-100 how strong this concept is (70+ = worth making, 85+ = excellent)
+- risk_flags: List of potential problems (e.g. "too abstract", "needs code to explain", "no visual subjects")
+
+Scoring guide:
+- 90+: Viral potential. Strong emotion, clear visual, specific payoff.
+- 80-89: Strong. Good hook, clear story arc, viewer cares.
+- 70-79: Decent. Watchable but needs strong execution.
+- 60-69: Weak. Missing clear payoff or visual potential.
+- Below 60: Not worth making. Skip.
+
+Respond with ONLY a JSON object, no prose:
+{{"angles": [{{"angle": "", "hook_type": "", "core_claim": "", "viewer_problem": "", "curiosity_gap": "", "emotional_driver": "", "payoff": "", "concept_score": 0, "risk_flags": []}}, ...]}}

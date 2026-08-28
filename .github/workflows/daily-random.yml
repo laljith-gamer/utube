@@ -26,14 +26,6 @@ on:
     - cron: "0 12 * * 0,6"
   workflow_dispatch:
     inputs:
-      video_count:
-        description: "Videos to produce (0-2). Leave empty for random."
-        required: false
-        default: ""
-      lane:
-        description: "Optional: restrict random pick to this lane id"
-        required: false
-        default: ""
       no_upload:
         description: "Build but skip YouTube upload"
         required: false
@@ -42,10 +34,10 @@ on:
         description: "Skip SVD animation (faster build)"
         required: false
         default: "false"
-      skip_random_sleep:
-        description: "Skip random delays between videos (manual runs)"
+      script_only:
+        description: "Stop immediately after generating script (no media)"
         required: false
-        default: "true"
+        default: "false"
 
 concurrency:
   group: utube-daily
@@ -54,8 +46,8 @@ concurrency:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    # Budget: 2 videos × ~55 min each + 1 gap × 40 min = ~150 min
-    timeout-minutes: 160
+    # Budget: 1 video × ~55 min
+    timeout-minutes: 60
     permissions:
       contents: write   # commit ledger.json + run artifacts back to repo
       issues:   write   # auto-open an issue on failure
@@ -105,58 +97,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          # ── 1. Decide how many videos to produce today (0-3) ─────────────
-          INPUT_COUNT="${{ inputs.video_count }}"
-          if [ -n "$INPUT_COUNT" ]; then
-            N=$INPUT_COUNT
-            echo "Manual override: $N video(s)."
-          else
-            N=$((RANDOM % 3))   # 0, 1, or 2 — equal 33% chance each
-            echo "Random draw: $N video(s) today."
-          fi
-
-          if [ "$N" -eq 0 ]; then
-            echo "Zero videos chosen — skipping today. See you tomorrow!"
-            exit 0
-          fi
-
-          # ── 2. Build base orchestrator args ──────────────────────────────
-          LANE="${{ inputs.lane }}"
+          # ── 1. Build orchestrator args ──────────────────────────────
           NO_UPLOAD="${{ inputs.no_upload || 'false' }}"
           SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
-          SKIP_SLEEP="${{ inputs.skip_random_sleep || 'false' }}"
+          SCRIPT_ONLY="${{ inputs.script_only || 'false' }}"
 
-          BASE="--random-batch --videos-min 1 --videos-max 1"
-          [ -n "$LANE" ]             && BASE="$BASE --lane $LANE"
+          BASE=""
           [ "$NO_UPLOAD" = "true" ]  && BASE="$BASE --no-upload"
           [ "$SKIP_SVD"  = "true" ]  && BASE="$BASE --skip-svd"
-
-          # ── 3. Initial random offset — scatter first upload 0-20 min ─────
-          if [ "$SKIP_SLEEP" != "true" ] && [ "${{ github.event_name }}" = "schedule" ]; then
-            OFFSET=$((RANDOM % 1201))   # 0-1200 s = 0-20 min
-            echo "Initial offset: ${OFFSET}s (~$((OFFSET/60)) min) → spreads within 05:00-05:20 IST."
-            sleep "$OFFSET"
-          fi
-
-          # ── 4. Produce each video, sleep a random gap between them ────────
-          for i in $(seq 1 "$N"); do
-            echo ""
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "  VIDEO $i / $N   $(date '+%Y-%m-%d %H:%M:%S UTC')"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            python -m pipeline.orchestrator $BASE
-
-            # Sleep a random gap between videos (20-40 min), skip after last
-            if [ "$i" -lt "$N" ] && [ "$SKIP_SLEEP" != "true" ]; then
-              GAP=$(( (RANDOM % 1201) + 1200 ))   # 1200-2400 s = 20-40 min
-              echo ""
-              echo "Cooling down ${GAP}s (~$((GAP/60)) min) before video $((i+1))…"
-              sleep "$GAP"
-            fi
-          done
+          [ "$SCRIPT_ONLY" = "true" ] && BASE="$BASE --script-only"
 
           echo ""
-          echo "✓ All $N video(s) done — $(date '+%H:%M:%S UTC')"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "  GENERATING VIDEO   $(date '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          python -m pipeline.orchestrator $BASE
+
+          echo ""
+          echo "✓ Pipeline complete — $(date '+%H:%M:%S UTC')"
 
       - name: Upload run artifacts
         if: always()

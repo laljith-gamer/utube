@@ -3,21 +3,11 @@ name: Manual Test (single video, no upload)
 on:
   workflow_dispatch:
     inputs:
-      lane:
-        description: "Lane preset to use (random theme picked from this lane)"
+      script_only:
+        description: "Stop immediately after generating script (no media)"
         required: false
-        default: "tech_news"
-        type: choice
-        options:
-          - did_you_know
-          - tech_news
-          - ai_breakthrough
-          - cybersecurity
-          - viral_science
-      theme:
-        description: "Optional: force a specific theme id (overrides lane)"
-        required: false
-        default: ""
+        default: "false"
+        type: boolean
       skip_svd:
         description: "Skip SVD animation (faster build)"
         required: false
@@ -60,17 +50,12 @@ jobs:
       - name: Build args
         id: args
         env:
-          LANE:    ${{ inputs.lane }}
-          THEME:   ${{ inputs.theme }}
           SKIPSVD: ${{ inputs.skip_svd }}
+          SCRIPTONLY: ${{ inputs.script_only }}
         run: |
           ARGS="--no-upload"
-          if [ -n "$THEME" ]; then
-            ARGS="$ARGS --theme $THEME"
-          else
-            ARGS="$ARGS --lane $LANE"
-          fi
           if [ "$SKIPSVD" = "true" ]; then ARGS="$ARGS --skip-svd"; fi
+          if [ "$SCRIPTONLY" = "true" ]; then ARGS="$ARGS --script-only"; fi
           echo "args=$ARGS" >> "$GITHUB_OUTPUT"
 
       - name: Run pipeline (no upload)

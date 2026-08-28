@@ -23,6 +23,10 @@ Rules:
   know that" fact — the scriptwriter will use it as the payoff at the end.
 - `comment_bait_question` must reference a specific element from the brief, not
   a generic "what do you think?".
+- `confidence` is 0-100 how confident you are that these facts are accurate.
+  Below 70 = flag as low confidence.
+- `risk_flags` lists any issues: "source is thin", "facts may be outdated",
+  "topic is too niche", "no visual subjects available".
 
 Respond with ONLY a JSON object:
 {{
@@ -31,5 +35,7 @@ Respond with ONLY a JSON object:
   "context":               "<one short paragraph of background a viewer needs>",
   "comment_bait_question": "<question that references something specific from the brief>",
   "open_questions":        ["<questions the source did NOT answer — the script must avoid these>"],
-  "citations":             ["<URL or short source label per fact>"]
+  "citations":             ["<URL or short source label per fact>"],
+  "confidence":            <int 0-100>,
+  "risk_flags":            ["<potential issues>"]
 }}

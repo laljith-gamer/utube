@@ -1,4 +1,9 @@
-"""Topic selection + research brief — token budgets and reasoning effort from pipeline.yaml."""
+"""Research stage — topic selection + research brief generation.
+
+The old `select_topic()` is kept for backward compatibility but the new pipeline
+uses `build_research_brief()` with a concept object instead of a raw topic.
+Token budgets and reasoning effort come from pipeline.yaml > research.
+"""
 from __future__ import annotations
 
 import logging
@@ -26,6 +31,10 @@ def select_topic(
     sources_label: str,
     recent_hashes: list[str],
 ) -> dict[str, Any]:
+    """Legacy topic selection via LLM. Kept for backward compatibility.
+
+    The new pipeline uses topic_scoring + concept stages instead.
+    """
     if not candidates:
         raise RuntimeError("No candidates to choose from")
 
@@ -33,7 +42,6 @@ def select_topic(
     rcfg = _research_cfg().get("topic_select", {}) or {}
     template = (repo_root() / "prompts" / "topic_select.txt").read_text(encoding="utf-8")
 
-    # Sort candidates by normalized score descending so the hottest topics are at the top
     candidates.sort(key=lambda x: x.get('score', 0), reverse=True)
 
     rendered = "\n".join(
@@ -72,6 +80,7 @@ def select_topic(
 
 
 def fetch_source_text(url: str, *, max_chars: int | None = None) -> str:
+    """Fetch and extract readable text from a URL."""
     if max_chars is None:
         max_chars = int(_research_cfg().get("source_text_max_chars", 6000))
     if not url:
@@ -95,7 +104,17 @@ def fetch_source_text(url: str, *, max_chars: int | None = None) -> str:
         return ""
 
 
-def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
+def build_research_brief(
+    llm: LLMRouter,
+    topic: dict,
+    *,
+    concept: dict | None = None,
+) -> dict[str, Any]:
+    """Build a research brief for the selected topic/concept.
+
+    If a concept is provided, uses the concept's angle and curiosity gap
+    to focus the research on specific facts needed for that framing.
+    """
     cfg = get_config()
     bcfg = _research_cfg().get("brief", {}) or {}
     template = (repo_root() / "prompts" / "research.txt").read_text(encoding="utf-8")
@@ -107,10 +126,17 @@ def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
         if fetched:
             source_text = fetched
 
+    # Use concept angle if available, otherwise fall back to topic angle
+    angle = ""
+    if concept:
+        angle = concept.get("chosen_angle", "")
+    if not angle:
+        angle = topic.get("angle", "")
+
     prompt = template.format(
         goal=goal_summary(),
         topic_title=topic.get("title", ""),
-        angle=topic.get("angle", ""),
+        angle=angle,
         source_url=source_url,
         source_text=source_text or "(no source text available)",
         target_duration=cfg.get_path("video.target_duration_sec", 35),
@@ -119,10 +145,18 @@ def build_research_brief(llm: LLMRouter, topic: dict) -> dict[str, Any]:
 
     brief = llm.chat_json(
         [{"role": "user", "content": prompt}],
-        max_tokens=int(bcfg.get("max_tokens", 2500)),
+        max_tokens=int(bcfg.get("max_tokens", 3000)),
         temperature=float(bcfg.get("temperature", 0.4)),
         reasoning_effort=bcfg.get("reasoning_effort"),
     )
+
+    # Enrich brief with concept metadata if available
+    if concept:
+        brief["concept_angle"] = concept.get("chosen_angle", "")
+        brief["concept_hook_type"] = concept.get("hook_type", "")
+        brief["concept_curiosity_gap"] = concept.get("curiosity_gap", "")
+        brief["concept_payoff"] = concept.get("payoff", "")
+
     LOG.info("Research brief: %d facts, %d gaps",
              len(brief.get("key_facts", [])), len(brief.get("open_questions", [])))
     return brief

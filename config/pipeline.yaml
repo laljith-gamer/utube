@@ -6,9 +6,8 @@ video:                              # final output specs
   height: 1920
   fps: 30
   target_duration_sec: 32
-  min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-32s
-  max_duration_sec: 45
-  num_scenes: 10                    # reduced from 15: fewer scenes = smaller JSON, no truncation
+  min_duration_sec: 25              # tightened: dense pro-paced shorts can land at 25-42s
+  max_duration_sec: 42
 
 # Visuals: every scene is motion-based.
 # Order: SDXL still -> SVD animation -> stock B-roll -> animated-gradient filler.
@@ -18,7 +17,7 @@ visuals:
 
 discover:
   user_agent: "script:utube-automation:v1.0 (by /u/laljith-gamer)"
-  total_candidates_limit: 25
+  total_candidates_limit: 40        # raised — scoring engine needs a wider pool
   per_source_limits:
     hackernews: 15
     reddit_per_subreddit: 8
@@ -30,27 +29,19 @@ discover:
 
 research:
   source_text_max_chars: 6000
-  topic_select:
-    max_tokens: 2000
-    temperature: 0.5
-    reasoning_effort: null         # null = no reasoning (fast, cheap)
   brief:
-    max_tokens: 2500
+    max_tokens: 3000
     temperature: 0.4
     reasoning_effort: null
 
 script:
-  max_tokens: 12000                 # raised from 8000: prevents mid-JSON truncation on 10-scene outputs
-  temperature: 0.7                  # slightly lower for more stable structured JSON
-  # "low" works well for a 35s narration: enough internal planning, plenty of
-  # tokens left for the actual JSON output. "high" causes truncation where the
-  # model spends the entire budget reasoning and never writes the answer.
+  max_tokens: 12000                 # raised from 8000: prevents mid-JSON truncation
+  temperature: 0.7
   reasoning_effort: low
-  # 3.0 wps written with Camb speaking_rate ~= 1.08 gives a brisk Shorts pace.
-  # If videos sound rushed, drop to 2.7. If too slow, push to 3.2.
   words_per_second: 2.5
-  hook_max_seconds: 2              # first 2s decides retention on Shorts
-  hashtags_count: 20               # exact number of dynamic hashtags the LLM must produce
+  hook_max_seconds: 1.5             # tightened from 2 — Shorts need sub-2s hooks
+  min_scenes: 5                     # story-rhythm range instead of fixed count
+  max_scenes: 8
 
 audio:
   bitrate: "128k"
@@ -104,6 +95,10 @@ assemble:
   motion_filler:                     # used only when SVD AND stock both fail for a scene
     speed: 0.02
     colors: ["0x0a0a2a", "0x4f1eb1", "0x111122", "0x222244"]
+  image_motion:                      # applied to generated still images (Ken Burns style)
+    zoom_rate: 0.0015                # zoom per frame (subtle)
+    pan_speed: 2                     # pixels per frame
+    duration_sec: 4                  # how long each image-motion clip lasts
   music:
     volume: 0.18                   # bg music level (1.0 = original)
     loop: true
@@ -135,10 +130,14 @@ assemble:
 
 stage_timeouts_sec:
   discover: 60
+  topic_scoring: 90
+  concept: 60
   research: 90
   script: 120
+  script_qc: 90
   tts: 180
   visuals: 600
+  visual_qc: 30
   captions: 120
   thumbnail: 90
   assemble: 240

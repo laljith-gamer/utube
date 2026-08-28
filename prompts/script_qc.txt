@@ -1,0 +1,44 @@
+{goal}
+
+Evaluate this YouTube Short script for quality. Score each dimension 0-100.
+
+Topic: {topic_title}
+{concept_context}
+
+Script:
+{script_text}
+
+Evaluate strictly. This is the final quality gate before production.
+
+Score these dimensions (0-100):
+- hook_strength: Does the first line stop a scroll? Does it open a clear curiosity loop? 90+ = can't look away. 70 = generic. Below 60 = skip-worthy.
+- clarity: Is every sentence easy to understand on FIRST listen at Shorts speed? No jargon, no complex clauses.
+- specificity: Are facts specific (numbers, names, dates, dollar amounts) not vague ("a lot", "many", "some")?
+- story_progression: Does each scene build on the last? Is there narrative momentum? Or is it just a list of facts?
+- payoff_strength: Does the ending resolve the hook's promise? Does it feel EARNED? Is there an "ah-ha" moment?
+- natural_voice: Does it sound like a real, energetic person talking? Not a textbook, not a news anchor, not robotic?
+- channel_fit: Does this fit "surprising technology that matters to ordinary people"? Would yesterday's viewer want this?
+
+Known failure patterns to watch for:
+- Hook is just a statement, not a question or contradiction
+- "Did you know" opening (banned)
+- Scenes that repeat the same idea in different words
+- Payoff that doesn't match the hook's promise
+- Generic CTA ("what do you think?")
+- Too many abstract/unfilmable visual prompts
+- Vague language that would sound robotic in TTS
+
+Respond with ONLY a JSON object:
+{{
+  "scores": {{
+    "hook_strength": <int>,
+    "clarity": <int>,
+    "specificity": <int>,
+    "story_progression": <int>,
+    "payoff_strength": <int>,
+    "natural_voice": <int>,
+    "channel_fit": <int>
+  }},
+  "issues": ["<specific problems found — be precise, reference exact lines>"],
+  "feedback": "<if any score is below 75, give specific rewrite instructions for those dimensions>"
+}}
