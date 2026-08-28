@@ -1,28 +1,11 @@
 name: Daily Random Uploads
 
 # Optimized IST Schedule (Skips Thursday entirely for research day)
-#
-# Weekdays (Mon, Tue, Wed, Fri):
-#   - 6:00 PM IST (12:30 UTC) - Hits the 7:00-8:00 PM peak starting window
-#
-# Weekends (Sat, Sun): Two windows per day
-#   - Sat Morning: 10:00 AM IST (04:30 UTC) - publishes ~11:00 AM
-#   - Sun Morning: 9:00 AM IST (03:30 UTC) - publishes ~10:00 AM
-#   - Sat/Sun Evening: 5:30 PM IST (12:00 UTC) - publishes ~6:30 PM
-#
-# In each window, video count (0-2) is chosen randomly at runtime.
-# Each video is uploaded individually with random gaps (20-40 min)
-# to maintain organic publish timestamps.
-
 on:
   schedule:
-    # Weekdays (Mon, Tue, Wed, Fri) @ 6:00 PM IST (to publish ~7:00 PM)
     - cron: "30 12 * * 1-3,5"
-    # Saturday Morning @ 10:00 AM IST (to publish ~11:00 AM)
     - cron: "30 4 * * 6"
-    # Sunday Morning @ 9:00 AM IST (to publish ~10:00 AM)
     - cron: "30 3 * * 0"
-    # Weekend Evenings (Sat, Sun) @ 5:30 PM IST (to publish ~6:30 PM)
     - cron: "0 12 * * 0,6"
   workflow_dispatch:
     inputs:
@@ -46,76 +29,57 @@ concurrency:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    # Budget: 1 video × ~55 min
     timeout-minutes: 60
     permissions:
-      contents: write   # commit ledger.json + run artifacts back to repo
-      issues:   write   # auto-open an issue on failure
+      contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-
       - name: Install ffmpeg + fonts
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends ffmpeg fonts-dejavu-core
-
       - name: Cache F5-TTS model weights
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface/hub
           key: f5tts-v1-base-${{ runner.os }}
           restore-keys: f5tts-v1-base-
-
       - name: Install PyTorch (CPU)
         run: |
           python -m pip install --upgrade pip uv
           uv pip install --system "numpy<2" torch torchvision torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
-
       - name: Install Python deps
-        run: |
-          uv pip install --system -r requirements.txt
-
-      - name: Produce and upload videos with random gaps
+        run: uv pip install --system -r requirements.txt
+      - name: Produce and upload videos
         env:
-          NVIDIA_NIM_API_KEY:    ${{ secrets.NVIDIA_NIM_API_KEY }}
-          OPENROUTER_API_KEY:    ${{ secrets.OPENROUTER_API_KEY }}
-          F5_REF_AUDIO:          assets/voice_ref.wav
-          F5_REF_TEXT:           ${{ secrets.F5_REF_TEXT }}
-          PEXELS_API_KEY:        ${{ secrets.PEXELS_API_KEY }}
-          PIXABAY_API_KEY:       ${{ secrets.PIXABAY_API_KEY }}
-          YOUTUBE_CLIENT_ID:     ${{ secrets.YOUTUBE_CLIENT_ID }}
+          NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          F5_REF_AUDIO: assets/voice_ref.wav
+          F5_REF_TEXT: ${{ secrets.F5_REF_TEXT }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
           set -euo pipefail
-
-          # ── 1. Build orchestrator args ──────────────────────────────
           NO_UPLOAD="${{ inputs.no_upload || 'false' }}"
           SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
           SCRIPT_ONLY="${{ inputs.script_only || 'false' }}"
-
           BASE=""
-          [ "$NO_UPLOAD" = "true" ]  && BASE="$BASE --no-upload"
-          [ "$SKIP_SVD"  = "true" ]  && BASE="$BASE --skip-svd"
+          [ "$NO_UPLOAD" = "true" ] && BASE="$BASE --no-upload"
+          [ "$SKIP_SVD" = "true" ] && BASE="$BASE --skip-svd"
           [ "$SCRIPT_ONLY" = "true" ] && BASE="$BASE --script-only"
-
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "  GENERATING VIDEO   $(date '+%Y-%m-%d %H:%M:%S UTC')"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           python -m pipeline.orchestrator $BASE
-
-          echo ""
-          echo "✓ Pipeline complete — $(date '+%H:%M:%S UTC')"
-
       - name: Upload run artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -127,20 +91,19 @@ jobs:
             runs/**/thumbnail.jpg
           retention-days: 14
           if-no-files-found: warn
-
       - name: Commit ledger + run summaries
         if: always()
         run: |
-          git config user.name  "utube-bot"
+          set -euo pipefail
+          git config user.name "utube-bot"
           git config user.email "utube-bot@users.noreply.github.com"
-          git add ledger.json runs/**/*.json runs/**/captions.srt 2>/dev/null || true
+          git add ledger.json runs/**/*.json runs/**/captions.srt
           if ! git diff --cached --quiet; then
             git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin HEAD:${{ github.ref_name }} || true
+            git push origin HEAD:${{ github.ref_name }}
           else
             echo "Nothing to commit."
           fi
-
       - name: Open issue on failure
         if: failure()
         uses: actions/github-script@v7
@@ -149,8 +112,8 @@ jobs:
             const today = new Date().toISOString().slice(0, 10);
             await github.rest.issues.create({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               title: `Daily run failed (${today})`,
-              body:  `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              body: `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               labels: ["daily-batch-failure"],
             });
