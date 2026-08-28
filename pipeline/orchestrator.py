@@ -43,14 +43,21 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         if not candidates:
             raise RuntimeError("No candidates discovered.")
 
-        scored = topic_scoring.score_candidates(candidates, content_memory=mem_ctx, recent_hashes=ledger.recent_hashes("global"))
+        memory_days = int(qual_cfg.get("memory_days", 30))
+        recent_hashes = ledger.recent_hashes("global", days=memory_days)
+        scored = topic_scoring.score_candidates(candidates, content_memory=mem_ctx, recent_hashes=recent_hashes)
         write_json(out / "2_scored_candidates.json", scored)
         best = topic_scoring.select_best(scored, exploration_ratio=float(qual_cfg.get("exploration_ratio", 0.25)))
         if not best:
             result.update({"ok": True, "reason": "No candidate passed minimum quality threshold."})
             write_json(out / "result.json", result)
             return result
-        ledger.record_topic("global", best.get("topic_hash", best.get("content_hash")))
+        topic_hash = best.get("topic_hash", best.get("content_hash"))
+        if topic_hash:
+            ledger.record_topic("global", topic_hash)
+        family = best.get("topic_family", best.get("family", ""))
+        if family:
+            ledger.record_family(family)
         write_json(out / "2_best_topic.json", best)
 
         top_concept = concept.generate_concept(best, content_memory=mem_ctx)
@@ -67,8 +74,6 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / "result.json", result)
             return result
 
-        # A lane/voice selection can be supplied by config or future callers. Keep it as one object
-        # and pass the same object to script + TTS so voice settings cannot silently disappear.
         lane = cfg.get_path("lane", {}) or {}
         sc = None
         qc_result = None
@@ -88,7 +93,6 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / "result.json", result)
             return result
 
-        # Keep PyTorch/TTS/vision inference sequential. This avoids CPU/RAM contention on the GitHub runner.
         audio_summary = audio.synthesize_narration(tts, script=sc, slot=lane, out_dir=out)
         captions_file = captions.transcribe_to_srt(out / audio_summary["master"], out / "captions.ass")
         vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
