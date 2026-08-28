@@ -53,8 +53,13 @@ def upload_video(
     cfg = _yt_cfg()
 
     if env_bool("DRY_RUN"):
-        LOG.info("[DRY_RUN] Would upload %s as %r (publish_at=%s)", video_path, title, publish_at_iso)
-        return {"id": "dry-run", "url": "https://youtu.be/dry-run", "dry_run": True}
+        return {
+            "id": "dry-run",
+            "video_id": "dry-run",
+            "url": "https://youtu.be/dry-run",
+            "title": title,
+            "dry_run": True,
+        }
 
     creds = _credentials()
     yt = build("youtube", "v3", credentials=creds, cache_discovery=False)
@@ -100,4 +105,10 @@ def upload_video(
         except Exception as e:  # noqa: BLE001
             LOG.warning("Thumbnail upload failed: %s", e)
 
-    return {"id": video_id, "url": f"https://youtu.be/{video_id}", "dry_run": False}
+    return {
+        "id": video_id,
+        "video_id": video_id,
+        "url": f"https://youtu.be/{video_id}",
+        "title": title,
+        "dry_run": False,
+    }
