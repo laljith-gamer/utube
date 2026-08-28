@@ -1,3 +1,6 @@
+"""Thursday learning loop: refresh performance, memory, then generate strategy."""
+from __future__ import annotations
+
 import datetime
 import json
 import logging
@@ -10,20 +13,23 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.ledger import Ledger
 from pipeline.providers.llm import LLMRouter
+from pipeline.stages.analytics import update_performance_records
+from pipeline.stages.content_memory import ContentMemory
 from pipeline.utils import env, repo_root
 
 LOG = logging.getLogger("analyze_trends")
 
-def get_youtube_analytics():
+
+def get_youtube_analytics() -> dict | None:
     client_id = env("YOUTUBE_CLIENT_ID")
     client_secret = env("YOUTUBE_CLIENT_SECRET")
     refresh_token = env("YOUTUBE_REFRESH_TOKEN")
-    
     if not client_id or not client_secret or not refresh_token:
-        LOG.error("Missing YouTube credentials in env")
+        LOG.error("Missing YouTube OAuth credentials")
         return None
-        
+
     creds = Credentials(
         token=None,
         refresh_token=refresh_token,
@@ -31,174 +37,210 @@ def get_youtube_analytics():
         client_id=client_id,
         client_secret=client_secret,
     )
-    
-    youtube = build("youtube", "v3", credentials=creds)
     analytics = build("youtubeAnalytics", "v2", credentials=creds)
-    
-    channel_id = "MINE"
-
     today = datetime.date.today()
     thirty_days_ago = today - datetime.timedelta(days=30)
     seven_days_ago = today - datetime.timedelta(days=7)
-    
-    def get_metrics(start_date, end_date):
+
+    def get_metrics(start_date: datetime.date, end_date: datetime.date) -> dict:
         res = analytics.reports().query(
-            ids=f"channel==MINE",
+            ids="channel==MINE",
             startDate=start_date.isoformat(),
             endDate=end_date.isoformat(),
             metrics="views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares,subscribersGained",
         ).execute()
         if not res.get("rows"):
-            return {"views": 0, "estimatedMinutesWatched": 0, "averageViewDuration": 0, "likes": 0, "comments": 0, "shares": 0, "subscribersGained": 0}
+            return {k: 0 for k in ("views", "estimatedMinutesWatched", "averageViewDuration", "likes", "comments", "shares", "subscribersGained")}
         row = res["rows"][0]
-        return {
-            "views": row[0],
-            "estimatedMinutesWatched": row[1],
-            "averageViewDuration": row[2],
-            "likes": row[3],
-            "comments": row[4],
-            "shares": row[5],
-            "subscribersGained": row[6]
-        }
-    def get_day_of_week_stats(start_date, end_date):
+        return dict(zip(("views", "estimatedMinutesWatched", "averageViewDuration", "likes", "comments", "shares", "subscribersGained"), row))
+
+    def get_day_of_week_stats(start_date: datetime.date, end_date: datetime.date) -> dict:
         try:
             res = analytics.reports().query(
-                ids=f"channel==MINE",
+                ids="channel==MINE",
                 startDate=start_date.isoformat(),
                 endDate=end_date.isoformat(),
                 metrics="views",
-                dimensions="dayOfWeek"
+                dimensions="dayOfWeek",
             ).execute()
-            if not res.get("rows"):
-                return {}
-            return {row[0]: row[1] for row in res["rows"]}
-        except Exception as e:
-            LOG.warning(f"Could not fetch dayOfWeek: {e}")
+            return {row[0]: row[1] for row in res.get("rows", [])}
+        except Exception as exc:
+            LOG.warning("Could not fetch dayOfWeek: %s", exc)
             return {}
 
-    monthly = get_metrics(thirty_days_ago, today)
-    weekly = get_metrics(seven_days_ago, today)
-    best_days = get_day_of_week_stats(thirty_days_ago, today)
-    
     return {
-        "channel_id": channel_id,
-        "monthly": monthly,
-        "weekly": weekly,
-        "best_days": best_days
+        "channel_id": "MINE",
+        "monthly": get_metrics(thirty_days_ago, today),
+        "weekly": get_metrics(seven_days_ago, today),
+        "best_days": get_day_of_week_stats(thirty_days_ago, today),
     }
 
-def main():
+
+def _load_json(path: Path, default):
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return default
+
+
+def build_learning_summary() -> dict:
+    root = repo_root()
+    performance = _load_json(root / "data" / "performance.json", {"videos": []})
+    memory = _load_json(root / "data" / "content_memory.json", {})
+    videos = performance.get("videos", [])
+
+    def top_patterns(category: str, limit: int = 8):
+        vals = []
+        for key, value in (memory.get("winning_patterns", {}).get(category, {}) or {}).items():
+            vals.append({"key": key, **value})
+        return sorted(vals, key=lambda x: (x.get("posterior_mean", 0), x.get("evidence_strength", 0)), reverse=True)[:limit]
+
+    def weak_patterns(category: str, limit: int = 8):
+        vals = []
+        for key, value in (memory.get("weak_patterns", {}).get(category, {}) or {}).items():
+            vals.append({"key": key, **value})
+        return sorted(vals, key=lambda x: (x.get("posterior_mean", 1), -x.get("evidence_strength", 0)))[:limit]
+
+    winners = [v for v in videos if v.get("performance_label") in ("winner", "above_average")]
+    losers = [v for v in videos if v.get("performance_label") in ("failure", "below_average")]
+    return {
+        "video_count": len(videos),
+        "winner_count": len(winners),
+        "loser_count": len(losers),
+        "top_winners": [
+            {k: v.get(k) for k in ("title", "topic_family", "hook_type", "emotional_driver", "duration_bucket", "title_pattern", "visual_source", "views", "views_per_day", "engagement_rate", "performance_label")}
+            for v in sorted(winners, key=lambda x: x.get("views_per_day", 0), reverse=True)[:8]
+        ],
+        "top_losers": [
+            {k: v.get(k) for k in ("title", "topic_family", "hook_type", "emotional_driver", "duration_bucket", "title_pattern", "visual_source", "views", "views_per_day", "engagement_rate", "performance_label")}
+            for v in sorted(losers, key=lambda x: x.get("views_per_day", 0))[:8]
+        ],
+        "winning_topic_families": top_patterns("topic_families"),
+        "weak_topic_families": weak_patterns("topic_families"),
+        "winning_hooks": top_patterns("hook_types"),
+        "weak_hooks": weak_patterns("hook_types"),
+        "winning_emotions": top_patterns("emotional_drivers"),
+        "winning_durations": top_patterns("duration_buckets"),
+        "winning_title_patterns": top_patterns("title_patterns"),
+        "winning_visual_sources": top_patterns("visual_sources"),
+        "winning_combinations": top_patterns("topic_hook_emotion"),
+    }
+
+
+def _write_strategy(strategy: dict, video_count: int) -> None:
+    root = repo_root()
+    path = root / "data" / "dynamic_strategy.json"
+    previous = _load_json(path, {})
+    previous_version = int(previous.get("strategy_version", 0) or 0)
+    clean = {
+        "version": 1,
+        "strategy_version": previous_version + 1,
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "based_on_video_count": video_count,
+        "confidence": max(0.0, min(1.0, min(1.0, video_count / 30.0))),
+        "overall_direction": str(strategy.get("overall_direction", "Stay focused on surprising technology that matters to ordinary people.")),
+        "focused_themes": list(strategy.get("focused_themes", []))[:8],
+        "avoid_themes": list(strategy.get("avoid_themes", []))[:8],
+        "recommended_hooks": list(strategy.get("recommended_hooks", []))[:8],
+        "avoid_hooks": list(strategy.get("avoid_hooks", []))[:8],
+        "recommended_emotions": list(strategy.get("recommended_emotions", []))[:6],
+        "duration_recommendation": str(strategy.get("duration_recommendation", "")),
+        "experiments": list(strategy.get("experiments", []))[:8],
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(clean, indent=2), encoding="utf-8")
+    LOG.info("Saved dynamic strategy v%d", clean["strategy_version"])
+
+
+def main() -> int:
     logging.basicConfig(level=logging.INFO)
+    root = repo_root()
     stats = get_youtube_analytics()
     if not stats:
-        LOG.warning("Could not fetch analytics, exiting.")
-        return
+        raise RuntimeError("YouTube Analytics unavailable; refusing to overwrite learning state")
 
-    def format_stats(s):
-        return f"- Views: {s.get('views', 0)}\n- Watch Time (min): {s.get('estimatedMinutesWatched', 0)}\n- Avg View Duration (s): {s.get('averageViewDuration', 0)}\n- Likes: {s.get('likes', 0)}\n- Comments: {s.get('comments', 0)}\n- Shares: {s.get('shares', 0)}\n- Subs Gained: {s.get('subscribersGained', 0)}"
+    ledger = Ledger.load(root / "ledger.json")
+    update_performance_records(ledger.data.get("runs", []))
+    memory = ContentMemory()
+    memory.refresh_from_performance()
+    learning = build_learning_summary()
 
-    report = f"## YouTube Trends Report\n\n**Weekly**\n{format_stats(stats['weekly'])}\n\n**Monthly**\n{format_stats(stats['monthly'])}\n"
-    
-    if stats.get("best_days"):
-        report += "\n**Views by Day of Week (Last 30 Days)**\n"
-        for day, views in stats["best_days"].items():
-            report += f"- {day}: {views}\n"
-    
-    prompt = f"""You are a Master YouTube Strategist analyzing an automated channel's performance.
-Here are the latest channel metrics:
-{report}
+    def format_stats(s: dict) -> str:
+        return (
+            f"Views={s.get('views', 0)}, watch_minutes={s.get('estimatedMinutesWatched', 0)}, "
+            f"avg_view_duration={s.get('averageViewDuration', 0)}, likes={s.get('likes', 0)}, "
+            f"comments={s.get('comments', 0)}, shares={s.get('shares', 0)}, subs={s.get('subscribersGained', 0)}"
+        )
 
-Based on these detailed metrics, perform a deep analysis. Think about audience engagement, shareability, and viewer retention.
-1. Suggest a comprehensive, high-converting strategy update. We need a new `goal_summary` for config/goal.yaml.
-2. Provide a `timing_strategy`. Analyze the best days to post based on the data. Remind the creator to check their 'When your viewers are on YouTube' graph in YouTube Studio and advise them to publish 30-90 minutes before the peak hour to allow YouTube time to process and distribute the video.
-3. Provide a `dynamic_strategy` to guide our topic selection and concept generation algorithms.
+    report = (
+        "## YouTube Trends Report\n\n"
+        f"**Weekly:** {format_stats(stats['weekly'])}\n\n"
+        f"**Monthly:** {format_stats(stats['monthly'])}\n\n"
+        f"**Views by day:** {json.dumps(stats.get('best_days', {}), sort_keys=True)}\n\n"
+        f"## Learned Video-Level Patterns\n```json\n{json.dumps(learning, indent=2, default=str)}\n```\n"
+    )
 
-Respond ONLY with a JSON object containing four keys:
-`analysis_rationale`: A short paragraph explaining your strategic reasoning based on the numbers.
-`new_goal_summary`: The detailed 4-5 sentence summary to use moving forward focusing on specific hooks and angles.
-`timing_strategy`: Advice on upload scheduling and leveraging peak viewer times.
-`dynamic_strategy`: A JSON object with the following structure:
-  - "focused_themes": [list of strings for themes to focus on]
-  - "avoid_themes": [list of strings for themes to avoid]
-  - "recommended_hooks": [list of strings for hook types to use]
-  - "overall_direction": "a sentence summarizing the direction"
+    prompt = f"""You are the weekly strategist for an automated YouTube Shorts channel.
+Do not invent evidence. Prefer patterns with meaningful sample size and evidence strength.
+Recent video-level performance and learned patterns are the primary evidence; channel aggregates are secondary.
+
+CHANNEL ANALYTICS:
+{format_stats(stats['weekly'])}
+{format_stats(stats['monthly'])}
+Day-of-week views: {json.dumps(stats.get('best_days', {}), sort_keys=True)}
+
+LEARNING DATA:
+{json.dumps(learning, indent=2, default=str)}
+
+Create a conservative strategy for the NEXT publishing period.
+Separate proven patterns from experiments. Do not overfit tiny samples.
+
+Return ONLY JSON with:
+analysis_rationale: concise evidence-based explanation
+new_goal_summary: 4-5 sentences; preserve the channel identity and quality bar
+ timing_strategy: practical scheduling guidance based only on available day data; tell the creator to use YouTube Studio's audience-online graph for the exact peak hour
+ dynamic_strategy: object containing:
+  overall_direction: string
+  focused_themes: array
+  avoid_themes: array
+  recommended_hooks: array
+  avoid_hooks: array
+  recommended_emotions: array
+  duration_recommendation: string
+  experiments: array of specific testable hypotheses
 """
+
     llm = LLMRouter("llm_script")
     try:
-        res = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=1500)
-        new_goal = res.get("new_goal_summary")
-        rationale = res.get("analysis_rationale")
-        timing = res.get("timing_strategy")
-        dynamic_strategy = res.get("dynamic_strategy")
-        
-        if new_goal:
-            report += f"\n## AI Deep Analysis\n**Rationale:**\n{rationale}\n\n**New Goal Summary:**\n{new_goal}\n\n**Timing & Scheduling Strategy:**\n{timing}\n"
-            
-            goal_yaml_path = repo_root() / "config" / "goal.yaml"
-            with open(goal_yaml_path, "r", encoding="utf-8") as f:
-                goal_data = yaml.safe_load(f) or {}
-                
-            goal_data["summary"] = new_goal
-            
-            with open(goal_yaml_path, "w", encoding="utf-8") as f:
-                yaml.dump(goal_data, f, default_flow_style=False)
-                
-            LOG.info("Updated goal.yaml with new summary.")
-            
-            if dynamic_strategy:
-                strategy_path = repo_root() / "data" / "dynamic_strategy.json"
-                strategy_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(strategy_path, "w", encoding="utf-8") as f:
-                    json.dump(dynamic_strategy, f, indent=2)
-                LOG.info("Updated dynamic_strategy.json")
-            
-            # --- Auto-update prompts ---
-            prompt_dir = repo_root() / "prompts"
-            script_prompt_path = prompt_dir / "script.txt"
-            topic_prompt_path = prompt_dir / "topic_select.txt"
-            
-            if script_prompt_path.exists() and topic_prompt_path.exists():
-                script_txt = script_prompt_path.read_text(encoding="utf-8")
-                topic_txt = topic_prompt_path.read_text(encoding="utf-8")
-                
-                update_prompt_msg = f'''You are a Prompt Engineer. We just updated our YouTube channel strategy based on latest metrics.
-Rationale: {rationale}
-New Goal: {new_goal}
+        result = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=2200)
+        if not isinstance(result, dict) or not isinstance(result.get("dynamic_strategy"), dict):
+            raise ValueError("Strategist returned invalid dynamic_strategy JSON")
+        dynamic = result["dynamic_strategy"]
+        _write_strategy(dynamic, learning["video_count"])
 
-Here is our current `script.txt` prompt:
----
-{script_txt}
----
+        goal = result.get("new_goal_summary")
+        if goal:
+            goal_path = root / "config" / "goal.yaml"
+            goal_data = yaml.safe_load(goal_path.read_text(encoding="utf-8")) or {}
+            goal_data["summary"] = goal
+            goal_path.write_text(yaml.safe_dump(goal_data, sort_keys=False), encoding="utf-8")
 
-Here is our current `topic_select.txt` prompt:
----
-{topic_txt}
----
+        report += (
+            "\n## AI Deep Analysis\n"
+            f"**Rationale:** {result.get('analysis_rationale', '')}\n\n"
+            f"**New Goal Summary:** {result.get('new_goal_summary', '')}\n\n"
+            f"**Timing & Scheduling Strategy:** {result.get('timing_strategy', '')}\n"
+        )
+    except Exception as exc:
+        LOG.error("Strategist failed: %s", exc)
+        raise
 
-Rewrite these two prompts. Keep ALL of the original structural constraints, output JSON formats, and strict rules intact.
-However, gracefully weave the New Goal and Rationale into the stylistic instructions, hook guidelines, and topic selection criteria.
-Make sure the updated prompts will naturally steer the AI to produce scripts and topics aligned with the new strategy.
-
-Respond ONLY with a JSON object containing two keys:
-`new_script_prompt`: The complete updated text for script.txt
-`new_topic_prompt`: The complete updated text for topic_select.txt
-'''
-                try:
-                    res_prompts = llm.chat_json([{"role": "user", "content": update_prompt_msg}], max_tokens=8000)
-                    new_script = res_prompts.get("new_script_prompt")
-                    new_topic = res_prompts.get("new_topic_prompt")
-                    if new_script and new_topic:
-                        script_prompt_path.write_text(new_script, encoding="utf-8")
-                        topic_prompt_path.write_text(new_topic, encoding="utf-8")
-                        LOG.info("Autonomously updated script.txt and topic_select.txt with new strategy.")
-                except Exception as e:
-                    LOG.error(f"Failed to auto-update prompts: {e}")
-    except Exception as e:
-        LOG.error(f"Failed to generate AI insights: {e}")
-        
-    report_path = repo_root() / "trend_report.md"
-    report_path.write_text(report, encoding="utf-8")
+    (root / "trend_report.md").write_text(report, encoding="utf-8")
     LOG.info("Saved trend_report.md")
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
