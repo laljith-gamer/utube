@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "strategy_version": 0,
+  "generated_at": null,
+  "based_on_video_count": 0,
+  "confidence": 0.0,
+  "overall_direction": "Stay focused on surprising technology that has a concrete consequence for ordinary people.",
+  "focused_themes": [],
+  "avoid_themes": [],
+  "recommended_hooks": [],
+  "avoid_hooks": [],
+  "recommended_emotions": [],
+  "duration_recommendation": "",
+  "experiments": []
+}
