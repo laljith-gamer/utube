@@ -1,169 +1,247 @@
-"""Content Memory — learning from performance data.
-
-Aggregates performance data into winning/losing patterns.
-These patterns feed back into the topic_scoring stage to prioritize or penalize candidates.
-"""
+"""Content memory: learn which content patterns perform and expose safe priors."""
 from __future__ import annotations
 
 import json
 import logging
+import math
 from collections import defaultdict
-from pathlib import Path
+from datetime import datetime, timezone
+from typing import Any
 
 from ..utils import repo_root
 from .analytics import update_performance_records
 
 LOG = logging.getLogger("utube.content_memory")
+VERSION = 3
+
+
+def _default() -> dict:
+    return {
+        "version": VERSION,
+        "winning_patterns": {},
+        "weak_patterns": {},
+        "recent_hashes": [],
+        "updated_at": None,
+    }
+
+
+def _bucket_duration(seconds: Any) -> str:
+    try:
+        s = float(seconds)
+    except (TypeError, ValueError):
+        return "unknown"
+    if s < 30:
+        return "25-29"
+    if s < 35:
+        return "30-34"
+    if s < 40:
+        return "35-39"
+    return "40-42"
+
+
+def _title_pattern(title: str) -> str:
+    t = (title or "").lower()
+    if "?" in t or t.startswith(("why ", "how ")):
+        return "question"
+    if any(x in t for x in (" vs ", "versus", "compared")):
+        return "comparison"
+    if any(x in t for x in ("secret", "hidden", "nobody knows", "you don't know")):
+        return "secret"
+    if any(x in t for x in ("danger", "dangerous", "scam", "warning")):
+        return "danger"
+    if any(ch.isdigit() for ch in t):
+        return "number"
+    if any(x in t for x in ("real reason", "truth", "actually")):
+        return "contradiction"
+    return "statement"
+
+
+def _topic_family(video: dict) -> str:
+    explicit = str(video.get("topic_family") or "").strip()
+    if explicit:
+        return explicit.lower()
+    text = f"{video.get('title', '')} {video.get('chosen_angle', '')}".lower()
+    rules = {
+        "ai scams": ("voice cloning", "deepfake", "impersonat", "ai scam", "ai fraud"),
+        "ai": ("artificial intelligence", " ai ", "chatgpt", "agent", "machine learning"),
+        "cybersecurity": ("hack", "malware", "phishing", "password", "cyber", "security"),
+        "privacy": ("privacy", "tracking", "location", "spy", "permission", "data"),
+        "consumer technology": ("phone", "iphone", "android", "laptop", "browser", "wifi"),
+        "internet mechanics": ("internet", "dns", "server", "cookie", "cloud"),
+    }
+    for family, needles in rules.items():
+        if any(n in text for n in needles):
+            return family
+    return "other"
+
+
+def _visual_source(video: dict) -> str:
+    sources = video.get("visual_sources")
+    if isinstance(sources, dict) and sources:
+        nonzero = [(k, float(v or 0)) for k, v in sources.items() if float(v or 0) > 0]
+        if nonzero:
+            return max(nonzero, key=lambda x: x[1])[0]
+    return str(video.get("visual_source") or "unknown").lower()
+
+
+def _weight(age_days: Any) -> float:
+    try:
+        age = max(0.0, float(age_days))
+    except (TypeError, ValueError):
+        age = 30.0
+    return max(0.15, math.exp(-age / 90.0))
+
+
+def _posterior(wins: float, samples: float) -> tuple[float, float]:
+    """Return posterior mean and a conservative confidence-like strength.
+
+    Uses Beta(2,2) shrinkage rather than applying Wilson intervals to fractional
+    recency-weighted observations. The second value is evidence strength 0..1.
+    """
+    failures = max(0.0, samples - wins)
+    mean = (wins + 2.0) / (samples + 4.0)
+    strength = min(1.0, samples / 10.0)
+    return mean, strength
+
+
+def _accumulate(stats: dict, key: str, win: bool, weight: float) -> None:
+    if not key or key == "unknown":
+        return
+    item = stats.setdefault(key, {"samples": 0.0, "wins": 0.0})
+    item["samples"] += weight
+    if win:
+        item["wins"] += weight
 
 
 class ContentMemory:
     def __init__(self):
-        self.memory_path = repo_root() / "data" / "content_memory.json"
-        self.perf_path = repo_root() / "data" / "performance.json"
+        root = repo_root()
+        self.memory_path = root / "data" / "content_memory.json"
+        self.perf_path = root / "data" / "performance.json"
         self.data = self._load()
 
     def _load(self) -> dict:
-        default_data = {
-            "version": 3,
-            "winning_patterns": {},
-            "weak_patterns": {},
-            "recent_hashes": [],
-        }
         if not self.memory_path.exists():
-            return default_data
+            return _default()
         try:
-            with open(self.memory_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if data.get("version") != 3:
-                    return default_data
-                return data
-        except json.JSONDecodeError:
-            return default_data
+            data = json.loads(self.memory_path.read_text(encoding="utf-8"))
+            if data.get("version") != VERSION:
+                LOG.warning("Migrating content memory to V3")
+                return _default()
+            return data
+        except (json.JSONDecodeError, OSError):
+            return _default()
 
     def save(self) -> None:
         self.memory_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.memory_path, "w", encoding="utf-8") as f:
-            json.dump(self.data, f, indent=2)
+        self.memory_path.write_text(json.dumps(self.data, indent=2), encoding="utf-8")
 
     def refresh_from_performance(self) -> None:
-        """Analyze performance.json and extract patterns (V3)."""
         if not self.perf_path.exists():
+            LOG.info("No performance data yet; memory unchanged")
             return
-            
         try:
-            with open(self.perf_path, "r", encoding="utf-8") as f:
-                perf_data = json.load(f)
-        except json.JSONDecodeError:
+            perf = json.loads(self.perf_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            LOG.error("Cannot read performance data: %s", exc)
             return
-            
-        videos = perf_data.get("videos", [])
+        videos = perf.get("videos", [])
         if not videos:
+            LOG.info("No performance videos yet; memory unchanged")
             return
-            
-        self.data["version"] = 3
-        stats = {
-            "hook_types": defaultdict(lambda: {"samples": 0.0, "wins": 0.0}),
-            "emotional_drivers": defaultdict(lambda: {"samples": 0.0, "wins": 0.0}),
-            "combinations": defaultdict(lambda: {"samples": 0.0, "wins": 0.0})
-        }
 
+        categories = (
+            "topic_families", "hook_types", "emotional_drivers", "duration_buckets",
+            "title_patterns", "visual_sources", "topic_hook", "topic_emotion",
+            "hook_emotion", "topic_hook_emotion",
+        )
+        stats = {cat: {} for cat in categories}
         for v in videos:
-            is_win = v.get("performance_label") in ("winner", "above_average")
-            age_days = v.get("age_days", 30.0)
-            
-            # Recency weighting: linearly drops from 1.0 down to 0.1 over 90 days
-            weight = max(0.1, 1.0 - (age_days / 90.0))
-            
-            hook = v.get("hook_type")
-            driver = v.get("emotional_driver")
-            
-            if hook and hook != "unknown":
-                stats["hook_types"][hook]["samples"] += weight
-                if is_win:
-                    stats["hook_types"][hook]["wins"] += weight
-                    
-            if driver and driver != "unknown":
-                stats["emotional_drivers"][driver]["samples"] += weight
-                if is_win:
-                    stats["emotional_drivers"][driver]["wins"] += weight
-                    
-            if hook and hook != "unknown" and driver and driver != "unknown":
-                comb = f"{hook}|{driver}"
-                stats["combinations"][comb]["samples"] += weight
-                if is_win:
-                    stats["combinations"][comb]["wins"] += weight
+            label = v.get("performance_label")
+            if label in ("too_new", "unknown", None):
+                continue
+            win = label in ("winner", "above_average")
+            weight = _weight(v.get("age_days", 30))
+            family = _topic_family(v)
+            hook = str(v.get("hook_type") or "unknown").lower()
+            emotion = str(v.get("emotional_driver") or "unknown").lower()
+            duration = str(v.get("duration_bucket") or _bucket_duration(v.get("duration_seconds"))).lower()
+            title_pat = str(v.get("title_pattern") or _title_pattern(v.get("title", ""))).lower()
+            visual = _visual_source(v)
+            _accumulate(stats["topic_families"], family, win, weight)
+            _accumulate(stats["hook_types"], hook, win, weight)
+            _accumulate(stats["emotional_drivers"], emotion, win, weight)
+            _accumulate(stats["duration_buckets"], duration, win, weight)
+            _accumulate(stats["title_patterns"], title_pat, win, weight)
+            _accumulate(stats["visual_sources"], visual, win, weight)
+            if hook != "unknown":
+                _accumulate(stats["topic_hook"], f"{family}|{hook}", win, weight)
+            if emotion != "unknown":
+                _accumulate(stats["topic_emotion"], f"{family}|{emotion}", win, weight)
+            if hook != "unknown" and emotion != "unknown":
+                _accumulate(stats["hook_emotion"], f"{hook}|{emotion}", win, weight)
+                _accumulate(stats["topic_hook_emotion"], f"{family}|{hook}|{emotion}", win, weight)
 
-        winning_patterns = {"hook_types": {}, "emotional_drivers": {}, "combinations": {}}
-        weak_patterns = {"hook_types": {}, "emotional_drivers": {}, "combinations": {}}
-        
-        def _wilson_score_lower_bound(wins: float, n: float, z: float = 1.96) -> float:
-            if n <= 0: return 0.0
-            phat = min(1.0, max(0.0, wins / n))
-            return (phat + z*z/(2*n) - z * ((phat*(1-phat)+z*z/(4*n))/n)**0.5) / (1+z*z/n)
+        min_samples = 5.0
+        try:
+            # Keep config optional; default is intentionally conservative.
+            import yaml
+            cfg_path = repo_root() / "config" / "quality.yaml"
+            if cfg_path.exists():
+                cfg = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+                min_samples = float(cfg.get("content_memory", {}).get("min_samples_for_pattern", 5))
+        except Exception:
+            pass
 
-        for cat in ("hook_types", "emotional_drivers", "combinations"):
-            for key, st in stats[cat].items():
-                samples = st["samples"]
-                wins = st["wins"]
-                win_rate = wins / samples if samples > 0 else 0
-                confidence = _wilson_score_lower_bound(wins, samples)
-                
+        winning, weak = {}, {}
+        for cat, entries in stats.items():
+            winning[cat], weak[cat] = {}, {}
+            for key, st in entries.items():
+                samples, wins = st["samples"], st["wins"]
+                mean, strength = _posterior(wins, samples)
                 pattern = {
                     "samples": round(samples, 2),
                     "wins": round(wins, 2),
-                    "win_rate": round(win_rate, 2),
-                    "confidence": round(confidence, 2)
+                    "win_rate": round(wins / samples, 3) if samples else 0.0,
+                    "posterior_mean": round(mean, 3),
+                    "evidence_strength": round(strength, 3),
                 }
-                
-                # ~2 recent videos equivalent threshold
-                if samples >= 1.5:
-                    if win_rate >= 0.5:
-                        winning_patterns[cat][key] = pattern
-                    elif win_rate <= 0.3:
-                        weak_patterns[cat][key] = pattern
+                if samples >= min_samples and mean >= 0.55:
+                    winning[cat][key] = pattern
+                elif samples >= min_samples and mean <= 0.40:
+                    weak[cat][key] = pattern
 
-        self.data["winning_patterns"] = winning_patterns
-        self.data["weak_patterns"] = weak_patterns
-        
-        # Track recent hashes to prevent immediate repetition (keep last 30)
-        recent = sorted(videos, key=lambda x: x.get("published_at", ""), reverse=True)[:30]
-        self.data["recent_hashes"] = [v["topic_hash"] for v in recent if v.get("topic_hash")]
-        
+        self.data.update({
+            "version": VERSION,
+            "winning_patterns": winning,
+            "weak_patterns": weak,
+            "recent_hashes": [v.get("topic_hash") for v in sorted(videos, key=lambda x: x.get("published_at", ""), reverse=True)[:30] if v.get("topic_hash")],
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        })
         self.save()
-        LOG.info("Content memory version 3 refreshed")
+        LOG.info("Content memory V3 refreshed from %d videos", len(videos))
 
     def get_context_for_scoring(self) -> dict:
-        """Returns a summarized context dict for the LLM and heuristic algorithms."""
-        win_hooks = self.data.get("winning_patterns", {}).get("hook_types", {})
-        lose_hooks = self.data.get("weak_patterns", {}).get("hook_types", {})
-        win_combs = self.data.get("winning_patterns", {}).get("combinations", {})
-        
-        strong_hooks = []
-        for h, st in win_hooks.items():
-            if st.get("confidence", 0) >= 0.2:
-                strong_hooks.append({"hook": h, "confidence": st["confidence"]})
-        strong_hooks.sort(key=lambda x: x["confidence"], reverse=True)
-                
-        weak_hooks = []
-        for h, st in lose_hooks.items():
-            if st.get("win_rate", 1) <= 0.3:
-                weak_hooks.append(h)
-                
-        strong_combinations = []
-        for c, st in win_combs.items():
-            if st.get("confidence", 0) >= 0.2:
-                strong_combinations.append({"combination": c, "confidence": st["confidence"]})
-        strong_combinations.sort(key=lambda x: x["confidence"], reverse=True)
-                
+        win = self.data.get("winning_patterns", {})
+        weak = self.data.get("weak_patterns", {})
+        def ranked(cat: str, source: dict) -> list[dict]:
+            vals = [{"key": k, **v} for k, v in source.get(cat, {}).items()]
+            return sorted(vals, key=lambda x: x.get("posterior_mean", 0), reverse=True)[:8]
         return {
-            "strong_hooks": [h["hook"] for h in strong_hooks],
-            "weak_hooks": weak_hooks,
-            "strong_combinations": strong_combinations,
+            "strong_topic_families": ranked("topic_families", win),
+            "weak_topic_families": ranked("topic_families", weak),
+            "strong_hooks": ranked("hook_types", win),
+            "weak_hooks": ranked("hook_types", weak),
+            "strong_emotions": ranked("emotional_drivers", win),
+            "strong_durations": ranked("duration_buckets", win),
+            "strong_title_patterns": ranked("title_patterns", win),
+            "strong_visual_sources": ranked("visual_sources", win),
+            "strong_combinations": ranked("topic_hook_emotion", win),
             "recent_hashes": self.data.get("recent_hashes", []),
         }
 
+
 def refresh_memory(ledger_entries: list[dict]) -> None:
-    """Helper to update performance and then refresh memory."""
+    """Refresh performance first, then rebuild V3 memory."""
     update_performance_records(ledger_entries)
-    mem = ContentMemory()
-    mem.refresh_from_performance()
+    ContentMemory().refresh_from_performance()
