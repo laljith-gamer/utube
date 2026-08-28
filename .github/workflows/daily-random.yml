@@ -1,28 +1,18 @@
 name: Daily Random Uploads
 
-# Optimized IST Schedule (Skips Thursday entirely for research day)
+# Scheduled workflows execute from the default branch. During the controlled
+# evaluation window 2026-08-30 through 2026-09-05, this scheduler explicitly
+# checks out and runs the `improved` branch, then automatically returns to the
+# normal `main` code path on 2026-09-06.
 #
-# Weekdays (Mon, Tue, Wed, Fri):
-#   - 6:00 PM IST (12:30 UTC) - Hits the 7:00-8:00 PM peak starting window
-#
-# Weekends (Sat, Sun): Two windows per day
-#   - Sat Morning: 10:00 AM IST (04:30 UTC) - publishes ~11:00 AM
-#   - Sun Morning: 9:00 AM IST (03:30 UTC) - publishes ~10:00 AM
-#   - Sat/Sun Evening: 5:30 PM IST (12:00 UTC) - publishes ~6:30 PM
-#
-# In each window, video count (0-2) is chosen randomly at runtime.
-# Each video is uploaded individually with random gaps (20-40 min)
-# to maintain organic publish timestamps.
+# IMPORTANT: the scheduled job below is the scheduler, but the application code
+# being executed during the test window is from `improved`.
 
 on:
   schedule:
-    # Weekdays (Mon, Tue, Wed, Fri) @ 6:00 PM IST (to publish ~7:00 PM)
     - cron: "30 12 * * 1-3,5"
-    # Saturday Morning @ 10:00 AM IST (to publish ~11:00 AM)
     - cron: "30 4 * * 6"
-    # Sunday Morning @ 9:00 AM IST (to publish ~10:00 AM)
     - cron: "30 3 * * 0"
-    # Weekend Evenings (Sat, Sun) @ 5:30 PM IST (to publish ~6:30 PM)
     - cron: "0 12 * * 0,6"
   workflow_dispatch:
     inputs:
@@ -54,21 +44,39 @@ concurrency:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    # Budget: 2 videos × ~55 min each + 1 gap × 40 min = ~150 min
     timeout-minutes: 160
     permissions:
-      contents: write   # commit ledger.json + run artifacts back to repo
-      issues:   write   # auto-open an issue on failure
+      contents: write
+      issues: write
     steps:
+      - name: Select code branch for one-week evaluation
+        id: test_window
+        shell: bash
+        run: |
+          set -euo pipefail
+          TODAY="$(date -u +%F)"
+          TEST_END="2026-09-05"
+          if [[ "$TODAY" < "2026-08-30" ]]; then
+            REF="main"
+            MODE="normal-pre-test"
+          elif [[ "$TODAY" > "$TEST_END" ]]; then
+            REF="main"
+            MODE="normal-post-test"
+          else
+            REF="improved"
+            MODE="IMPROVED-WEEK-TEST"
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "TEST DATE: $TODAY"
+          echo "EXECUTION MODE: $MODE"
+          echo "CODE REF: $REF"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          ref: ${{ steps.test_window.outputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
 
       - name: Install ffmpeg + fonts
         run: |
@@ -91,7 +99,7 @@ jobs:
         run: |
           uv pip install --system -r requirements.txt
 
-      - name: Produce and upload videos with random gaps
+      - name: Produce and upload videos
         env:
           NVIDIA_NIM_API_KEY:    ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY:    ${{ secrets.OPENROUTER_API_KEY }}
@@ -105,40 +113,39 @@ jobs:
         run: |
           set -euo pipefail
 
-          # ── 1. Decide how many videos to produce today (0-3) ─────────────
+          echo "Execution mode: ${{ steps.test_window.outputs.mode }}"
+          echo "Application source branch: ${{ steps.test_window.outputs.ref }}"
+
           INPUT_COUNT="${{ inputs.video_count }}"
           if [ -n "$INPUT_COUNT" ]; then
             N=$INPUT_COUNT
             echo "Manual override: $N video(s)."
           else
-            N=$((RANDOM % 3))   # 0, 1, or 2 — equal 33% chance each
+            N=$((RANDOM % 3))
             echo "Random draw: $N video(s) today."
           fi
 
           if [ "$N" -eq 0 ]; then
-            echo "Zero videos chosen — skipping today. See you tomorrow!"
+            echo "Zero videos chosen — skipping today."
             exit 0
           fi
 
-          # ── 2. Build base orchestrator args ──────────────────────────────
           LANE="${{ inputs.lane }}"
           NO_UPLOAD="${{ inputs.no_upload || 'false' }}"
           SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
           SKIP_SLEEP="${{ inputs.skip_random_sleep || 'false' }}"
 
           BASE="--random-batch --videos-min 1 --videos-max 1"
-          [ -n "$LANE" ]             && BASE="$BASE --lane $LANE"
+          [ -n "$LANE" ]              && BASE="$BASE --lane $LANE"
           [ "$NO_UPLOAD" = "true" ]  && BASE="$BASE --no-upload"
           [ "$SKIP_SVD"  = "true" ]  && BASE="$BASE --skip-svd"
 
-          # ── 3. Initial random offset — scatter first upload 0-20 min ─────
           if [ "$SKIP_SLEEP" != "true" ] && [ "${{ github.event_name }}" = "schedule" ]; then
-            OFFSET=$((RANDOM % 1201))   # 0-1200 s = 0-20 min
-            echo "Initial offset: ${OFFSET}s (~$((OFFSET/60)) min) → spreads within 05:00-05:20 IST."
+            OFFSET=$((RANDOM % 1201))
+            echo "Initial offset: ${OFFSET}s"
             sleep "$OFFSET"
           fi
 
-          # ── 4. Produce each video, sleep a random gap between them ────────
           for i in $(seq 1 "$N"); do
             echo ""
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -146,17 +153,14 @@ jobs:
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             python -m pipeline.orchestrator $BASE
 
-            # Sleep a random gap between videos (20-40 min), skip after last
             if [ "$i" -lt "$N" ] && [ "$SKIP_SLEEP" != "true" ]; then
-              GAP=$(( (RANDOM % 1201) + 1200 ))   # 1200-2400 s = 20-40 min
-              echo ""
-              echo "Cooling down ${GAP}s (~$((GAP/60)) min) before video $((i+1))…"
+              GAP=$(( (RANDOM % 1201) + 1200 ))
+              echo "Cooling down ${GAP}s (~$((GAP/60)) min) before video $((i+1))..."
               sleep "$GAP"
             fi
           done
 
-          echo ""
-          echo "✓ All $N video(s) done — $(date '+%H:%M:%S UTC')"
+          echo "✓ All $N video(s) done"
 
       - name: Upload run artifacts
         if: always()
@@ -170,15 +174,16 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-      - name: Commit ledger + run summaries
+      - name: Commit ledger + run summaries back to executed branch
         if: always()
         run: |
-          git config user.name  "utube-bot"
+          set -euo pipefail
+          git config user.name "utube-bot"
           git config user.email "utube-bot@users.noreply.github.com"
-          git add ledger.json runs/**/*.json runs/**/captions.srt 2>/dev/null || true
+          git add ledger.json runs/**/*.json runs/**/captions.srt
           if ! git diff --cached --quiet; then
             git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin HEAD:${{ github.ref_name }} || true
+            git push origin "HEAD:${{ steps.test_window.outputs.ref }}"
           else
             echo "Nothing to commit."
           fi
@@ -191,8 +196,8 @@ jobs:
             const today = new Date().toISOString().slice(0, 10);
             await github.rest.issues.create({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               title: `Daily run failed (${today})`,
-              body:  `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              body: `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
               labels: ["daily-batch-failure"],
             });
