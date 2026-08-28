@@ -84,7 +84,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
     try:
         # 1. Discover
         LOG.info("--- Stage 1: Discover ---")
-        candidates = discover.discover_all()
+        candidates = discover.discover_candidates()
         
         # Inject seed ideas
         seed_ideas = themes_mod.pick_seeds(5)
@@ -107,12 +107,12 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         # 2. Score Candidates
         LOG.info("--- Stage 2: Topic Scoring ---")
         scored_candidates = topic_scoring.score_candidates(
-            llm_research, candidates, mem_ctx
+            candidates, content_memory=mem_ctx, recent_hashes=mem_ctx.get("recent_hashes", [])
         )
-        write_json(out / "2_scored_candidates.json", [c.__dict__ for c in scored_candidates])
+        write_json(out / "2_scored_candidates.json", scored_candidates)
         
         exploration_ratio = float(qual_cfg.get("exploration_ratio", 0.25))
-        best_candidate = topic_scoring.select_best(scored_candidates, exploration_ratio)
+        best_candidate = topic_scoring.select_best(scored_candidates, exploration_ratio=exploration_ratio)
         
         if not best_candidate:
             LOG.warning("Pipeline rejected all candidates. No good topic today.")
@@ -122,14 +122,14 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             return result
             
         # Record topic usage
-        topic_hash = best_candidate.topic_hash
+        topic_hash = best_candidate.get("topic_hash", best_candidate.get("content_hash"))
         ledger.record_topic("global", topic_hash)
         
-        write_json(out / "2_best_topic.json", best_candidate.__dict__)
+        write_json(out / "2_best_topic.json", best_candidate)
         
         # 3. Concept Generation
         LOG.info("--- Stage 3: Concept Generation ---")
-        top_concept = concept.generate_concepts(llm_concept, best_candidate, mem_ctx)
+        top_concept = concept.generate_concept(best_candidate, content_memory=mem_ctx)
         if not top_concept:
             LOG.warning("Failed to generate a valid concept.")
             result["reason"] = "Concept generation failed."
@@ -140,7 +140,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
 
         # 4. Deep Research
         LOG.info("--- Stage 4: Deep Research ---")
-        brief = research.deep_research(llm_research, best_candidate, top_concept)
+        brief = research.build_research_brief(llm_research, best_candidate, concept=top_concept)
         write_json(out / "4_research.json", brief)
         
         if brief.get("confidence", 0) < float(qual_cfg.get("min_fact_confidence", 90)):
@@ -160,6 +160,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             LOG.info("Script generation attempt %d/%d", attempt + 1, max_regen + 1)
             sc = script.generate_script(
                 llm_script, 
+                slot={},
                 topic=best_candidate, 
                 concept=top_concept, 
                 research=brief,
@@ -167,7 +168,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             )
             write_json(out / f"5_script_v{attempt+1}.json", sc)
             
-            qc_result = script_qc.evaluate_script(llm_qc, sc, top_concept)
+            qc_result = script_qc.evaluate_script(sc, topic=best_candidate, concept=top_concept)
             write_json(out / f"5_qc_v{attempt+1}.json", qc_result)
             
             if qc_result["passed"]:
@@ -291,7 +292,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         # 10. Record metadata
         ledger.record_run({
             "run_id": run_id,
-            "topic": best_candidate.__dict__,
+            "topic": best_candidate,
             "concept": top_concept,
             "script": sc,
             "visual_qc": v_qc,

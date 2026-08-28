@@ -77,8 +77,8 @@ def evaluate_script(
             reasoning_effort=llm_cfg.get("reasoning_effort"),
         )
     except Exception as e:
-        LOG.warning("Script QC LLM call failed (%s), passing by default", e)
-        return {"passed": True, "overall_score": 75, "scores": {}, "feedback": "", "issues": []}
+        LOG.error("Script QC LLM call failed (%s)", e)
+        return {"passed": False, "overall_score": 0, "scores": {}, "feedback": "QC evaluation failed.", "issues": [f"QC LLM Error: {e}"]}
 
     scores = result.get("scores", {})
     issues = result.get("issues", [])

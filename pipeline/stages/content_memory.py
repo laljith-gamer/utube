@@ -31,9 +31,18 @@ class ContentMemory:
             }
         try:
             with open(self.memory_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                if data.get("version") != 2:
+                    data = {
+                        "version": 2,
+                        "winning_patterns": {},
+                        "weak_patterns": {},
+                        "recent_hashes": [],
+                    }
+                return data
         except json.JSONDecodeError:
             return {
+                "version": 2,
                 "winning_patterns": {},
                 "weak_patterns": {},
                 "recent_hashes": [],
@@ -59,12 +68,49 @@ class ContentMemory:
         if not videos:
             return
             
-        # Extract patterns
-        winners = [v for v in videos if v.get("performance_label") in ("winner", "above_average")]
-        losers = [v for v in videos if v.get("performance_label") in ("failure", "below_average")]
-        
-        self.data["winning_patterns"] = self._extract_patterns(winners)
-        self.data["weak_patterns"] = self._extract_patterns(losers)
+        self.data["version"] = 2
+        stats = {
+            "hook_types": defaultdict(lambda: {"samples": 0, "wins": 0}),
+            "emotional_drivers": defaultdict(lambda: {"samples": 0, "wins": 0})
+        }
+
+        for v in videos:
+            is_win = v.get("performance_label") in ("winner", "above_average")
+            hook = v.get("hook_type")
+            if hook and hook != "unknown":
+                stats["hook_types"][hook]["samples"] += 1
+                if is_win:
+                    stats["hook_types"][hook]["wins"] += 1
+                    
+            driver = v.get("emotional_driver")
+            if driver and driver != "unknown":
+                stats["emotional_drivers"][driver]["samples"] += 1
+                if is_win:
+                    stats["emotional_drivers"][driver]["wins"] += 1
+
+        winning_patterns = {"hook_types": {}, "emotional_drivers": {}}
+        weak_patterns = {"hook_types": {}, "emotional_drivers": {}}
+
+        for cat in ("hook_types", "emotional_drivers"):
+            for key, st in stats[cat].items():
+                samples = st["samples"]
+                wins = st["wins"]
+                win_rate = wins / samples if samples > 0 else 0
+                
+                pattern = {
+                    "samples": samples,
+                    "wins": wins,
+                    "win_rate": round(win_rate, 2)
+                }
+                
+                if samples >= 2:
+                    if win_rate >= 0.5:
+                        winning_patterns[cat][key] = pattern
+                    elif win_rate <= 0.3:
+                        weak_patterns[cat][key] = pattern
+
+        self.data["winning_patterns"] = winning_patterns
+        self.data["weak_patterns"] = weak_patterns
         
         # Track recent hashes to prevent immediate repetition
         # Only keep last 30
@@ -72,27 +118,7 @@ class ContentMemory:
         self.data["recent_hashes"] = [v["topic_hash"] for v in recent if v.get("topic_hash")]
         
         self.save()
-        LOG.info("Content memory refreshed: %d winners, %d losers analyzed", len(winners), len(losers))
-
-    def _extract_patterns(self, video_list: list[dict]) -> dict:
-        patterns = {
-            "hook_types": defaultdict(int),
-            "emotional_drivers": defaultdict(int),
-        }
-        
-        for v in video_list:
-            hook = v.get("hook_type")
-            if hook and hook != "unknown":
-                patterns["hook_types"][hook] += 1
-                
-            driver = v.get("emotional_driver")
-            if driver and driver != "unknown":
-                patterns["emotional_drivers"][driver] += 1
-                
-        return {
-            "hook_types": dict(patterns["hook_types"]),
-            "emotional_drivers": dict(patterns["emotional_drivers"])
-        }
+        LOG.info("Content memory version 2 refreshed")
 
     def get_context_for_scoring(self) -> dict:
         """Returns a summarized context dict for the LLM to use during scoring."""
@@ -101,13 +127,13 @@ class ContentMemory:
         lose_hooks = self.data.get("weak_patterns", {}).get("hook_types", {})
         
         strong_hooks = []
-        for h, count in win_hooks.items():
-            if count >= 3 and count > lose_hooks.get(h, 0) * 2:
+        for h, st in win_hooks.items():
+            if st.get("win_rate", 0) >= 0.5:
                 strong_hooks.append(h)
                 
         weak_hooks = []
-        for h, count in lose_hooks.items():
-            if count >= 3 and count > win_hooks.get(h, 0) * 2:
+        for h, st in lose_hooks.items():
+            if st.get("win_rate", 1) <= 0.3:
                 weak_hooks.append(h)
                 
         return {

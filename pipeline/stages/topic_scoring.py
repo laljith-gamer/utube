@@ -221,6 +221,7 @@ def _llm_batch_score(candidates: list[dict], scoring_cfg: dict) -> list[dict]:
 
     prompt = template.format(
         goal=goal,
+        target_duration=int(get_config().get_path("video.target_duration_sec", 35)),
         n_candidates=len(candidates),
         candidates="\n".join(candidate_lines),
     )

@@ -78,16 +78,13 @@ def generate_concept(
     winning_hooks = ""
     weak_hooks = ""
     if content_memory:
-        winners = content_memory.get("winning_patterns", [])
-        if winners:
-            winning_hooks = "Hook types that performed well recently: " + ", ".join(
-                p.get("hook_type", "unknown") for p in winners[:5]
-            )
-        weak = content_memory.get("weak_patterns", [])
-        if weak:
-            weak_hooks = "Hook types that performed poorly: " + ", ".join(
-                p.get("hook_type", "unknown") for p in weak[:5]
-            )
+        strong_hooks = content_memory.get("strong_hooks", [])
+        if strong_hooks:
+            winning_hooks = "Hook types that performed well recently: " + ", ".join(strong_hooks[:5])
+            
+        weak_hooks_list = content_memory.get("weak_hooks", [])
+        if weak_hooks_list:
+            weak_hooks = "Hook types that performed poorly: " + ", ".join(weak_hooks_list[:5])
 
     prompt = template.format(
         goal=goal,

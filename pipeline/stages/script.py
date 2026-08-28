@@ -24,6 +24,7 @@ def generate_script(
     topic: dict,
     research: dict,
     concept: dict | None = None,
+    previous_qc: dict | None = None,
 ) -> dict[str, Any]:
     """Generate a script JSON from the research brief and concept.
 
@@ -58,6 +59,10 @@ def generate_script(
     if not angle:
         angle = topic.get("angle", "")
 
+    qc_feedback = ""
+    if previous_qc and previous_qc.get("feedback"):
+        qc_feedback = f"\n\n[PREVIOUS QC FEEDBACK TO FIX]\n{previous_qc['feedback']}\nIssues: {', '.join(previous_qc.get('issues', []))}"
+
     prompt = template.format(
         goal=goal_summary(),
         niche_title=slot.get("title", ""),
@@ -81,6 +86,7 @@ def generate_script(
         hashtags_count=hashtags_count,
         hashtags_count_minus_one=hashtags_count - 1,
     )
+    prompt += qc_feedback
 
     script = llm.chat_json(
         [{"role": "user", "content": prompt}],

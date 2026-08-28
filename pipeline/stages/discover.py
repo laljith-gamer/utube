@@ -9,6 +9,7 @@ import hashlib
 import logging
 import re
 from datetime import datetime, timezone
+import time
 from typing import Any
 
 import feedparser
@@ -102,7 +103,7 @@ def discover_candidates(*, limit: int | None = None) -> list[dict[str, Any]]:
         c["keywords"] = _extract_keywords(c.get("title", ""))
 
     LOG.info("Discovered %d unique candidates from %d sources", len(unique), len(source_specs))
-    return unique[:limit]
+    return unique
 
 
 # Backward compatibility alias
@@ -160,7 +161,7 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
             c["score"] = 50
 
     LOG.info("Discovered %d candidates for slot %s", len(out), slot.get("id"))
-    return out[:limit]
+    return out
 
 
 # ──────────────────────── Helpers ────────────────────────────────────────────
@@ -261,11 +262,18 @@ def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
 def _rss(url: str, limit: int) -> list[dict]:
     feed = feedparser.parse(url)
     out = []
+    now = time.time()
     for e in feed.entries[:limit]:
+        score = 0
+        if e.get("published_parsed"):
+            pub_ts = time.mktime(e.published_parsed)
+            age_hours = (now - pub_ts) / 3600
+            score = max(0, int(100 * (1 - age_hours / 168)))
+
         out.append({
             "title": e.get("title", ""),
             "url": e.get("link", ""),
-            "score": 0,
+            "score": score,
             "summary": (e.get("summary") or "")[:500],
             "source": f"rss:{feed.feed.get('title', 'rss')}",
         })
