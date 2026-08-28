@@ -1,8 +1,11 @@
 name: Thursday Weekly Analysis
 
+# Scheduled from main, but during 2026-08-30 through 2026-09-05 the
+# analysis code is explicitly checked out from `improved` for evaluation.
+
 on:
   schedule:
-    - cron: "30 23 * * 4"   # 05:00 IST on Thursday
+    - cron: "30 23 * * 4"
   workflow_dispatch:
 
 jobs:
@@ -13,9 +16,33 @@ jobs:
       contents: write
       issues: write
     steps:
+      - name: Select code branch for one-week evaluation
+        id: test_window
+        shell: bash
+        run: |
+          set -euo pipefail
+          TODAY="$(date -u +%F)"
+          TEST_END="2026-09-05"
+          if [[ "$TODAY" < "2026-08-30" ]]; then
+            REF="main"
+            MODE="normal-pre-test"
+          elif [[ "$TODAY" > "$TEST_END" ]]; then
+            REF="main"
+            MODE="normal-post-test"
+          else
+            REF="improved"
+            MODE="IMPROVED-WEEK-TEST"
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "TEST DATE: $TODAY"
+          echo "EXECUTION MODE: $MODE"
+          echo "CODE REF: $REF"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          ref: ${{ steps.test_window.outputs.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-python@v5
@@ -37,17 +64,21 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
+          set -euo pipefail
+          echo "Execution mode: ${{ steps.test_window.outputs.mode }}"
+          echo "Application source branch: ${{ steps.test_window.outputs.ref }}"
           python scripts/analyze_trends.py
 
-      - name: Commit Trend Updates
+      - name: Commit Trend Updates back to executed branch
         if: always()
         run: |
-          git config user.name  "utube-bot"
+          set -euo pipefail
+          git config user.name "utube-bot"
           git config user.email "utube-bot@users.noreply.github.com"
-          git add trend_report.md config/goal.yaml prompts/ 2>/dev/null || true
+          git add trend_report.md config/goal.yaml data/content_memory.json data/performance.json data/dynamic_strategy.json
           if ! git diff --cached --quiet; then
-            git commit -m "chore(analysis): update metrics and prompt learning $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push origin HEAD:${{ github.ref_name }} || true
+            git commit -m "chore(analysis): update learning state $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push origin "HEAD:${{ steps.test_window.outputs.ref }}"
           else
             echo "Nothing to commit."
           fi
