@@ -98,7 +98,10 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
         write_json(out / "6_visuals.json", vis)
         thumb_path = out / "thumbnail.jpg"
-        thumbnail.make_thumbnail(image=img, prompt=sc.get("thumbnail_prompt", sc.get("title", "")), text=sc.get("thumbnail_text", sc.get("title", "")[:30]), out_path=thumb_path, palette="vibrant")
+        thumb_palette = cfg.get_path("thumbnail.palette", None)
+        if not isinstance(thumb_palette, list) or not thumb_palette:
+            thumb_palette = ["#FFFFFF", "#000000", "#FFDD00"]
+        thumbnail.make_thumbnail(image=img, prompt=sc.get("thumbnail_prompt", sc.get("title", "")), text=sc.get("thumbnail_text", sc.get("title", "")[:30]), out_path=thumb_path, palette=thumb_palette)
 
         v_qc = visual_qc.evaluate_visuals(vis)
         write_json(out / "7_visual_qc.json", v_qc)
