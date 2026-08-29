@@ -14,26 +14,50 @@ Research brief:
 STORY RHYTHM — {min_scenes} to {max_scenes} scenes, NOT a fixed count
 ==============================================================
 
-Beat 1 — HOOK (scene 1, <= {hook_max_seconds}s):
+IMPORTANT STRUCTURE RULE:
+The `hook` field is a separate spoken opening that is already included in the audio timeline.
+NEVER repeat, paraphrase, restate, or echo the hook inside scene 1 or any later scene.
+Scene 1 MUST continue the story from the hook with NEW information.
+The CTA is also spoken separately and must not repeat any earlier narration.
+Every narration unit — hook, each scene, and CTA — must add new information or a new rhetorical move.
+
+Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
 Cold open. Make the viewer's thumb stop. Use the "{hook_type}" pattern.
 NO 'hey guys', NO 'welcome back', NO slow intro.
 Open the curiosity loop. Do NOT solve it yet.
+This exact hook is spoken once. Do not put the same idea in a scene.
 
-Beat 2 — CONTEXT (scenes 2-3):
+Beat 2 — CONTEXT (scenes 1-2):
+Continue directly from the hook. Do NOT restate the hook.
 Why does this matter TO THE VIEWER? What is at stake for them personally?
 Make it feel relevant to their daily life.
 
-Beat 3 — EVIDENCE (scenes 4-6):
+Beat 3 — EVIDENCE (scenes 3-5):
 Two to four concrete, specific facts. Numbers, names, dates, dollars.
 Each scene = ONE punchy beat (not two). Each builds on the last.
 
-Beat 4 — PAYOFF (scene 7 or second-to-last):
+Beat 4 — PAYOFF (scene 6 or second-to-last):
 Resolve the curiosity loop opened in the hook. The 'ah-ha' moment.
 Must feel earned. Must match the hook's promise.
+Do not repeat the hook wording while delivering the payoff.
 
 Beat 5 — CTA (final line, separate from scenes):
 A specific question that makes a viewer comment. Not 'subscribe please'.
-Must reference a specific element from the script.
+Must reference a specific element from the script without copying any previous sentence.
+
+==============================================================
+ANTI-REPETITION — MANDATORY
+==============================================================
+- The hook, every scene narration, and CTA are separate spoken units.
+- NEVER repeat an identical sentence anywhere in the script.
+- NEVER paraphrase the hook as scene 1.
+- NEVER repeat a sentence, clause, or distinctive phrase of 5+ consecutive words elsewhere in the script.
+- Do not reuse the same transition/filler phrase more than once.
+- Do not use a fixed sequence of transitions such as 'Wait' -> 'Now' -> 'But' -> 'Here's the thing'.
+- Transitions are optional. If the story flows naturally without one, use none.
+- Prefer natural topic-specific transitions over generic filler.
+- Vary sentence openings across scenes.
+- Before returning JSON, mentally compare hook + every scene + CTA and rewrite anything that sounds duplicated.
 
 ==============================================================
 HARD WRITING RULES
@@ -48,9 +72,8 @@ HARD WRITING RULES
 - Do not start consecutive scenes with the same word.
 - Use present tense, active voice. Cut every adverb you can.
 - TONE: Write like an expressive, energetic pro YouTuber!
-  Use conversational filler ('Wait,', 'Get this:', 'Seriously,', 'Okay,').
-  Use ellipses (...) for pauses, em-dashes (—) for abrupt cuts, ALL CAPS
-  for intense emphasis. Make it highly engaging and entertaining.
+  Conversational language is allowed, but do NOT rely on a fixed filler list.
+  Use pauses and emphasis only when they fit the specific story.
 
 ==============================================================
 TTS PRONUNCIATION RULES (the AI voice reads your text literally)
@@ -60,7 +83,7 @@ TTS PRONUNCIATION RULES (the AI voice reads your text literally)
 - Write large numbers spoken: 'three point four trillion'.
 - NEVER use symbols: no '&', '+', '/', '#', '@'. Write 'and', 'plus', etc.
 - End EVERY narration with a period, question mark, or exclamation mark.
-- Add COMMA after introductory words: 'Wait, that is only half the story.'
+- Add COMMA after introductory words when actually used.
 - Write 'point' not '.' in decimals: 'zero point zero zero one seconds'.
 
 ==============================================================
@@ -95,13 +118,13 @@ OUTPUT — return ONLY this JSON, no prose, no code fences
   "hook": "<{hook_max_seconds}s or less, opens the loop>",
   "scenes": [
     {{
-      "narration": "<one sentence, <= 14 words, specific, TTS-friendly>",
+      "narration": "<one sentence, <= 14 words, specific, TTS-friendly, NEVER repeating hook>",
       "duration_sec": <int 2-4>,
       "visual_prompt": "<real subject in real setting, 1 line>",
       "broll_keywords": ["<3-5 plain nouns>"]
     }}
   ],
-  "cta": "<comment-bait question referencing a specific element>",
+  "cta": "<comment-bait question referencing a specific element, NEVER repeating earlier narration>",
   "title": "<= {title_max_chars} chars>",
   "description": "<2-3 sentences + source URL + AI disclosure>\n\n<hashtags>",
   "hashtags": ["#shorts", "...exactly {hashtags_count} total"],
