@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Any
 
 from ..config import get_config, goal_summary
@@ -20,6 +21,79 @@ def _load_strategy() -> dict:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return {}
+
+
+def _normalize_phrase(text: str) -> str:
+    """Normalize narration for deterministic duplicate detection."""
+    text = str(text or "").lower()
+    text = re.sub(r"[^a-z0-9']+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _words(text: str) -> list[str]:
+    return _normalize_phrase(text).split()
+
+
+def _repetition_issues(script: dict[str, Any]) -> list[str]:
+    """Detect exact and distinctive phrase reuse across spoken units.
+
+    We compare hook, scenes, and CTA because all of them are spoken in the final
+    narration timeline. Short common words are intentionally ignored.
+    """
+    units: list[tuple[str, str]] = []
+    hook = str(script.get("hook", "")).strip()
+    if hook:
+        units.append(("hook", hook))
+    for i, scene in enumerate(script.get("scenes", [])):
+        text = str(scene.get("narration", "")).strip()
+        if text:
+            units.append((f"scene_{i + 1}", text))
+    cta = str(script.get("cta", "")).strip()
+    if cta:
+        units.append(("cta", cta))
+
+    issues: list[str] = []
+    normalized = [(name, _normalize_phrase(text), _words(text)) for name, text in units]
+
+    # Exact duplicate spoken units.
+    for i in range(len(normalized)):
+        for j in range(i + 1, len(normalized)):
+            a_name, a_norm, _ = normalized[i]
+            b_name, b_norm, _ = normalized[j]
+            if a_norm and a_norm == b_norm:
+                issues.append(f"Exact repetition: {a_name} == {b_name}")
+
+    # Distinctive 5-word phrase reuse. This catches paraphrased/reused fragments
+    # while avoiding false positives from normal 1-4 word overlaps.
+    for i in range(len(normalized)):
+        for j in range(i + 1, len(normalized)):
+            a_name, _, a_words = normalized[i]
+            b_name, _, b_words = normalized[j]
+            if len(a_words) < 5 or len(b_words) < 5:
+                continue
+            a_grams = {tuple(a_words[k:k + 5]) for k in range(len(a_words) - 4)}
+            b_grams = {tuple(b_words[k:k + 5]) for k in range(len(b_words) - 4)}
+            overlap = a_grams & b_grams
+            if overlap:
+                phrase = " ".join(next(iter(overlap)))
+                issues.append(f"Repeated 5-word phrase between {a_name} and {b_name}: '{phrase}'")
+
+    # Scene-opening repetition is a separate stylistic problem.
+    openings: list[tuple[str, str]] = []
+    for name, _, words in normalized:
+        if name.startswith("scene_") and words:
+            openings.append((name, words[0]))
+    for i in range(1, len(openings)):
+        if openings[i][1] == openings[i - 1][1]:
+            issues.append(f"Consecutive scene openings repeat '{openings[i][1]}'")
+
+    return issues
+
+
+def _validate_script_structure(script: dict[str, Any]) -> None:
+    issues = _repetition_issues(script)
+    if issues:
+        raise ValueError("Script repetition detected: " + "; ".join(issues))
 
 
 def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, concept: dict | None = None, previous_qc: dict | None = None) -> dict[str, Any]:
@@ -65,13 +139,46 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     )
     prompt += strategy_context + qc_feedback
 
-    script = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=int(scfg.get("max_tokens", 12000)), temperature=float(scfg.get("temperature", 0.7)), reasoning_effort=scfg.get("reasoning_effort", "low"))
+    def _call(extra_feedback: str = "") -> dict[str, Any]:
+        call_prompt = prompt + extra_feedback
+        return llm.chat_json(
+            [{"role": "user", "content": call_prompt}],
+            max_tokens=int(scfg.get("max_tokens", 12000)),
+            temperature=float(scfg.get("temperature", 0.7)),
+            reasoning_effort=scfg.get("reasoning_effort", "low"),
+        )
+
+    script = _call()
     required = ["hook", "scenes", "title", "description", "hashtags", "thumbnail_prompt"]
     missing = [k for k in required if k not in script]
     if missing:
         raise ValueError(f"Script JSON missing fields: {missing}")
     if not isinstance(script["scenes"], list) or not script["scenes"]:
         raise ValueError("Script has no scenes")
+
+    # LLMs can still occasionally repeat a hook or distinctive phrase despite
+    # instructions. Give the model one targeted rewrite opportunity before QC.
+    repetition_issues = _repetition_issues(script)
+    if repetition_issues:
+        LOG.warning("Script repetition detected; requesting targeted rewrite: %s", "; ".join(repetition_issues))
+        feedback = (
+            "\n\n[MANDATORY REPETITION REPAIR]\n"
+            "The generated script contains repeated spoken material. Rewrite the script so every spoken unit is unique. "
+            "The hook is spoken separately and MUST NOT appear or be paraphrased in any scene. "
+            "Do not reuse any distinctive 5+ word phrase. Keep the same topic, factual claims, story promise, and CTA intent. "
+            "Return the complete corrected JSON only.\n"
+            "Detected issues:\n- " + "\n- ".join(repetition_issues)
+        )
+        script = _call(feedback)
+        missing = [k for k in required if k not in script]
+        if missing:
+            raise ValueError(f"Rewritten script JSON missing fields: {missing}")
+        if not isinstance(script["scenes"], list) or not script["scenes"]:
+            raise ValueError("Rewritten script has no scenes")
+        _validate_script_structure(script)
+    else:
+        _validate_script_structure(script)
+
     script["_learning"] = {"strategy_version": strategy.get("strategy_version", 0)}
     if concept:
         script["_concept"] = {
