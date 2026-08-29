@@ -3,7 +3,8 @@
     "global": {
       "how-sweden-built-one-of-europe-s-hottest-39086b49": "2026-08-29T05:37:02.011423+00:00",
       "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00",
-      "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d": "2026-08-29T11:19:38.537751+00:00"
+      "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d": "2026-08-29T11:19:38.537751+00:00",
+      "hollywood-celebs-are-getting-into-microd-1788f74f": "2026-08-29T16:15:37.761105+00:00"
     }
   },
   "families": {},
@@ -499,6 +500,211 @@
         "video_id": "XqDFhMZNxVU",
         "url": "https://youtu.be/XqDFhMZNxVU",
         "title": "The Real Reason Multiverse Stories Are Not Just Escapism",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-08-29T16:43:09.221277+00:00",
+      "run_id": "run_161521",
+      "topic": {
+        "title": "Hollywood celebs are getting into microdrama apps",
+        "url": "https://techcrunch.com/2026/08/29/hollywood-celebs-are-getting-into-microdrama-apps/",
+        "score": 99,
+        "summary": "Several Hollywood celebs are ditching the massive eight-figure checks and exotic movie sets for a rising format: microdramas.",
+        "source": "rss:TechCrunch",
+        "raw_score": 99,
+        "normalized_hotness": 100,
+        "content_hash": "hollywood-celebs-are-getting-into-microd-1788f74f",
+        "keywords": [
+          "hollywood",
+          "celebs",
+          "getting",
+          "microdrama",
+          "apps"
+        ],
+        "scores": {
+          "freshness": 100,
+          "source_quality": 72,
+          "specificity": 50,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 40,
+          "curiosity_gap": 40,
+          "story_potential": 40,
+          "visual_potential": 40,
+          "shareability": 40
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 49.7,
+        "selection_mode": "best_valid"
+      },
+      "concept": {
+        "topic_title": "Hollywood celebs are getting into microdrama apps",
+        "topic_url": "https://techcrunch.com/2026/08/29/hollywood-celebs-are-getting-into-microdrama-apps/",
+        "topic_source": "rss:TechCrunch",
+        "topic_score": 49.7,
+        "chosen_angle": "How microdramas are turning actors into millionaires without a single box office hit.",
+        "hook_type": "money_hook",
+        "core_claim": "The revenue model is based on ad revenue and in-app purchases, and top stars can earn more than traditional movie residuals.",
+        "viewer_problem": "You think streaming is the only way to profit, but microdramas are a new goldmine that you could even tap into.",
+        "curiosity_gap": "What's the actual math behind a microdrama's earnings?",
+        "emotional_driver": "Greed and aspiration.",
+        "payoff": "A single hit microdrama can generate millions in a month, and actors get a cut of the ad revenue.",
+        "concept_score": 90.0,
+        "risk_flags": [
+          "Avoid get-rich-quick clich\u00e9s"
+        ],
+        "all_angles": [
+          {
+            "angle": "Celebs are swapping $20M movie deals for $50K microdrama episodes \u2013 and it's not a downgrade.",
+            "hook_type": "surprising_number",
+            "core_claim": "Microdrama apps are paying stars less upfront but offering massive backend potential through viral reach and equity.",
+            "viewer_problem": "You think Hollywood success means big budgets, but the real money is shifting to short-form content that you watch on your phone.",
+            "curiosity_gap": "How much are these actors actually earning per episode, and why would they leave a sure thing?",
+            "emotional_driver": "Surprise and curiosity about the new economics.",
+            "payoff": "They're making more per minute of screen time and gaining direct control over their careers.",
+            "concept_score": 88,
+            "risk_flags": [
+              "Need to verify actual numbers",
+              "Avoid exaggeration"
+            ]
+          },
+          {
+            "angle": "They left billion-dollar franchises to film in a rented apartment \u2013 and they're happier than ever.",
+            "hook_type": "contradiction",
+            "core_claim": "Microdramas offer creative freedom and a closer fan connection that big studio productions can't match.",
+            "viewer_problem": "You assume celebrities always chase the biggest payday, but this trend shows they value something else.",
+            "curiosity_gap": "What makes a 3-minute vertical drama more appealing than a Marvel movie?",
+            "emotional_driver": "Intrigue and maybe a bit of envy.",
+            "payoff": "They get to experiment with roles and build a loyal audience without studio interference.",
+            "concept_score": 85,
+            "risk_flags": [
+              "Might sound too idealistic",
+              "Need concrete examples"
+            ]
+          },
+          {
+            "angle": "The real reason your favorite A-listers are suddenly starring in vertical videos isn't the money \u2013 it's the algorithm.",
+            "hook_type": "hidden_cause",
+            "core_claim": "Short-form platforms are manipulating their recommendation algorithms to favor celebrity content, creating a new gold rush.",
+            "viewer_problem": "You see these videos everywhere and wonder why, but the cause is hidden in the tech.",
+            "curiosity_gap": "What exactly does the algorithm do to make these actors go viral overnight?",
+            "emotional_driver": "Curiosity about how tech shapes culture.",
+            "payoff": "The algorithm rewards high engagement, and celebrities bring instant attention, so platforms pay them to jumpstart the cycle.",
+            "concept_score": 82,
+            "risk_flags": [
+              "Might be too technical",
+              "Need to simplify"
+            ]
+          },
+          {
+            "angle": "How microdramas are turning actors into millionaires without a single box office hit.",
+            "hook_type": "money_hook",
+            "core_claim": "The revenue model is based on ad revenue and in-app purchases, and top stars can earn more than traditional movie residuals.",
+            "viewer_problem": "You think streaming is the only way to profit, but microdramas are a new goldmine that you could even tap into.",
+            "curiosity_gap": "What's the actual math behind a microdrama's earnings?",
+            "emotional_driver": "Greed and aspiration.",
+            "payoff": "A single hit microdrama can generate millions in a month, and actors get a cut of the ad revenue.",
+            "concept_score": 90,
+            "risk_flags": [
+              "Avoid get-rich-quick clich\u00e9s"
+            ]
+          }
+        ]
+      },
+      "script": {
+        "hook": "Hollywood stars are making millions without a single box office hit. How?",
+        "scenes": [
+          {
+            "narration": "Microdramas are taking over mobile phones, generating $1.5 billion in revenue this year.",
+            "duration_sec": 3,
+            "visual_prompt": "James Franco on set of a microdrama, surrounded by cameras and crew",
+            "broll_keywords": [
+              "microdrama",
+              "mobile phone",
+              "camera",
+              "crew"
+            ]
+          },
+          {
+            "narration": "Issa Rae's company Hoorae Media launched 'Screen Time', which reached nearly 75 million views on TikTok in its first week.",
+            "duration_sec": 3,
+            "visual_prompt": "Issa Rae holding a phone with the 'Screen Time' microdrama playing on the screen",
+            "broll_keywords": [
+              "Issa Rae",
+              "phone",
+              "TikTok",
+              "views counter"
+            ]
+          },
+          {
+            "narration": "Taye Diggs has launched his own vertical storytelling platform, Microhouse Films, and starred in 'Off Limits & All Mine'.",
+            "duration_sec": 3,
+            "visual_prompt": "Taye Diggs on set of a microdrama, looking at a script and directing actors",
+            "broll_keywords": [
+              "Taye Diggs",
+              "microdrama",
+              "script",
+              "actors"
+            ]
+          },
+          {
+            "narration": "A single hit microdrama can generate millions in a month, and actors get a cut of the ad revenue.",
+            "duration_sec": 4,
+            "visual_prompt": "A phone screen showing a microdrama with ads playing before and after the episode",
+            "broll_keywords": [
+              "phone screen",
+              "microdrama",
+              "ads",
+              "money counter"
+            ]
+          }
+        ],
+        "cta": "Which Hollywood star's transition to microdramas do you find most surprising, and why?",
+        "title": "The Real Reason Hollywood Stars Are Making Millions Without Box Office Hits",
+        "description": "Hollywood stars are turning to microdramas to make millions without relying on box office hits. But how does it work? Source: https://techcrunch.com/2026/08/29/hollywood-celebs-are-getting-into-microdrama-apps/. AI-assisted.\n\n#shorts #microdramas #hollywood",
+        "hashtags": [
+          "#shorts",
+          "#microdramas",
+          "#hollywood",
+          "#entertainment",
+          "#tech"
+        ],
+        "thumbnail_prompt": "A close-up of a phone screen showing a microdrama with a surprised expression of a Hollywood star in the background",
+        "thumbnail_text": "Microdramas: The New Hollywood Gold Rush",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "money_hook",
+          "angle": "How microdramas are turning actors into millionaires without a single box office hit.",
+          "emotional_driver": "Greed and aspiration.",
+          "concept_score": 90.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 4,
+        "sources": {
+          "svd": 0,
+          "stock": 4,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "DJdJVybZByI",
+        "video_id": "DJdJVybZByI",
+        "url": "https://youtu.be/DJdJVybZByI",
+        "title": "The Real Reason Hollywood Stars Are Making Millions Without Box Office Hits",
         "dry_run": false
       }
     }
