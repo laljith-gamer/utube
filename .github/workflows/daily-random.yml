@@ -99,7 +99,10 @@ jobs:
           set -euo pipefail
           git config user.name "utube-bot"
           git config user.email "utube-bot@users.noreply.github.com"
-          git add ledger.json runs/**/*.json runs/**/captions.ass
+          git add ledger.json
+          if [ -d runs ]; then
+            git add runs/
+          fi
           if ! git diff --cached --quiet; then
             git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
             git push origin HEAD:${{ github.ref_name }}
