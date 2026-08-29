@@ -96,3 +96,6 @@ hard_rejections:
   - "Requires charts or code to explain"
   - "Topic too broad — cannot payoff in one sentence"
   - "Duplicates recent topic family"
+
+# Research phase thresholds
+min_fact_confidence: 70

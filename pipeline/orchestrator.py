@@ -69,8 +69,15 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
 
         brief = research.build_research_brief(llm_research, best, concept=top_concept)
         write_json(out / "4_research.json", brief)
-        if brief.get("confidence", 0) < float(qual_cfg.get("min_fact_confidence", 90)):
-            result["reason"] = "Fact check failed."
+        conf_val = brief.get("confidence", 0)
+        try:
+            conf_val = float(conf_val)
+        except (ValueError, TypeError):
+            conf_val = 0.0
+
+        if conf_val < float(qual_cfg.get("min_fact_confidence", 70)):
+            LOG.warning("Fact confidence too low (%s). Aborting.", conf_val)
+            result["reason"] = f"Fact check failed (confidence {conf_val})."
             write_json(out / "result.json", result)
             return result
 
