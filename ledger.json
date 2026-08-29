@@ -1,11 +1,229 @@
 {
   "topics": {
     "global": {
-      "how-sweden-built-one-of-europe-s-hottest-39086b49": "2026-08-29T05:37:02.011423+00:00"
+      "how-sweden-built-one-of-europe-s-hottest-39086b49": "2026-08-29T05:37:02.011423+00:00",
+      "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00"
     }
   },
   "families": {},
   "themes": {},
   "usage": {},
-  "runs": []
+  "runs": [
+    {
+      "timestamp": "2026-08-29T08:45:05.475120+00:00",
+      "run_id": "run_081911",
+      "topic": {
+        "title": "Apple TV now costs $14.99 a month after its fourth price hike in four years",
+        "url": "https://www.theverge.com/tech/986130/apple-tv-plus-price-hike",
+        "score": 88,
+        "summary": "Apple raised the price of its streaming service for new and current subscribers on Friday, bumping it up from $12.99 per month to $14.99, Deadline and Variety are reporting. An annual subscription now costs $119, up from $99. Apple also increased the cost of its individual Apple One subscription, which includes Apple TV and Apple's [&#8230;]",
+        "source": "rss:The Verge",
+        "raw_score": 88,
+        "normalized_hotness": 93,
+        "content_hash": "apple-tv-now-costs-14-99-a-month-after-i-045748ef",
+        "keywords": [
+          "apple",
+          "costs",
+          "month",
+          "fourth",
+          "price",
+          "hike",
+          "four",
+          "years"
+        ],
+        "scores": {
+          "freshness": 93.0,
+          "source_quality": 72,
+          "specificity": 85,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 73,
+          "curiosity_gap": 43,
+          "story_potential": 64,
+          "visual_potential": 75,
+          "shareability": 68
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 66.7,
+        "selection_mode": "best_valid"
+      },
+      "concept": {
+        "topic_title": "Apple TV now costs $14.99 a month after its fourth price hike in four years",
+        "topic_url": "https://www.theverge.com/tech/986130/apple-tv-plus-price-hike",
+        "topic_source": "rss:The Verge",
+        "topic_score": 66.7,
+        "chosen_angle": "Apple's 'affordable' streaming service just got a 200% price increase \u2013 here's the math that exposes the contradiction.",
+        "hook_type": "contradiction",
+        "core_claim": "Apple markets Apple TV+ as an affordable service, but its price has tripled since launch, far outpacing inflation.",
+        "viewer_problem": "You might be paying $14.99 for a service that was once $4.99, and you need to know if it's still worth it.",
+        "curiosity_gap": "How much more are you paying compared to when it launched, and what does that actually get you?",
+        "emotional_driver": "surprise",
+        "payoff": "Apple TV+ has gone from $4.99 to $14.99 in four years \u2013 a 200% increase, while the content library hasn't even doubled.",
+        "concept_score": 85.0,
+        "risk_flags": [
+          "might be too numbers-heavy",
+          "needs clear visual of price timeline"
+        ],
+        "all_angles": [
+          {
+            "angle": "Apple's 'affordable' streaming service just got a 200% price increase \u2013 here's the math that exposes the contradiction.",
+            "hook_type": "contradiction",
+            "core_claim": "Apple markets Apple TV+ as an affordable service, but its price has tripled since launch, far outpacing inflation.",
+            "viewer_problem": "You might be paying $14.99 for a service that was once $4.99, and you need to know if it's still worth it.",
+            "curiosity_gap": "How much more are you paying compared to when it launched, and what does that actually get you?",
+            "emotional_driver": "surprise",
+            "payoff": "Apple TV+ has gone from $4.99 to $14.99 in four years \u2013 a 200% increase, while the content library hasn't even doubled.",
+            "concept_score": 85,
+            "risk_flags": [
+              "might be too numbers-heavy",
+              "needs clear visual of price timeline"
+            ]
+          },
+          {
+            "angle": "The hidden reason Apple TV+ costs $14.99 isn't your favorite show \u2013 it's the billions Apple spent on sports.",
+            "hook_type": "hidden_cause",
+            "core_claim": "Apple's price hike is driven by its massive sports deals (MLS, NFL Sunday Ticket) and the streaming arms race, not just original content.",
+            "viewer_problem": "You're paying for sports you may never watch, and that's why your bill went up.",
+            "curiosity_gap": "What exactly is Apple spending your subscription money on?",
+            "emotional_driver": "curiosity",
+            "payoff": "Apple paid $2.5 billion for MLS rights and $2 billion for NFL Sunday Ticket \u2013 and they're passing that cost to you.",
+            "concept_score": 80,
+            "risk_flags": [
+              "needs to verify exact numbers",
+              "might be too industry-insider"
+            ]
+          },
+          {
+            "angle": "Apple TV+ just hit $14.99 \u2013 that's a 200% price jump since launch. Here's what that really means for your wallet.",
+            "hook_type": "surprising_number",
+            "core_claim": "The price increase is unprecedented compared to competitors and inflation, making Apple TV+ one of the most expensive streaming services.",
+            "viewer_problem": "You're paying more for a service that hasn't quadrupled in value, and you need to decide if it's worth keeping.",
+            "curiosity_gap": "How does $14.99 compare to Netflix, Disney+, and what you're actually getting?",
+            "emotional_driver": "surprise",
+            "payoff": "Apple TV+ now costs more than Netflix's standard plan with ads, yet has a fraction of the content library.",
+            "concept_score": 82,
+            "risk_flags": [
+              "needs up-to-date competitor pricing",
+              "might be too comparative"
+            ]
+          },
+          {
+            "angle": "Your Apple One subscription just went up silently \u2013 here's how much extra you're paying without realizing it.",
+            "hook_type": "money_hook",
+            "core_claim": "The price increase is hidden in Apple One bundles, so many users will see higher bills without a clear reason.",
+            "viewer_problem": "If you have Apple One, your monthly bill just increased, and you might not have noticed until now.",
+            "curiosity_gap": "How much more will you pay per year if you're on Apple One?",
+            "emotional_driver": "annoyance",
+            "payoff": "Apple One individual went from $16.95 to $19.95 per month \u2013 that's an extra $36 per year for the same services.",
+            "concept_score": 84,
+            "risk_flags": [
+              "needs to confirm exact bundle prices",
+              "might be too niche if not many use Apple One"
+            ]
+          }
+        ]
+      },
+      "script": {
+        "hook": "Apple TV+ just got a 200% price hike. Wait, wasn't it supposed to be affordable?",
+        "scenes": [
+          {
+            "narration": "Launched in 2019, Apple TV+ started at $4.99 a month.",
+            "duration_sec": 2,
+            "visual_prompt": "Close-up of an iPhone screen showing the Apple TV+ app in 2019",
+            "broll_keywords": [
+              "iPhone",
+              "Apple TV+",
+              "2019"
+            ]
+          },
+          {
+            "narration": "Today, the price is $14.99, a 200% increase in just four years.",
+            "duration_sec": 3,
+            "visual_prompt": "Split-screen comparison of the Apple TV+ pricing in 2019 and 2023",
+            "broll_keywords": [
+              "price comparison",
+              "Apple TV+",
+              "2023"
+            ]
+          },
+          {
+            "narration": "This marks the fourth consecutive year Apple has raised the price.",
+            "duration_sec": 2,
+            "visual_prompt": "Animated graph showing the annual price increases of Apple TV+",
+            "broll_keywords": [
+              "graph",
+              "price increase",
+              "Apple TV+"
+            ]
+          },
+          {
+            "narration": "The Apple One bundle also got a price hike, now costing $19.95 a month.",
+            "duration_sec": 2,
+            "visual_prompt": "Close-up of an iPad screen showing the Apple One bundle pricing",
+            "broll_keywords": [
+              "iPad",
+              "Apple One",
+              "2023"
+            ]
+          },
+          {
+            "narration": "So, what do you get for this premium price?",
+            "duration_sec": 2,
+            "visual_prompt": "Montage of popular Apple TV+ shows, with a question mark overlay",
+            "broll_keywords": [
+              "Apple TV+",
+              "shows",
+              "question mark"
+            ]
+          }
+        ],
+        "cta": "With Apple TV+ now costing $14.99 per month, is the quality and quantity of content on the platform sufficient to justify this premium pricing?",
+        "title": "The Real Reason Apple TV+ is No Longer Affordable",
+        "description": "Apple TV+ launched as a cheap alternative to cable, but its price has increased by 200% in just four years. What do you get for this premium price? AI-assisted.\n\n#shorts #appletv #streaming",
+        "hashtags": [
+          "#shorts",
+          "#appletv",
+          "#streaming",
+          "#tech",
+          "#entertainment"
+        ],
+        "thumbnail_prompt": "A surprised person looking at their iPhone screen with the Apple TV+ app open",
+        "thumbnail_text": "Apple TV+ Price Shock",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "contradiction",
+          "angle": "Apple's 'affordable' streaming service just got a 200% price increase \u2013 here's the math that exposes the contradiction.",
+          "emotional_driver": "surprise",
+          "concept_score": 85.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 5,
+        "sources": {
+          "svd": 0,
+          "stock": 5,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "2lGRSRHcbKM",
+        "video_id": "2lGRSRHcbKM",
+        "url": "https://youtu.be/2lGRSRHcbKM",
+        "title": "The Real Reason Apple TV+ is No Longer Affordable",
+        "dry_run": false
+      }
+    }
+  ]
 }
