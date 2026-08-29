@@ -23,7 +23,8 @@ llm_research:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      # Valid OpenRouter model; the previous NVIDIA ising slug was not hosted by OpenRouter.
+      model: deepseek/deepseek-v4-flash-0731
       supports_reasoning_effort: false
       params:
         temperature: 1.00
@@ -44,7 +45,7 @@ llm_script:
     nvidia_nim_script:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: nvidia/llama-3.1-nemotron-70b-instruct   # NVIDIA's own model, more stable than Meta llama on NIM
+      model: nvidia/llama-3.1-nemotron-70b-instruct
       supports_reasoning_effort: false
 
 # Concept angle generation — reuses research models (cheaper, fast)
@@ -56,7 +57,7 @@ llm_concept:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      model: deepseek/deepseek-v4-flash-0731
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -81,7 +82,7 @@ llm_qc:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      model: deepseek/deepseek-v4-flash-0731
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -97,9 +98,7 @@ llm_qc:
         top_p: 0.95
         max_tokens: 3000
 
-
 image:
-  # nvidia_nim_sdxl removed — endpoint 404 as of 2026-08-26. Pollinations only.
   chain: [pollinations]
   default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
   request_timeout_sec: 120
@@ -109,35 +108,29 @@ image:
       min_response_bytes: 1000
 
 video:
-  # nvidia_nim_svd removed — endpoint 404 as of 2026-08-26. skip_svd=true in pipeline.yaml.
   chain: []
   request_timeout_sec: 300
   providers: {}
 
 tts:
-  # F5-TTS is the sole TTS provider. No fallbacks — if it fails, the run fails.
-  # A reference WAV file must be committed to the repo (5–15 s of clean speech).
-  # Set F5_REF_AUDIO to its path (e.g. assets/voice_ref.wav).
-  # Optionally set F5_REF_TEXT to its transcript for better quality; if empty,
-  # F5-TTS runs built-in ASR (uses more RAM, adds ~30 s on first call).
   chain: [f5tts]
   default_rate: "+0%"
   default_pitch: "+0Hz"
-  continuous_narration: true        # single-pass synthesis for smooth, natural delivery
+  continuous_narration: true
   normalize_output: true
   trim_silence: true
   silence_threshold_db: -45
-  silence_keep_sec: 0.40            # keep natural pauses between sentences for clarity
-  request_timeout_sec: 1800   # CPU inference can take 15-30 min
+  silence_keep_sec: 0.40
+  request_timeout_sec: 1800
   providers:
     f5tts:
       backend: f5_tts
-      ref_audio_env: F5_REF_AUDIO   # env var holding path to reference WAV
-      ref_text_env:  F5_REF_TEXT    # env var holding transcript (empty = ASR)
+      ref_audio_env: F5_REF_AUDIO
+      ref_text_env:  F5_REF_TEXT
       params:
         model: F5TTS_v1_Base
         device: cpu
-        speed: 0.85                   # slightly slower for clear pronunciation
+        speed: 0.85
     camb:
       backend: camb_tts
       url: https://client.camb.ai/apis/tts-stream
