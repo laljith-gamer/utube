@@ -125,18 +125,17 @@ def select_best(scored: list[dict[str, Any]], *, min_score: float | None = None,
     qualified = [c for c in scored if c.get("total_score", 0) >= min_score and not c.get("hard_rejection")]
     if not qualified:
         if not scored: return None
-        # Controlled recovery: do not publish a genuinely bad topic. Allow the
-        # best candidate only inside the configured recovery floor, and only
-        # when it is not hard-rejected. This prevents an empty production day
-        # without turning the quality gate into a free pass.
-        recovery_floor = float(scoring_cfg.get("recovery_floor", 65))
-        best = scored[0]
-        if not best.get("hard_rejection") and best.get("total_score", 0) >= recovery_floor:
-            LOG.warning("No candidate met %.1f; controlled recovery selected %.1f: %s", min_score, best.get("total_score", 0), best.get("title", "")[:60])
-            best["selection_mode"] = "recovery"
-            return best
-        LOG.warning("No candidate met minimum %.1f. Best was: %s (%.1f)", min_score, best.get("title", "?")[:60], best.get("total_score", 0))
-        return None
+        # Production mode: scoring ranks candidates; it does not block the day.
+        # Hard rejections remain absolute. If every candidate is hard-rejected,
+        # stopping is safer than manufacturing a topic.
+        valid = [c for c in scored if not c.get("hard_rejection")]
+        if not valid:
+            LOG.warning("All candidates are hard-rejected; no safe topic to publish")
+            return None
+        best = valid[0]
+        LOG.warning("No candidate met %.1f; production mode selecting best valid candidate %.1f: %s", min_score, best.get("total_score", 0), best.get("title", "")[:60])
+        best["selection_mode"] = "best_valid"
+        return best
     if len(qualified) > 1 and random.random() < exploration_ratio:
         chosen = random.choice(qualified[1:min(5, len(qualified))]); LOG.info("Exploration pick: %s (%.1f)", chosen.get("title", "")[:50], chosen.get("total_score", 0)); return chosen
     LOG.info("Top pick: %s (%.1f)", qualified[0].get("title", "")[:50], qualified[0].get("total_score", 0)); return qualified[0]
