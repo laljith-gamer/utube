@@ -2,7 +2,8 @@
   "topics": {
     "global": {
       "how-sweden-built-one-of-europe-s-hottest-39086b49": "2026-08-29T05:37:02.011423+00:00",
-      "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00"
+      "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00",
+      "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d": "2026-08-29T11:19:38.537751+00:00"
     }
   },
   "families": {},
@@ -222,6 +223,282 @@
         "video_id": "2lGRSRHcbKM",
         "url": "https://youtu.be/2lGRSRHcbKM",
         "title": "The Real Reason Apple TV+ is No Longer Affordable",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-08-29T11:34:57.036775+00:00",
+      "run_id": "run_111927",
+      "topic": {
+        "title": "Apple TV\u2019s sci-fi thriller Dark Matter gets even trippier in season 2",
+        "url": "https://www.theverge.com/entertainment/983263/dark-matter-season-2-review-apple-tv",
+        "score": 86,
+        "summary": "Confusion is a generally accepted side effect of mystery box shows. They slather on secrets with the promise of a satisfying payoff in the end, and sometimes the cast and crew even have a hard time following what's going on. But even by the standards of the genre, Dark Matter is extreme. Its multiversal premise, [&#8230;]",
+        "source": "rss:The Verge",
+        "raw_score": 86,
+        "normalized_hotness": 93,
+        "content_hash": "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d",
+        "keywords": [
+          "apple",
+          "sci",
+          "thriller",
+          "dark",
+          "matter",
+          "gets",
+          "even",
+          "trippier",
+          "season"
+        ],
+        "scores": {
+          "freshness": 93.0,
+          "source_quality": 72,
+          "specificity": 70,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 85,
+          "curiosity_gap": 90,
+          "story_potential": 75,
+          "visual_potential": 95,
+          "shareability": 90
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 80.3
+      },
+      "concept": {
+        "topic_title": "Apple TV\u2019s sci-fi thriller Dark Matter gets even trippier in season 2",
+        "topic_url": "https://www.theverge.com/entertainment/983263/dark-matter-season-2-review-apple-tv",
+        "topic_source": "rss:The Verge",
+        "topic_score": 80.3,
+        "chosen_angle": "Contradict the idea that multiverse stories are just escapism by revealing that Dark Matter's chaos mirrors how our own choices create parallel lives every day.",
+        "hook_type": "contradiction",
+        "core_claim": "Dark Matter isn't just sci-fi\u2014it's a dramatization of the 'many worlds' theory that physicists say could be real, making your daily decisions literally create alternate universes.",
+        "viewer_problem": "Every time you choose coffee over tea, you're 'killing' a version of yourself\u2014understanding this makes you question free will and regret in a new way.",
+        "curiosity_gap": "What if the 'you' that took that other job is watching you right now\u2014and how does quantum physics say that's possible?",
+        "emotional_driver": "mind-bending awe",
+        "payoff": "Quantum mechanics suggests every decision splits reality, so Dark Matter's chaos is closer to your actual life than you think.",
+        "concept_score": 88.0,
+        "risk_flags": [
+          "needs clear visual of branching timelines",
+          "might be too abstract if not grounded in everyday choices"
+        ],
+        "all_angles": [
+          {
+            "angle": "Contradict the idea that multiverse stories are just escapism by revealing that Dark Matter's chaos mirrors how our own choices create parallel lives every day.",
+            "hook_type": "contradiction",
+            "core_claim": "Dark Matter isn't just sci-fi\u2014it's a dramatization of the 'many worlds' theory that physicists say could be real, making your daily decisions literally create alternate universes.",
+            "viewer_problem": "Every time you choose coffee over tea, you're 'killing' a version of yourself\u2014understanding this makes you question free will and regret in a new way.",
+            "curiosity_gap": "What if the 'you' that took that other job is watching you right now\u2014and how does quantum physics say that's possible?",
+            "emotional_driver": "mind-bending awe",
+            "payoff": "Quantum mechanics suggests every decision splits reality, so Dark Matter's chaos is closer to your actual life than you think.",
+            "concept_score": 88,
+            "risk_flags": [
+              "needs clear visual of branching timelines",
+              "might be too abstract if not grounded in everyday choices"
+            ]
+          },
+          {
+            "angle": "Ask the forbidden question: Is your life just one of infinite versions, and if so, does your 'real' self even matter?",
+            "hook_type": "forbidden_question",
+            "core_claim": "Dark Matter forces us to ask whether identity is stable when infinite copies of you exist\u2014a question that becomes urgent as AI and VR create digital doppelgangers.",
+            "viewer_problem": "With deepfakes and AI avatars, the line between 'you' and 'not you' is blurring\u2014this show makes you confront who you actually are.",
+            "curiosity_gap": "If a perfect copy of you exists, which one deserves to live your life\u2014and how will you know if you're the copy?",
+            "emotional_driver": "existential dread",
+            "payoff": "The show's answer: your choices define you, not your origin\u2014so every decision you make is what makes you 'you'.",
+            "concept_score": 84,
+            "risk_flags": [
+              "too philosophical for some",
+              "needs strong visual of identical characters"
+            ]
+          },
+          {
+            "angle": "Reveal the hidden cause: The show's confusing multiverse is actually a deliberate tool to make you feel what the protagonist feels\u2014confusion is the point.",
+            "hook_type": "hidden_cause",
+            "core_claim": "Dark Matter's intentionally disorienting narrative is a storytelling technique called 'cognitive estrangement' that forces you to experience the protagonist's reality.",
+            "viewer_problem": "You're not dumb for feeling lost\u2014the show is designed to break your brain, and understanding that makes you appreciate the craft and your own perception.",
+            "curiosity_gap": "Why do showrunners want you to feel confused, and what does that do to your brain's reward system?",
+            "emotional_driver": "relief and validation",
+            "payoff": "By making you feel lost, the show mirrors the character's journey, turning confusion into empathy and engagement.",
+            "concept_score": 78,
+            "risk_flags": [
+              "needs to avoid sounding like an excuse for bad writing",
+              "visuals must show side-by-side confusion vs clarity"
+            ]
+          },
+          {
+            "angle": "Use a surprising number: There are 10^500 possible universes in string theory\u2014Dark Matter only shows a few, but your real life is already a multiverse of choices.",
+            "hook_type": "surprising_number",
+            "core_claim": "Physicists estimate up to 10^500 parallel universes could exist, and Dark Matter's premise is based on this real math, not just fantasy.",
+            "viewer_problem": "Your life is one of countless possibilities\u2014realizing this can reduce regret and increase your willingness to take risks, because every choice creates a new branch.",
+            "curiosity_gap": "What are the odds that the version of you watching this is the 'best' one\u2014and can you ever know?",
+            "emotional_driver": "curiosity and hope",
+            "payoff": "The math says your 'worst' decisions still exist in some universe, so you're free to make bold choices here.",
+            "concept_score": 82,
+            "risk_flags": [
+              "number might be too abstract",
+              "needs to connect number to concrete life examples"
+            ]
+          },
+          {
+            "angle": "Compare Dark Matter's multiverse to your own 'sliding doors' moments\u2014the show makes literal what you experience as regret or 'what if'.",
+            "hook_type": "comparison",
+            "core_claim": "Dark Matter takes the common human feeling of 'what if I had chosen differently' and makes it literal, showing that our everyday regrets are a form of multiverse thinking.",
+            "viewer_problem": "You've stayed up at night wondering about a past choice\u2014this show validates that feeling and offers a new way to process it.",
+            "curiosity_gap": "What would happen if you could actually visit the timeline where you said 'yes' instead of 'no'\u2014would you be happier?",
+            "emotional_driver": "nostalgia and regret",
+            "payoff": "The show suggests that every 'what if' is a real universe, so your regrets are not wasted\u2014they're just another version of you living it.",
+            "concept_score": 80,
+            "risk_flags": [
+              "comparison might feel too emotional",
+              "needs strong before/after visual of two lives"
+            ]
+          },
+          {
+            "angle": "Personal danger: The tech in Dark Matter\u2014quantum superposition\u2014is being used in real quantum computers that could crack your passwords and simulate your choices.",
+            "hook_type": "personal_danger",
+            "core_claim": "The 'dark matter' tech in the show is based on real quantum computing research that could eventually predict your behavior and break encryption.",
+            "viewer_problem": "Quantum computers are advancing fast\u2014they could make your online security obsolete and even create simulations of you that companies use to market to you.",
+            "curiosity_gap": "How close are we to a quantum computer that can 'choose' for you\u2014and what does that mean for your free will?",
+            "emotional_driver": "fear and urgency",
+            "payoff": "While full multiverse travel is fiction, quantum computing is already here, and it's changing how your data is processed and predicted.",
+            "concept_score": 76,
+            "risk_flags": [
+              "risk of overhyping quantum computing",
+              "needs to avoid fearmongering without facts"
+            ]
+          },
+          {
+            "angle": "Money hook: The multiverse in Dark Matter isn't just cool\u2014it's a multi-billion-dollar tech concept that companies are investing in to create parallel digital worlds.",
+            "hook_type": "money_hook",
+            "core_claim": "The 'multiverse' idea is fueling a gold rush in tech\u2014from metaverse investments to quantum computing\u2014and Dark Matter is cashing in on the trend.",
+            "viewer_problem": "Tech giants are spending billions on 'multiverse' tech that will shape your future entertainment, work, and even shopping experiences.",
+            "curiosity_gap": "How much money is being poured into making the Dark Matter multiverse a reality\u2014and who's winning?",
+            "emotional_driver": "greed and curiosity",
+            "payoff": "Companies like Meta and Google are betting on parallel digital worlds, and Dark Matter is just the tip of the iceberg.",
+            "concept_score": 72,
+            "risk_flags": [
+              "needs concrete numbers and examples",
+              "might feel too business-focused for general audience"
+            ]
+          },
+          {
+            "angle": "Time pressure: Season 2 of Dark Matter is out now, and if you haven't seen it, you're already behind on the most mind-bending sci-fi of the decade.",
+            "hook_type": "time_pressure",
+            "core_claim": "Dark Matter season 2 is raising the bar for sci-fi storytelling, and you need to catch up before spoilers ruin the experience.",
+            "viewer_problem": "Everyone is talking about the show, and avoiding spoilers is impossible\u2014you'll feel left out if you don't watch soon.",
+            "curiosity_gap": "What twist in season 2 makes the first season look like a warm-up\u2014and why is it breaking the internet?",
+            "emotional_driver": "fear of missing out",
+            "payoff": "Season 2 introduces a new dimension that redefines the entire story, making it a must-watch for any tech-curious person.",
+            "concept_score": 70,
+            "risk_flags": [
+              "too dependent on show's popularity",
+              "needs to avoid pure promotion"
+            ]
+          },
+          {
+            "angle": "Mystery: There's a hidden 'observer effect' in Dark Matter that explains why the show feels so real\u2014and it's a real physics concept you've never heard of.",
+            "hook_type": "mystery",
+            "core_claim": "Dark Matter secretly uses the quantum 'observer effect' to justify its plot, and understanding it reveals a deeper truth about how we shape reality.",
+            "viewer_problem": "You've heard of the multiverse, but not the observer effect\u2014knowing it changes how you watch the show and how you see your own influence on the world.",
+            "curiosity_gap": "What is the observer effect, and how does it make you a 'creator' of your own universe every time you look?",
+            "emotional_driver": "mystery and wonder",
+            "payoff": "The observer effect says that observation collapses possibilities into reality\u2014so you are literally choosing your universe every second.",
+            "concept_score": 86,
+            "risk_flags": [
+              "needs to explain quantum concept simply",
+              "visuals must show observation collapsing waves"
+            ]
+          }
+        ]
+      },
+      "script": {
+        "hook": "What if the 'you' that took that other job is watching you right now?",
+        "scenes": [
+          {
+            "narration": "Dark Matter's multiverse mirrors real-life decision-making.",
+            "duration_sec": 2,
+            "visual_prompt": "A person staring at multiple versions of themselves in a hall of mirrors.",
+            "broll_keywords": [
+              "hall of mirrors",
+              "multiple selves",
+              "confusion"
+            ]
+          },
+          {
+            "narration": "Jason Dessen discovers a multiverse of parallel universes.",
+            "duration_sec": 3,
+            "visual_prompt": "A person standing in front of a whiteboard filled with equations and diagrams.",
+            "broll_keywords": [
+              "whiteboard",
+              "equations",
+              "diagrams"
+            ]
+          },
+          {
+            "narration": "Quantum mechanics suggests every decision splits reality.",
+            "duration_sec": 3,
+            "visual_prompt": "An animation of a decision tree branching out into multiple parallel universes.",
+            "broll_keywords": [
+              "decision tree",
+              "parallel universes",
+              "animation"
+            ]
+          },
+          {
+            "narration": "The chaos in Dark Matter reflects how our choices create parallel lives every day.",
+            "duration_sec": 4,
+            "visual_prompt": "A person looking at a fork in the road, with multiple paths disappearing into the distance.",
+            "broll_keywords": [
+              "fork in the road",
+              "multiple paths",
+              "choice"
+            ]
+          }
+        ],
+        "cta": "Do you believe in the multiverse theory? Could your life have gone drastically differently with just one small choice?",
+        "title": "The Real Reason Multiverse Stories Are Not Just Escapism",
+        "description": "The multiverse theory is not just a sci-fi concept, but a reflection of our own decision-making. Dark Matter's chaos mirrors how our choices create parallel lives every day. AI-assisted. \n\n#shorts #multiverse #decisionmaking #darkmatter",
+        "hashtags": [
+          "#shorts",
+          "#multiverse",
+          "#decisionmaking",
+          "#darkmatter",
+          "#scifi"
+        ],
+        "thumbnail_prompt": "A person looking at a fork in the road, with multiple paths disappearing into the distance.",
+        "thumbnail_text": "Which Path Will You Choose?",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "contradiction",
+          "angle": "Contradict the idea that multiverse stories are just escapism by revealing that Dark Matter's chaos mirrors how our own choices create parallel lives every day.",
+          "emotional_driver": "mind-bending awe",
+          "concept_score": 88.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 4,
+        "sources": {
+          "svd": 0,
+          "stock": 4,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "XqDFhMZNxVU",
+        "video_id": "XqDFhMZNxVU",
+        "url": "https://youtu.be/XqDFhMZNxVU",
+        "title": "The Real Reason Multiverse Stories Are Not Just Escapism",
         "dry_run": false
       }
     }
