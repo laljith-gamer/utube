@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import time
 from typing import Any
 
@@ -232,29 +232,58 @@ def _hackernews(limit: int) -> list[dict]:
 
 
 def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
-    r = requests.get(
-        f"https://www.reddit.com/r/{subreddit}/top.json",
+    """Fetch Reddit JSON, with an RSS fallback for hosted CI runners."""
+    params = {"t": time_filter, "limit": limit}
+    headers = {"User-Agent": _ua()}
+    url = f"https://www.reddit.com/r/{subreddit}/top.json"
+    try:
+        r = requests.get(url, params=params, headers=headers, timeout=_timeout())
+        if r.status_code == 429:
+            LOG.warning("Reddit rate-limited for r/%s; trying RSS fallback", subreddit)
+        elif r.status_code == 403:
+            LOG.warning("Reddit blocked JSON access for r/%s; trying RSS fallback", subreddit)
+        else:
+            r.raise_for_status()
+            out = []
+            for c in r.json().get("data", {}).get("children", []):
+                d = c.get("data", {})
+                if d.get("over_18") or d.get("stickied"):
+                    continue
+                out.append({
+                    "title": d.get("title", ""),
+                    "url": "https://reddit.com" + d.get("permalink", ""),
+                    "external_url": d.get("url"),
+                    "score": d.get("score", 0),
+                    "summary": (d.get("selftext") or "")[:500],
+                    "source": f"reddit:{subreddit}",
+                    "num_comments": d.get("num_comments", 0),
+                })
+            return out
+    except requests.RequestException as exc:
+        LOG.warning("Reddit JSON failed for r/%s: %s; trying RSS fallback", subreddit, exc)
+
+    # Reddit's RSS endpoint is often available when JSON is blocked by CI IPs.
+    rss = requests.get(
+        f"https://www.reddit.com/r/{subreddit}/top/.rss",
         params={"t": time_filter, "limit": limit},
-        headers={"User-Agent": _ua()},
+        headers=headers,
         timeout=_timeout(),
     )
-    if r.status_code == 429:
-        LOG.warning("Reddit rate-limited for r/%s", subreddit)
-        return []
-    r.raise_for_status()
+    rss.raise_for_status()
+    feed = feedparser.parse(rss.content)
     out = []
-    for c in r.json().get("data", {}).get("children", []):
-        d = c.get("data", {})
-        if d.get("over_18") or d.get("stickied"):
-            continue
+    for entry in feed.entries[:limit]:
+        link = entry.get("link", "")
+        title = entry.get("title", "")
+        summary = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))[:500]
         out.append({
-            "title": d.get("title", ""),
-            "url": "https://reddit.com" + d.get("permalink", ""),
-            "external_url": d.get("url"),
-            "score": d.get("score", 0),
-            "summary": (d.get("selftext") or "")[:500],
+            "title": title,
+            "url": link,
+            "external_url": link,
+            "score": 0,
+            "summary": summary,
             "source": f"reddit:{subreddit}",
-            "num_comments": d.get("num_comments", 0),
+            "num_comments": 0,
         })
     return out
 
@@ -303,19 +332,36 @@ def _wikipedia_otd(limit: int) -> list[dict]:
 
 
 def _github_trending(limit: int) -> list[dict]:
+    """Approximate GitHub daily trending with recently-pushed, popular repos.
+
+    The previous third-party gitterapp endpoint now returns 404. GitHub's
+    authenticated search API is more stable and gives us a first-party,
+    current signal without scraping HTML.
+    """
     try:
+        token = __import__("os").getenv("GITHUB_TOKEN", "")
+        since = (datetime.now(timezone.utc) - timedelta(days=2)).date().isoformat()
+        headers = {"Accept": "application/vnd.github+json", "User-Agent": _ua()}
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
         r = requests.get(
-            "https://api.gitterapp.com/repositories",
-            params={"since": "daily"},
+            "https://api.github.com/search/repositories",
+            params={
+                "q": f"stars:>50 pushed:>={since}",
+                "sort": "stars",
+                "order": "desc",
+                "per_page": limit,
+            },
+            headers=headers,
             timeout=_timeout(),
         )
         r.raise_for_status()
         out = []
-        for repo in r.json()[:limit]:
+        for repo in r.json().get("items", [])[:limit]:
             out.append({
-                "title": f"{repo.get('author')}/{repo.get('name')}: {repo.get('description','')}",
-                "url": repo.get("url", ""),
-                "score": repo.get("stars", 0),
+                "title": f"{repo.get('full_name')}: {repo.get('description','') or ''}",
+                "url": repo.get("html_url", ""),
+                "score": repo.get("stargazers_count", 0),
                 "summary": repo.get("description", "") or "",
                 "source": "github_trending",
             })
