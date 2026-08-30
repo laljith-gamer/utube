@@ -5,7 +5,8 @@
       "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00",
       "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d": "2026-08-29T11:19:38.537751+00:00",
       "hollywood-celebs-are-getting-into-microd-1788f74f": "2026-08-29T16:15:37.761105+00:00",
-      "lawmakers-added-1-to-car-insurance-polic-512c7a56": "2026-08-30T09:24:08.104284+00:00"
+      "lawmakers-added-1-to-car-insurance-polic-512c7a56": "2026-08-30T09:24:08.104284+00:00",
+      "techcrunch-mobility-the-hidden-human-cos-b882f405": "2026-08-30T16:06:44.055753+00:00"
     }
   },
   "families": {},
@@ -931,6 +932,214 @@
         "video_id": "4qI3cgx_Jx8",
         "url": "https://youtu.be/4qI3cgx_Jx8",
         "title": "You Pay $1 Extra for Insurance That Watches You Back",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-08-30T16:38:42.265874+00:00",
+      "run_id": "run_160633",
+      "topic": {
+        "title": "TechCrunch Mobility: The hidden human cost of robotaxis",
+        "url": "https://techcrunch.com/2026/08/30/techcrunch-mobility-the-hidden-human-cost-of-robotaxis/",
+        "score": 99,
+        "summary": "Welcome back to TechCrunch Mobility, your hub for the future of transportation and now, more than ever, the role AI is playing in it.",
+        "source": "rss:TechCrunch",
+        "raw_score": 99,
+        "normalized_hotness": 100,
+        "content_hash": "techcrunch-mobility-the-hidden-human-cos-b882f405",
+        "keywords": [
+          "techcrunch",
+          "mobility",
+          "hidden",
+          "human",
+          "cost",
+          "robotaxis"
+        ],
+        "scores": {
+          "freshness": 100,
+          "source_quality": 72,
+          "specificity": 65,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 100,
+          "curiosity_gap": 90,
+          "story_potential": 100,
+          "visual_potential": 85,
+          "shareability": 95
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "ai",
+          "matches": []
+        },
+        "total_score": 85.9
+      },
+      "concept": {
+        "topic_title": "TechCrunch Mobility: The hidden human cost of robotaxis",
+        "topic_url": "https://techcrunch.com/2026/08/30/techcrunch-mobility-the-hidden-human-cost-of-robotaxis/",
+        "topic_source": "rss:TechCrunch",
+        "topic_score": 85.9,
+        "chosen_angle": "The Human Toll of Autonomous Driving Tests",
+        "hook_type": "personal_danger",
+        "core_claim": "The widespread testing of robotaxis has led to a significant increase in traffic accidents and injuries in San Francisco.",
+        "viewer_problem": "Your safety is at risk if you share the road with these experimental vehicles, as they have a higher collision rate than traditional taxis.",
+        "curiosity_gap": "Are robotaxis actually safer than human drivers? The data suggests otherwise.",
+        "emotional_driver": "Fear",
+        "payoff": "The collision rate for robotaxis is 2.8 times higher than that of human-driven taxis, indicating a serious safety issue that needs to be addressed.",
+        "concept_score": 90.0,
+        "risk_flags": [
+          "This angle is highly sensitive. While the data is factual, presenting it as 'personal danger' requires careful wording to avoid sensationalism or legal backlash from the companies involved."
+        ],
+        "all_angles": [
+          {
+            "angle": "The Unseen Labor Behind Robotaxi 'Magic'",
+            "hook_type": "hidden_cause",
+            "core_claim": "The smooth operation of robotaxis relies heavily on an army of remote human workers, not just autonomous AI.",
+            "viewer_problem": "You might think robotaxis are fully automated, but the reality involves significant human intervention, which affects the cost and reliability of the service.",
+            "curiosity_gap": "What happens when a robotaxi gets stuck? Is there a human fixing it remotely?",
+            "emotional_driver": "Surprise",
+            "payoff": "Robotaxis require constant monitoring and manual intervention by remote operators, making them less 'autonomous' than advertised.",
+            "concept_score": 80,
+            "risk_flags": [
+              "The visual representation of 'remote labor' might be abstract or require stock footage, reducing the impact of the reveal."
+            ]
+          },
+          {
+            "angle": "The $1 Billion Gamble on Autonomous Taxis",
+            "hook_type": "money_hook",
+            "core_claim": "Waymo has spent over $1 billion on its robotaxi service, yet it still struggles to turn a profit due to high operational costs.",
+            "viewer_problem": "This massive investment means the future of affordable, autonomous transportation is still uncertain, and you might be waiting longer for cheaper rides.",
+            "curiosity_gap": "How can a company lose money on a 'self-driving' car? Isn't automation supposed to save costs?",
+            "emotional_driver": "Curiosity",
+            "payoff": "Despite the hype, the current model of robotaxis is not financially sustainable without significant changes in efficiency or pricing.",
+            "concept_score": 75,
+            "risk_flags": [
+              "The financial data is dense and might be difficult to visualize in a compelling way for a short video. The focus on costs rather than the technology itself might be less engaging."
+            ]
+          },
+          {
+            "angle": "Robotaxis: The New Traffic Jam Creators?",
+            "hook_type": "contradiction",
+            "core_claim": "While robotaxis are designed to improve traffic flow, they are currently causing congestion by driving slower than human-driven cars.",
+            "viewer_problem": "If you live in a city with robotaxis, you might experience longer commute times because these vehicles are blocking lanes with their cautious driving.",
+            "curiosity_gap": "Why are robotaxis making traffic worse? Aren't they supposed to be smarter than humans?",
+            "emotional_driver": "Outrage",
+            "payoff": "The slow driving speed of robotaxis (averaging 21 mph) is creating bottlenecks, proving that automation doesn't always mean efficiency.",
+            "concept_score": 85,
+            "risk_flags": [
+              "The comparison to human drivers is strong, but the visual evidence (traffic jams) might be hard to capture in a short clip without footage from the specific test areas."
+            ]
+          },
+          {
+            "angle": "The Human Toll of Autonomous Driving Tests",
+            "hook_type": "personal_danger",
+            "core_claim": "The widespread testing of robotaxis has led to a significant increase in traffic accidents and injuries in San Francisco.",
+            "viewer_problem": "Your safety is at risk if you share the road with these experimental vehicles, as they have a higher collision rate than traditional taxis.",
+            "curiosity_gap": "Are robotaxis actually safer than human drivers? The data suggests otherwise.",
+            "emotional_driver": "Fear",
+            "payoff": "The collision rate for robotaxis is 2.8 times higher than that of human-driven taxis, indicating a serious safety issue that needs to be addressed.",
+            "concept_score": 90,
+            "risk_flags": [
+              "This angle is highly sensitive. While the data is factual, presenting it as 'personal danger' requires careful wording to avoid sensationalism or legal backlash from the companies involved."
+            ]
+          }
+        ]
+      },
+      "script": {
+        "hook": "You're riding in a robotaxi when it suddenly slams on the brakes. Are you safe?",
+        "scenes": [
+          {
+            "narration": "Autonomous vehicles are being tested on public roads, with human drivers on board.",
+            "duration_sec": 2,
+            "visual_prompt": "A person sitting in the passenger seat of a self-driving car, looking concerned.",
+            "broll_keywords": [
+              "self-driving car",
+              "passenger",
+              "road"
+            ]
+          },
+          {
+            "narration": "But what's the human cost of these tests?",
+            "duration_sec": 2,
+            "visual_prompt": "A close-up of a person's face, looking worried, with a blurred background of a moving car.",
+            "broll_keywords": [
+              "concerned face",
+              "self-driving car",
+              "test"
+            ]
+          },
+          {
+            "narration": "Test drivers for Waymo and Zoox sustained over two dozen injuries in 2024 and 2025.",
+            "duration_sec": 3,
+            "visual_prompt": "A news headline on a screen, showing the number of injuries, with a blurred background of a city street.",
+            "broll_keywords": [
+              "news headline",
+              "injuries",
+              "self-driving car"
+            ]
+          },
+          {
+            "narration": "Some drivers were sidelined for months with whiplash from sudden stops.",
+            "duration_sec": 3,
+            "visual_prompt": "A person lying on a bed, holding their neck, with a blurred background of a medical office.",
+            "broll_keywords": [
+              "whiplash",
+              "injury",
+              "self-driving car"
+            ]
+          },
+          {
+            "narration": "The collision rate for robotaxis is 2.8 times higher than that of human-driven taxis.",
+            "duration_sec": 3,
+            "visual_prompt": "A graph on a screen, showing the comparison of collision rates, with a blurred background of a city street.",
+            "broll_keywords": [
+              "graph",
+              "collision rate",
+              "self-driving car"
+            ]
+          }
+        ],
+        "cta": "Do you think the benefits of autonomous vehicles outweigh the risks to human test drivers?",
+        "title": "The Hidden Human Cost of Robotaxis",
+        "description": "Autonomous vehicles are being tested on public roads, but at what cost to human drivers? A recent report reveals the surprising truth. AI-assisted.\n\n#shorts #selfdrivingcars #autonomousvehicles #tech #innovation",
+        "hashtags": [
+          "#shorts",
+          "#selfdrivingcars",
+          "#autonomousvehicles",
+          "#tech",
+          "#innovation"
+        ],
+        "thumbnail_prompt": "A person sitting in the passenger seat of a self-driving car, looking concerned, with a red ' warning' symbol overlaid on the image.",
+        "thumbnail_text": "Robotaxis: Safe or Not?",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "personal_danger",
+          "angle": "The Human Toll of Autonomous Driving Tests",
+          "emotional_driver": "Fear",
+          "concept_score": 90.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 5,
+        "sources": {
+          "svd": 0,
+          "stock": 5,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "ZYEeVEP7iUY",
+        "video_id": "ZYEeVEP7iUY",
+        "url": "https://youtu.be/ZYEeVEP7iUY",
+        "title": "The Hidden Human Cost of Robotaxis",
         "dry_run": false
       }
     }
