@@ -31,7 +31,10 @@ concurrency:
 jobs:
   produce:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # F5-TTS on CPU is the dominant cost and has recently taken ~18 minutes
+    # for a ~40s narration. Keep a 90-minute ceiling to absorb provider/network
+    # variance without allowing a stuck run to consume the runner indefinitely.
+    timeout-minutes: 90
     permissions:
       contents: write
       issues: write
