@@ -4,7 +4,8 @@
       "how-sweden-built-one-of-europe-s-hottest-39086b49": "2026-08-29T05:37:02.011423+00:00",
       "apple-tv-now-costs-14-99-a-month-after-i-045748ef": "2026-08-29T08:19:23.769769+00:00",
       "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d": "2026-08-29T11:19:38.537751+00:00",
-      "hollywood-celebs-are-getting-into-microd-1788f74f": "2026-08-29T16:15:37.761105+00:00"
+      "hollywood-celebs-are-getting-into-microd-1788f74f": "2026-08-29T16:15:37.761105+00:00",
+      "lawmakers-added-1-to-car-insurance-polic-512c7a56": "2026-08-30T09:24:08.104284+00:00"
     }
   },
   "families": {},
@@ -705,6 +706,231 @@
         "video_id": "DJdJVybZByI",
         "url": "https://youtu.be/DJdJVybZByI",
         "title": "The Real Reason Hollywood Stars Are Making Millions Without Box Office Hits",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:49:26.997738+00:00",
+      "run_id": "run_092358",
+      "topic": {
+        "title": "Lawmakers added $1 to car insurance policies. That money paid for Flock cameras",
+        "url": "https://www.texastribune.org/2026/08/28/texas-flock-cameras-auto-insurance-fee-mvcpa-grants/",
+        "score": 295,
+        "summary": "",
+        "source": "hackernews",
+        "num_comments": 168,
+        "raw_score": 295,
+        "normalized_hotness": 64,
+        "content_hash": "lawmakers-added-1-to-car-insurance-polic-512c7a56",
+        "keywords": [
+          "lawmakers",
+          "added",
+          "car",
+          "insurance",
+          "policies",
+          "money",
+          "paid",
+          "flock",
+          "cameras"
+        ],
+        "scores": {
+          "freshness": 64.0,
+          "source_quality": 80,
+          "specificity": 85,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 100,
+          "curiosity_gap": 100,
+          "story_potential": 100,
+          "visual_potential": 74,
+          "shareability": 100
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 85.0
+      },
+      "concept": {
+        "topic_title": "Lawmakers added $1 to car insurance policies. That money paid for Flock cameras",
+        "topic_url": "https://www.texastribune.org/2026/08/28/texas-flock-cameras-auto-insurance-fee-mvcpa-grants/",
+        "topic_source": "hackernews",
+        "topic_score": 85.0,
+        "chosen_angle": "You pay $1 extra for insurance that watches you back",
+        "hook_type": "contradiction",
+        "core_claim": "Your own mandatory car insurance payment is funding a network of AI cameras that track your every move.",
+        "viewer_problem": "People unknowingly finance the very surveillance that can be used against them",
+        "curiosity_gap": "How did a $1 fee become a surveillance tax without most drivers noticing?",
+        "emotional_driver": "surprise, outrage",
+        "payoff": "That tiny fee has quietly built a nationwide license plate recognition system that can locate any car.",
+        "concept_score": 90.0,
+        "risk_flags": [
+          "Needs clear legal context",
+          "Might be seen as clickbait if not grounded"
+        ],
+        "all_angles": [
+          {
+            "angle": "You pay $1 extra for insurance that watches you back",
+            "hook_type": "contradiction",
+            "core_claim": "Your own mandatory car insurance payment is funding a network of AI cameras that track your every move.",
+            "viewer_problem": "People unknowingly finance the very surveillance that can be used against them",
+            "curiosity_gap": "How did a $1 fee become a surveillance tax without most drivers noticing?",
+            "emotional_driver": "surprise, outrage",
+            "payoff": "That tiny fee has quietly built a nationwide license plate recognition system that can locate any car.",
+            "concept_score": 90,
+            "risk_flags": [
+              "Needs clear legal context",
+              "Might be seen as clickbait if not grounded"
+            ]
+          },
+          {
+            "angle": "Why is the government hiding a surveillance fee in your car insurance?",
+            "hook_type": "forbidden_question",
+            "core_claim": "Legislators slipped a $1 surveillance surcharge into car insurance bills, sidestepping public debate.",
+            "viewer_problem": "This sets a precedent: hidden fees can fund tech with big privacy implications",
+            "curiosity_gap": "Who decided that every driver should pay for police cameras without a vote?",
+            "emotional_driver": "curiosity, suspicion",
+            "payoff": "The bill passed as part of a broader funding package, and the cameras are now live in dozens of cities.",
+            "concept_score": 85,
+            "risk_flags": [
+              "Needs legal/political context",
+              "May require specific example to feel concrete"
+            ]
+          },
+          {
+            "angle": "The real reason your car insurance went up a dollar\u2014and no it's not inflation",
+            "hook_type": "hidden_cause",
+            "core_claim": "The $1 insurance hike is a hidden tax for Flock's surveillance network, and drivers never got a say.",
+            "viewer_problem": "Your monthly bill is slightly higher for something you didn't ask for, and it affects your privacy",
+            "curiosity_gap": "What else are lawmakers hiding in those 'small' fees?",
+            "emotional_driver": "betrayal, curiosity",
+            "payoff": "The money goes to Flock cameras that capture your license plate every time you drive.",
+            "concept_score": 82,
+            "risk_flags": [
+              "Needs strong data on how small fees add up",
+              "Might be too abstract without visual of camera"
+            ]
+          },
+          {
+            "angle": "One dollar \u00d7 every car = a multi-million-dollar surveillance network",
+            "hook_type": "surprising_number",
+            "core_claim": "The $1 fee adds up to tens of millions, enough to install AI cameras that read plates across entire states.",
+            "viewer_problem": "Small fees can compound into massive surveillance systems that track us without consent",
+            "curiosity_gap": "How many cameras did that $1 per policy actually buy?",
+            "emotional_driver": "shock, concern",
+            "payoff": "It funded thousands of Flock cameras that have already helped solve crimes but also raised privacy alarms.",
+            "concept_score": 88,
+            "risk_flags": [
+              "Needs to be visually compelling (show camera networks)",
+              "May need a scale comparison"
+            ]
+          }
+        ]
+      },
+      "script": {
+        "hook": "You're paying a $1 insurance fee to be watched.",
+        "scenes": [
+          {
+            "narration": "Texas lawmakers hiked auto insurance costs by $1 in 2023.",
+            "duration_sec": 2,
+            "visual_prompt": "A person holding a car insurance bill with a red $1 added on top",
+            "broll_keywords": [
+              "car insurance",
+              "bill",
+              "money"
+            ]
+          },
+          {
+            "narration": "The extra cash funds Flock cameras to combat catalytic converter theft.",
+            "duration_sec": 3,
+            "visual_prompt": "A Flock camera being installed on a pole near a highway",
+            "broll_keywords": [
+              "Flock camera",
+              "installation",
+              "highway"
+            ]
+          },
+          {
+            "narration": "At least 3,200 cameras now watch Texas roads, from El Paso to the Louisiana border.",
+            "duration_sec": 3,
+            "visual_prompt": "A map of Texas with camera icons marking locations along highways",
+            "broll_keywords": [
+              "Texas map",
+              "camera icons",
+              "highways"
+            ]
+          },
+          {
+            "narration": "Each camera creates a 'vehicle fingerprint' and stores data without warrants.",
+            "duration_sec": 3,
+            "visual_prompt": "A close-up of a Flock camera's screen displaying vehicle information",
+            "broll_keywords": [
+              "Flock camera screen",
+              "vehicle info",
+              "data"
+            ]
+          },
+          {
+            "narration": "That $1 insurance fee has paid for nearly 25% of all Flock cameras in Texas.",
+            "duration_sec": 3,
+            "visual_prompt": "A person looking surprised while holding a car insurance bill with a Flock camera in the background",
+            "broll_keywords": [
+              "person surprised",
+              "car insurance bill",
+              "Flock camera"
+            ]
+          }
+        ],
+        "cta": "Should your insurance fee fund a surveillance network, or be returned if theft rates drop?",
+        "title": "You Pay $1 Extra for Insurance That Watches You Back",
+        "description": "A $1 insurance fee hike in Texas funds Flock cameras that create a 'vehicle fingerprint' and store data without warrants. AI-assisted.\n\nhttps://www.texastribune.org/2026/08/28/texas-flock-cameras-auto-insurance-fee-mvcpa-grants/\n\n#shorts #flockcameras #surveillance",
+        "hashtags": [
+          "#shorts",
+          "#flockcameras",
+          "#surveillance",
+          "#texas",
+          "#insurance"
+        ],
+        "thumbnail_prompt": "A person looking surprised while holding a car insurance bill with a Flock camera in the background",
+        "thumbnail_text": "Watched for $1",
+        "strategy_version": 0,
+        "overall_direction": "Stay focused on surprising technology that has a concrete consequence for ordinary people.",
+        "focused_themes": [],
+        "avoid_themes": [],
+        "recommended_hooks": [],
+        "recommended_emotions": [],
+        "duration_recommendation": "",
+        "experiments": [],
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "contradiction",
+          "angle": "You pay $1 extra for insurance that watches you back",
+          "emotional_driver": "surprise, outrage",
+          "concept_score": 90.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 5,
+        "sources": {
+          "svd": 0,
+          "stock": 5,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "4qI3cgx_Jx8",
+        "video_id": "4qI3cgx_Jx8",
+        "url": "https://youtu.be/4qI3cgx_Jx8",
+        "title": "You Pay $1 Extra for Insurance That Watches You Back",
         "dry_run": false
       }
     }
