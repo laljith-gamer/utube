@@ -3,6 +3,8 @@
 # `chain` = order in which providers are tried.
 
 llm_research:
+  # Prefer a current general-purpose text model. The previous Ising Calibration
+  # model is a quantum-calibration VLM and is not an appropriate research model.
   chain: [nvidia_nim_research, openrouter_research]
   request_timeout_sec: 120
   reasoning_token_floor:
@@ -14,22 +16,21 @@ llm_research:
     nvidia_nim_research:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      model: nvidia/nemotron-3.5-lightning-30b-a3b
       supports_reasoning_effort: false
       params:
-        temperature: 1.00
+        temperature: 0.4
         top_p: 0.95
-        max_tokens: 32768
+        max_tokens: 6000
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      # Valid OpenRouter model; the previous NVIDIA ising slug was not hosted by OpenRouter.
       model: deepseek/deepseek-v4-flash-0731
       supports_reasoning_effort: false
       params:
-        temperature: 1.00
+        temperature: 0.4
         top_p: 0.95
-        max_tokens: 32768
+        max_tokens: 12000
 
 llm_script:
   # OpenRouter is first — NIM llama models (3.3 and 3.1) both hit EOL 2026-08-26
@@ -48,7 +49,6 @@ llm_script:
       model: nvidia/llama-3.1-nemotron-70b-instruct
       supports_reasoning_effort: false
 
-# Concept angle generation — reuses research models (cheaper, fast)
 llm_concept:
   chain: [openrouter_research, nvidia_nim_research]
   request_timeout_sec: 120
@@ -66,14 +66,13 @@ llm_concept:
     nvidia_nim_research:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      model: nvidia/nemotron-3.5-lightning-30b-a3b
       supports_reasoning_effort: false
       params:
         temperature: 0.6
         top_p: 0.95
         max_tokens: 4000
 
-# Script quality control — reuses research models (cheaper, fast)
 llm_qc:
   chain: [openrouter_research, nvidia_nim_research]
   request_timeout_sec: 120
@@ -91,7 +90,7 @@ llm_qc:
     nvidia_nim_research:
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: nvidia/ising-calibration-1.5-31b
+      model: nvidia/nemotron-3.5-lightning-30b-a3b
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -126,7 +125,7 @@ tts:
     f5tts:
       backend: f5_tts
       ref_audio_env: F5_REF_AUDIO
-      ref_text_env:  F5_REF_TEXT
+      ref_text_env: F5_REF_TEXT
       params:
         model: F5TTS_v1_Base
         device: cpu
