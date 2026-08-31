@@ -113,6 +113,13 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     curiosity_gap = concept.get("curiosity_gap", "") if concept else ""
     emotional_driver = concept.get("emotional_driver", "curiosity") if concept else "curiosity"
     strategy = _load_strategy()
+    
+    # ── Inject Style Memory ──
+    from ..repetition import RepetitionChecker
+    from .. import narration_archive
+    checker = RepetitionChecker(history_depth=10)
+    style_mem = checker.get_style_memory(narration_archive.load_recent(10))
+    
     strategy_context = "\n[CURRENT LEARNED STRATEGY]\n" + json.dumps({
         "strategy_version": strategy.get("strategy_version", 0),
         "overall_direction": strategy.get("overall_direction", ""),
@@ -123,6 +130,9 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
         "duration_recommendation": strategy.get("duration_recommendation", ""),
         "experiments": strategy.get("experiments", []),
     }, indent=2) + "\n"
+
+    if style_mem and any(style_mem.values()):
+        strategy_context += "\n[STYLE MEMORY: AVOID REPEATING THESE RECENT PATTERNS]\n" + json.dumps(style_mem, indent=2) + "\n"
 
     qc_feedback = ""
     if previous_qc and previous_qc.get("feedback"):

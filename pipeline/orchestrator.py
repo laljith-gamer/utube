@@ -103,6 +103,26 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
                 "flagged_phrases": rep_result.flagged_phrases[:10],
             })
 
+            # ── Factual Consistency Check ──
+            from .factual_consistency import validate_facts
+            try:
+                validate_facts(LLMRouter("llm_qc"), brief, sc)
+                fact_passed = True
+                fact_reason = ""
+            except ValueError as e:
+                fact_passed = False
+                fact_reason = str(e)
+            
+            write_json(out / f"5_factual_v{attempt+1}.json", {
+                "passed": fact_passed,
+                "reason": fact_reason,
+            })
+            
+            if not fact_passed:
+                LOG.warning("Script failed factual consistency on attempt %d: %s", attempt + 1, fact_reason)
+                qc_result = {"passed": False, "feedback": fact_reason, "issues": ["hallucination_or_overclaim"]}
+                continue # Force a retry by bypassing the break condition
+
             # ── Script QC (LLM-based quality evaluation) ──
             qc_result = script_qc.evaluate_script(sc, topic=best, concept=top_concept)
             write_json(out / f"5_qc_v{attempt+1}.json", qc_result)
@@ -125,7 +145,18 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             return result
 
         audio_summary = audio.synthesize_narration(tts, script=sc, slot=lane, out_dir=out)
-        captions_file = captions.transcribe_to_srt(out / audio_summary["master"], out / "captions.ass")
+        
+        # ── Audio Validation (ASR) ──
+        master_audio = out / audio_summary["master"]
+        asr_text, asr_segments, asr_info = captions.transcribe_audio(master_audio)
+        if asr_text:
+            from .audio_validation import validate_audio
+            ref_text = cfg.get_path("tts.providers.f5_tts.params.ref_text", env("F5_REF_TEXT", ""))
+            validate_audio(sc, asr_text, ref_text)
+        
+        # ── Write ASS ──
+        captions_file = out / "captions.ass"
+        captions.write_ass(asr_segments, asr_info, captions_file)
         vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
         write_json(out / "6_visuals.json", vis)
         thumb_path = out / "thumbnail.jpg"

@@ -24,21 +24,13 @@ LOG = logging.getLogger("utube.captions")
 CueT = tuple[float, float, str, int, int]
 
 
-def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
-    """Transcribe audio and write cinematic ASS captions.
-
-    Despite the legacy function name (kept for API compatibility), output
-    is now ASS format.  The file extension is changed to .ass automatically.
-    """
+def transcribe_audio(audio_path: Path) -> tuple[str, list[Any], Any]:
+    """Transcribe audio and return (full_text, segments_list, info)."""
     cfg = get_config()
     cap_cfg = cfg.get_path("captions", {}) or {}
 
-    # Switch the output path to .ass
-    ass_path = srt_path.with_suffix(".ass")
-
     if not cap_cfg.get("enabled", True):
-        ass_path.write_text("", encoding="utf-8")
-        return ass_path
+        return "", [], None
 
     model_size = cap_cfg.get("whisper_model_size", "base")
     device = cap_cfg.get("whisper_device", "cpu")
@@ -46,60 +38,77 @@ def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
     beam = int(cap_cfg.get("beam_size", 1))
     word_ts = bool(cap_cfg.get("word_timestamps", True))
     vad = bool(cap_cfg.get("vad_filter", True))
-    fade_ms = int(cap_cfg.get("fade_ms", 150))
-    layout = _layout_cfg(cap_cfg)
-
-    # Video dimensions for ASS PlayRes (1:1 pixel mapping)
-    vcfg = cfg.get_path("video", {}) or {}
-    video_w = int(vcfg.get("width", 1080))
-    video_h = int(vcfg.get("height", 1920))
-
-    # Cinematic caption style
-    acfg = cfg.get_path("assemble", {}) or {}
-    style_cfg = acfg.get("cinematic_caption_style", {}) or {}
-    float_px = int(style_cfg.get("float_pixels", 6))
 
     try:
         from faster_whisper import WhisperModel
 
         LOG.info("Loading faster-whisper model %r on %s/%s …", model_size, device, compute_type)
         model = WhisperModel(model_size, device=device, compute_type=compute_type)
-        segments, info = model.transcribe(
+        segments_gen, info = model.transcribe(
             str(audio_path),
             beam_size=beam,
             word_timestamps=word_ts,
             vad_filter=vad,
         )
-        timed_cues: list[CueT] = []
-        for seg in segments:
-            words = list(seg.words or [])
-            if not words:
-                timed_cues.extend(
-                    _plain_text_cues(seg.start, seg.end, seg.text.strip(), layout, fade_ms)
-                )
-                continue
-            timed_cues.extend(_word_cues(words, layout, fade_ms))
+        
+        segments = list(segments_gen)
+        full_text = " ".join([s.text.strip() for s in segments])
 
-        # Build ASS file
-        header = _ass_header(style_cfg, video_w, video_h)
-        cx, cy = video_w // 2, video_h // 2
-        dialogues = [
-            _ass_dialogue(s, e, txt, fi, fo, float_px, cx, cy)
-            for s, e, txt, fi, fo in timed_cues
-        ]
-        ass_path.write_text(header + "".join(dialogues), encoding="utf-8")
-        LOG.info("Captions: %d cues from %.1fs audio → %s", len(timed_cues), info.duration, ass_path.name)
-
-        # Free memory explicitly
         del model
         import gc
         gc.collect()
 
-        return ass_path
+        return full_text, segments, info
     except Exception as e:  # noqa: BLE001
-        LOG.warning("Whisper transcription failed (%s); writing empty ASS", e)
+        LOG.warning("Whisper transcription failed (%s)", e)
+        return "", [], None
+
+
+def write_ass(segments: list[Any], info: Any, ass_path: Path) -> Path:
+    """Generate cinematic ASS captions from ASR segments."""
+    if not segments or info is None:
         ass_path.write_text("", encoding="utf-8")
         return ass_path
+
+    cfg = get_config()
+    cap_cfg = cfg.get_path("captions", {}) or {}
+    fade_ms = int(cap_cfg.get("fade_ms", 150))
+    layout = _layout_cfg(cap_cfg)
+
+    vcfg = cfg.get_path("video", {}) or {}
+    video_w = int(vcfg.get("width", 1080))
+    video_h = int(vcfg.get("height", 1920))
+
+    acfg = cfg.get_path("assemble", {}) or {}
+    style_cfg = acfg.get("cinematic_caption_style", {}) or {}
+    float_px = int(style_cfg.get("float_pixels", 6))
+
+    timed_cues: list[CueT] = []
+    for seg in segments:
+        words = list(seg.words or [])
+        if not words:
+            timed_cues.extend(
+                _plain_text_cues(seg.start, seg.end, seg.text.strip(), layout, fade_ms)
+            )
+            continue
+        timed_cues.extend(_word_cues(words, layout, fade_ms))
+
+    header = _ass_header(style_cfg, video_w, video_h)
+    cx, cy = video_w // 2, video_h // 2
+    dialogues = [
+        _ass_dialogue(s, e, txt, fi, fo, float_px, cx, cy)
+        for s, e, txt, fi, fo in timed_cues
+    ]
+    ass_path.write_text(header + "".join(dialogues), encoding="utf-8")
+    LOG.info("Captions: %d cues from %.1fs audio → %s", len(timed_cues), info.duration, ass_path.name)
+    return ass_path
+
+
+def transcribe_to_srt(audio_path: Path, srt_path: Path) -> Path:
+    """Legacy wrapper for callers that haven't been updated to split ASR/ASS."""
+    full_text, segments, info = transcribe_audio(audio_path)
+    ass_path = srt_path.with_suffix(".ass")
+    return write_ass(segments, info, ass_path)
 
 
 # ────────────────────────────────────────────────────────────────

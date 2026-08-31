@@ -294,6 +294,50 @@ def _technical_validation(output_path: Path, srt_path: Path, audio_summary: dict
     if not srt_path.exists() or srt_path.stat().st_size == 0:
         LOG.warning("No captions file found or file is empty.")
     
-    # We could do an ffprobe check here for exact resolution and duration,
-    # but checking size is a good proxy for "did ffmpeg fail silently".
-    LOG.info("Technical validation passed for %s", output_path.name)
+    import json
+    
+    # Run ffprobe to check streams
+    cmd = [
+        "ffprobe", 
+        "-v", "error", 
+        "-show_entries", "format=duration:stream=codec_type,codec_name,width,height",
+        "-of", "json",
+        str(output_path)
+    ]
+    try:
+        res = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        probe = json.loads(res.stdout)
+    except Exception as e:
+        LOG.error("ffprobe failed during technical validation: %s", e)
+        raise RuntimeError(f"FFprobe validation failed: {e}")
+
+    streams = probe.get("streams", [])
+    video_streams = [s for s in streams if s.get("codec_type") == "video"]
+    audio_streams = [s for s in streams if s.get("codec_type") == "audio"]
+
+    if not video_streams:
+        raise RuntimeError("Validation failed: No video stream found in final output.")
+    if not audio_streams:
+        raise RuntimeError("Validation failed: No audio stream found in final output.")
+
+    # Check codec (we expect h264/aac from the pipeline config)
+    v_codec = video_streams[0].get("codec_name", "")
+    if v_codec not in ("h264", "libx264"):
+        LOG.warning("Unexpected video codec: %s (expected h264)", v_codec)
+
+    a_codec = audio_streams[0].get("codec_name", "")
+    if a_codec not in ("aac", "mp3"):
+        LOG.warning("Unexpected audio codec: %s", a_codec)
+
+    # Check duration bounds
+    try:
+        duration = float(probe.get("format", {}).get("duration", 0))
+        if duration < 5.0:
+            raise RuntimeError(f"Validation failed: Final video is too short ({duration:.1f}s)")
+        if duration > 120.0:
+            LOG.warning("Final video is longer than 60s Shorts limit: %.1fs", duration)
+    except (ValueError, TypeError):
+        LOG.warning("Could not parse duration from ffprobe output.")
+
+    LOG.info("Technical validation passed for %s (%.1fs, %s/%s)", 
+             output_path.name, duration if 'duration' in locals() else 0, v_codec, a_codec)

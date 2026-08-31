@@ -21,95 +21,75 @@ Scene 1 MUST continue the story from the hook with NEW information.
 The CTA is also spoken separately and must not repeat any earlier narration.
 Every narration unit — hook, each scene, and CTA — must add new information or a new rhetorical move.
 
+BEAT STRUCTURE:
 Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
 Cold open. Make the viewer's thumb stop. Use the "{hook_type}" pattern.
 NO 'hey guys', NO 'welcome back', NO slow intro.
 Open the curiosity loop. Do NOT solve it yet.
-This exact hook is spoken once. Do not put the same idea in a scene.
 
-Beat 2 — CONTEXT (scenes 1-2):
-Continue directly from the hook. Do NOT restate the hook.
-Why does this matter TO THE VIEWER? What is at stake for them personally?
-Make it feel relevant to their daily life.
+Beat 2 — CONTEXT (Scene 1):
+Continue directly from the hook. Establish the stakes. Why does this matter TO THE VIEWER?
 
-Beat 3 — EVIDENCE (scenes 3-5):
-Two to four concrete, specific facts. Numbers, names, dates, dollars.
-Each scene = ONE punchy beat (not two). Each builds on the last.
+Beat 3 — EVIDENCE & MECHANISM (Scenes 2-4):
+How does it actually work? Provide 2-3 concrete facts (numbers, dates, dollars).
+Explain the cause-and-effect (CAUSALITY). A caused B, which led to C.
 
-Beat 4 — PAYOFF (scene 6 or second-to-last):
-Resolve the curiosity loop opened in the hook. The 'ah-ha' moment.
-Must feel earned. Must match the hook's promise.
-Do not repeat the hook wording while delivering the payoff.
+Beat 4 — CONSEQUENCE (Scenes 5-6):
+What is the direct impact of this? Show the scale or the personal consequence.
 
-Beat 5 — CTA (final line, separate from scenes):
-A specific question that makes a viewer comment. Not 'subscribe please'.
-Must reference a specific element from the script without copying any previous sentence.
+Beat 5 — PAYOFF (Second-to-last scene):
+Resolve the curiosity loop opened in the hook. The 'ah-ha' moment. Must feel earned.
+
+Beat 6 — CTA (final line, separate from scenes):
+A specific comment-bait question referencing the core mechanism.
 
 ==============================================================
-ANTI-REPETITION — MANDATORY
+CONTENT DENSITY & FACTUAL FIDELITY — MANDATORY
 ==============================================================
-- The hook, every scene narration, and CTA are separate spoken units.
+- MAXIMIZE FACT DENSITY: Every sentence must contain a specific noun, number, or active verb grounded in the research.
+- CAUSALITY & CONSEQUENCE: Connect ideas with "because", "therefore", or "which means". Don't just list facts. Show the mechanism.
+- NO HALLUCINATIONS: Do not claim "caused" if the research says "associated". Stick rigidly to the provided facts.
+
+==============================================================
+ANTI-REPETITION & ANTI-FILLER — MANDATORY
+==============================================================
 - NEVER repeat an identical sentence anywhere in the script.
-- NEVER paraphrase the hook as scene 1.
-- NEVER repeat a sentence, clause, or distinctive phrase of 5+ consecutive words elsewhere in the script.
-- Do not reuse the same transition/filler phrase more than once.
-- Do not use a fixed sequence of transitions such as 'Wait' -> 'Now' -> 'But' -> 'Here's the thing'.
-- Transitions are optional. If the story flows naturally without one, use none.
-- Prefer natural topic-specific transitions over generic filler.
-- Vary sentence openings across scenes.
-- Before returning JSON, mentally compare hook + every scene + CTA and rewrite anything that sounds duplicated.
+- NEVER repeat a sentence, clause, or distinctive phrase of 5+ words elsewhere in the script.
+- BAN ALL STATIC FILLER: "But here's the crazy part," "And it gets worse," "Let me explain," "Think about it." Cut all of these. Get straight to the point.
+- Do not use a fixed sequence of transitions (e.g. 'Wait' -> 'Now' -> 'But'). Transitions are optional. If the story flows, use none.
 
 ==============================================================
 HARD WRITING RULES
 ==============================================================
 - Total narration target: {target_duration} seconds (~{target_words} words at {wpm} wpm).
 - Each scene narration is ONE sentence, max 14 words, plain spoken English.
-- Use SPECIFICS only: '$3.4 trillion', '1947', '0.001 seconds', '73% of users'.
-  NEVER vague words: 'a lot', 'many', 'some', 'amazing', 'very', 'really',
-  'incredible', 'literally', 'basically', 'actually', 'honestly'.
-- BANNED openings: 'hey guys', 'welcome back', 'today we're going to',
-  'did you know that', 'in this video', 'let me tell you', 'so basically'.
-- Do not start consecutive scenes with the same word.
-- Use present tense, active voice. Cut every adverb you can.
-- TONE: Write like an expressive, energetic pro YouTuber!
-  Conversational language is allowed, but do NOT rely on a fixed filler list.
-  Use pauses and emphasis only when they fit the specific story.
+- Use SPECIFICS only: '$3.4 trillion', '1947', '0.001 seconds'.
+- NEVER vague words: 'a lot', 'many', 'some', 'amazing', 'very', 'really', 'literally', 'basically'.
+- TONE: Expressive, energetic pro YouTuber. Conversational, but NO FILLER.
 
 ==============================================================
 TTS PRONUNCIATION RULES (the AI voice reads your text literally)
 ==============================================================
 - SPELL OUT abbreviations: 'N A S A' not 'NASA', 'U S' not 'US'.
-- Write dollar amounts as words: 'two hundred fifty thousand dollars'.
-- Write large numbers spoken: 'three point four trillion'.
+- Write numbers as words if possible or keep them clean.
 - NEVER use symbols: no '&', '+', '/', '#', '@'. Write 'and', 'plus', etc.
 - End EVERY narration with a period, question mark, or exclamation mark.
-- Add COMMA after introductory words when actually used.
-- Write 'point' not '.' in decimals: 'zero point zero zero one seconds'.
+- Add COMMA after introductory words.
 
 ==============================================================
-VISUAL RULES (every scene is a moving video clip — no slideshow)
+VISUAL RULES
 ==============================================================
-- Each visual_prompt: real subject in a real setting that moves.
-  Person doing X, machine running, liquid pouring, drone shot, close-up of hands.
-  AVOID abstract overlays, charts, text walls, frozen diagrams.
-- Alternate scale/angle: extreme close-up -> wide -> over-shoulder -> top-down -> macro.
-- broll_keywords: 3-5 simple nouns for stock video search.
-  Bad: 'innovation'. Good: 'soldering iron, circuit board, sparks'.
+- Each visual_prompt: real subject in a real setting that moves. (e.g., "Drone shot of factory", "Close-up of hands soldering").
+- AVOID abstract overlays, charts, text walls, frozen diagrams.
+- broll_keywords: 3-5 simple nouns. Bad: 'innovation'. Good: 'soldering iron, circuit board, sparks'.
 
 ==============================================================
 TITLE / DESCRIPTION / HASHTAGS / THUMBNAIL
 ==============================================================
-- Title <= {title_max_chars} chars. Use proven shapes:
-  'The real reason {{thing}} is {{surprising verb}}'
-  'Why {{number}} is {{counterintuitive claim}}'
-  '{{Noun}}: the {{age}}-year-old {{secret/trick/mistake}}'
-  No clickbait lies. The payoff must match the title.
-- Description: 2-3 short sentences echoing hook + payoff. One source URL.
-  End with AI disclosure: '{ai_disclosure}'. Then blank line, then hashtags.
+- Title <= {title_max_chars} chars. Use proven shapes without clickbait lies.
+- Description: 2-3 short sentences. End with AI disclosure: '{ai_disclosure}'.
 - Hashtags: exactly {hashtags_count} distinct, lowercase. First MUST be #shorts.
-  Mix niche + topic-specific. No duplicates, no spaces, each <= 25 chars.
-- Thumbnail: text 3-4 punchy words. Image prompt: single high-contrast subject
-  + one emotional cue.
+- Thumbnail: text 3-4 punchy words. Image prompt: high-contrast subject + emotional cue.
 
 ==============================================================
 OUTPUT — return ONLY this JSON, no prose, no code fences

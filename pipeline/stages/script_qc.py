@@ -86,13 +86,14 @@ def evaluate_script(
 
     # Calculate overall score (weighted average of dimensions)
     dimension_weights = {
-        "hook_strength": 0.20,
-        "clarity": 0.15,
-        "specificity": 0.15,
-        "story_progression": 0.12,
-        "payoff_strength": 0.15,
-        "natural_voice": 0.10,
-        "channel_fit": 0.13,
+        "hook_strength": 0.15,
+        "content_density": 0.15,
+        "factual_grounding": 0.15,
+        "novel_information": 0.10,
+        "non_redundancy": 0.10,
+        "spoken_naturalness": 0.15,
+        "payoff_strength": 0.10,
+        "channel_fit": 0.10,
     }
 
     # Fail closed: missing or invalid scores are errors, not defaults.
@@ -196,23 +197,25 @@ Script:
 {script_text}
 
 Score these dimensions:
-- hook_strength: Does the first line stop a scroll? Does it open a curiosity loop?
-- clarity: Is every sentence easy to understand on first listen?
-- specificity: Are facts specific (numbers, names, dates) not vague?
-- story_progression: Does each scene build on the last? Is there momentum?
-- payoff_strength: Does the ending resolve the hook's promise? Does it feel earned?
-- natural_voice: Does it sound like a real person talking, not a textbook?
+- hook_strength: Does the first line stop a scroll and open a curiosity gap?
+- content_density: Is every single sentence packed with meaning? Zero fluff.
+- factual_grounding: Are the claims backed by specific numbers, dates, and entities?
+- novel_information: Does this tell the viewer something they likely didn't already know?
+- non_redundancy: Does the script avoid repeating the same concept in different words?
+- spoken_naturalness: Does it sound like a real person talking? (No "delve", "explore", or robotic phrasing)
+- payoff_strength: Does the ending resolve the hook's promise satisfyingly?
 - channel_fit: Does this fit "surprising technology that matters to ordinary people"?
 
 Respond with ONLY a JSON object:
 {{
   "scores": {{
     "hook_strength": <int>,
-    "clarity": <int>,
-    "specificity": <int>,
-    "story_progression": <int>,
+    "content_density": <int>,
+    "factual_grounding": <int>,
+    "novel_information": <int>,
+    "non_redundancy": <int>,
+    "spoken_naturalness": <int>,
     "payoff_strength": <int>,
-    "natural_voice": <int>,
     "channel_fit": <int>
   }},
   "issues": ["<specific problems found>"],

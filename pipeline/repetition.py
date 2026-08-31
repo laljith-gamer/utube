@@ -25,6 +25,12 @@ DEFAULT_HISTORY_DEPTH = 20
 # Ignore generic n-grams shorter than this character count
 MIN_PHRASE_CHARS = 20
 
+STOPWORDS = {
+    "the", "a", "an", "this", "that", "it", "there", "these", "those",
+    "my", "your", "what", "why", "how", "and", "but", "because",
+    "so", "now", "here", "then", "if", "when", "in", "on", "at", "to",
+    "for", "with", "by", "as", "is", "are", "was", "were", "be", "been",
+}
 
 @dataclass
 class RepetitionReport:
@@ -34,6 +40,7 @@ class RepetitionReport:
     intra_issues: list[str] = field(default_factory=list)
     cross_issues: list[str] = field(default_factory=list)
     flagged_phrases: list[str] = field(default_factory=list)
+    style_memory: dict[str, list[str]] = field(default_factory=dict)
 
     @property
     def all_issues(self) -> list[str]:
@@ -70,7 +77,10 @@ def _extract_all_ngrams(text: str, min_n: int = MIN_NGRAM, max_n: int = 8) -> se
 def _first_word(sentence: str) -> str:
     """Return the first substantive word of a sentence."""
     words = _normalize(sentence).split()
-    return words[0] if words else ""
+    for w in words:
+        if w not in STOPWORDS:
+            return w
+    return ""
 
 
 # ── Intra-video checks ──────────────────────────────────────────────────────
@@ -233,11 +243,41 @@ class RepetitionChecker:
     def __init__(self, history_depth: int = DEFAULT_HISTORY_DEPTH) -> None:
         self.history_depth = history_depth
 
-    def check(
-        self,
-        script: dict,
-        *,
-        history: list[dict] | None = None,
+    def get_style_memory(self, history: list[dict[str, Any]] | None) -> dict[str, list[str]]:
+        style_memory: dict[str, list[str]] = {
+            "recent_hooks": [],
+            "recent_ctas": [],
+            "recent_phrases": [],
+        }
+        history = (history or [])[:self.history_depth]
+        if not history:
+            return style_memory
+
+        history_texts = []
+        history_hooks = []
+        history_ctas = []
+        for entry in history:
+            h_hook = str(entry.get("hook", ""))
+            h_scenes = entry.get("scenes", [])
+            h_cta = str(entry.get("cta", ""))
+            history_texts.append(
+                " ".join([h_hook] + [str(s) for s in h_scenes] + [h_cta])
+            )
+            history_hooks.append(h_hook)
+            history_ctas.append(h_cta)
+
+        style_memory["recent_hooks"] = history_hooks[:5]
+        style_memory["recent_ctas"] = history_ctas[:5]
+        
+        all_history_ngrams = set()
+        for ht in history_texts[:5]:
+            all_history_ngrams |= _extract_all_ngrams(ht)
+        style_memory["recent_phrases"] = list(all_history_ngrams)[:20]
+        
+        return style_memory
+
+    def check_script(
+        self, script: dict[str, Any], history: list[dict[str, Any]] | None = None
     ) -> RepetitionReport:
         """Run all repetition checks on a script.
 
@@ -303,4 +343,5 @@ class RepetitionChecker:
             intra_issues=intra,
             cross_issues=cross,
             flagged_phrases=flagged[:20],  # Cap to avoid prompt bloat
+            style_memory=self.get_style_memory(history),
         )
