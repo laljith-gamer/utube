@@ -62,8 +62,14 @@ class LLMRouter:
         last_err: Exception | None = None
         for p in self.active:
             try:
-                LOG.info("LLM call → %s (%s)", p["name"], p["model"])
                 provider_params = p.get("params", {})
+                provider_timeout = p.get("request_timeout_sec", self.timeout)
+                provider_retries = p.get("max_retries", 0 if "request_timeout_sec" in p else 2)
+                
+                LOG.info(
+                    "LLM call → %s (%s) timeout=%ss retries=%s",
+                    p["name"], p["model"], provider_timeout, provider_retries
+                )
                 
                 is_gemini = "gemini" in p["model"].lower() or p.get("api_key_env") == "GEMINI_API_KEY"
                 if is_gemini:
@@ -111,7 +117,12 @@ class LLMRouter:
                         )
                     return content
                 else:
-                    client = OpenAI(api_key=p["api_key"], base_url=p["base_url"], timeout=self.timeout)
+                    client = OpenAI(
+                        api_key=p["api_key"], 
+                        base_url=p["base_url"], 
+                        timeout=provider_timeout,
+                        max_retries=provider_retries
+                    )
                     kwargs: dict[str, Any] = {
                         "model": p["model"],
                         "messages": messages,
