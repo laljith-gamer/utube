@@ -90,10 +90,29 @@ def _repetition_issues(script: dict[str, Any]) -> list[str]:
     return issues
 
 
+def _fluff_issues(script: dict[str, Any]) -> list[str]:
+    blocklist = [
+        "delve", "explore", "crucial", "innovative", "foster", "testament",
+        "but here's the thing", "but here's the catch", "think about it",
+        "let me explain", "and it gets worse", "wait for it", "picture this",
+        "imagine this", "revolutionary", "game changer", "game-changer"
+    ]
+    issues = []
+    
+    text = str(script.get("hook", "")) + " " + " ".join(str(s.get("narration", "")) for s in script.get("scenes", [])) + " " + str(script.get("cta", ""))
+    text = text.lower()
+    
+    for word in blocklist:
+        if re.search(r'\b' + re.escape(word) + r'\b', text):
+            issues.append(f"Contains AI buzzword or fluff: '{word}'")
+    return issues
+
+
 def _validate_script_structure(script: dict[str, Any]) -> None:
     issues = _repetition_issues(script)
+    issues.extend(_fluff_issues(script))
     if issues:
-        raise ValueError("Script repetition detected: " + "; ".join(issues))
+        raise ValueError("Script repetition or fluff detected: " + "; ".join(issues))
 
 
 def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, concept: dict | None = None, previous_qc: dict | None = None, previous_repetition: Any | None = None) -> dict[str, Any]:
@@ -116,9 +135,9 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     
     # ── Inject Style Memory ──
     from ..repetition import RepetitionChecker
-    from .. import narration_archive
+    from ..narration_archive import load_recent
     checker = RepetitionChecker(history_depth=10)
-    style_mem = checker.get_style_memory(narration_archive.load_recent(10))
+    style_mem = checker.get_style_memory(load_recent(10))
     
     strategy_context = "\n[CURRENT LEARNED STRATEGY]\n" + json.dumps({
         "strategy_version": strategy.get("strategy_version", 0),

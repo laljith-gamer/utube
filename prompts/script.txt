@@ -47,6 +47,7 @@ A specific comment-bait question referencing the core mechanism.
 CONTENT DENSITY & FACTUAL FIDELITY — MANDATORY
 ==============================================================
 - MAXIMIZE FACT DENSITY: Every sentence must contain a specific noun, number, or active verb grounded in the research.
+- IF a scene does not introduce a specific new noun or number, DELETE THE SCENE. Better to have a shorter, dense script than a long, fluffy one.
 - CAUSALITY & CONSEQUENCE: Connect ideas with "because", "therefore", or "which means". Don't just list facts. Show the mechanism.
 - NO HALLUCINATIONS: Do not claim "caused" if the research says "associated". Stick rigidly to the provided facts.
 
@@ -57,6 +58,7 @@ ANTI-REPETITION & ANTI-FILLER — MANDATORY
 - NEVER repeat a sentence, clause, or distinctive phrase of 5+ words elsewhere in the script.
 - BAN ALL STATIC FILLER: "But here's the crazy part," "And it gets worse," "Let me explain," "Think about it." Cut all of these. Get straight to the point.
 - Do not use a fixed sequence of transitions (e.g. 'Wait' -> 'Now' -> 'But'). Transitions are optional. If the story flows, use none.
+- STYLE MEMORY: If you see a [STYLE MEMORY] block below, you MUST NOT use any of the hooks, CTAs, or distinctive phrases listed in it.
 
 ==============================================================
 HARD WRITING RULES
@@ -66,6 +68,7 @@ HARD WRITING RULES
 - Use SPECIFICS only: '$3.4 trillion', '1947', '0.001 seconds'.
 - NEVER vague words: 'a lot', 'many', 'some', 'amazing', 'very', 'really', 'literally', 'basically'.
 - TONE: Expressive, energetic pro YouTuber. Conversational, but NO FILLER.
+- HUMAN-LIKE SPEECH: Use contractions ("I'm", "they're"). Start sentences with "But", "And", or "So". Use rhetorical questions. DO NOT use essay words like "delve", "explore", "foster", "crucial", or "testament".
 
 ==============================================================
 TTS PRONUNCIATION RULES (the AI voice reads your text literally)

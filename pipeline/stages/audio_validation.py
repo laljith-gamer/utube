@@ -5,6 +5,7 @@ the intended script and the TTS reference text to detect hallucinated leakage.
 """
 from __future__ import annotations
 
+import difflib
 import logging
 import re
 from typing import Any
@@ -54,18 +55,7 @@ def validate_audio(script: dict[str, Any], asr_text: str, ref_text: str) -> None
     if not script_words:
         return  # Nothing to validate
 
-    # 2. Check fidelity (word coverage)
-    # Ensure at least 70% of the script words appear in the ASR output.
-    # Whisper might misspell some, but 70% is a safe lower bound for a match.
-    script_vocab = set(script_words)
-    asr_vocab = set(asr_words)
-    coverage = len(script_vocab & asr_vocab) / max(1, len(script_vocab))
-    
-    LOG.info("Audio ASR fidelity: %.1f%% word coverage", coverage * 100)
-    if coverage < 0.70:
-        raise ValueError(f"Audio validation failed: ASR fidelity too low ({coverage*100:.1f}%). Expected script was not spoken.")
-
-    # 3. Check for reference text leakage (Hallucination)
+    # 2. Check for reference text leakage (Hallucination)
     # F5-TTS sometimes loops or injects the reference text into the output.
     # We look for 4-grams from the reference text that appear in the ASR,
     # but which are NOT part of the intended script.
@@ -82,5 +72,15 @@ def validate_audio(script: dict[str, Any], asr_text: str, ref_text: str) -> None
             leaked_phrases = [" ".join(g) for g in leaked]
             LOG.error("Audio validation FAILED. Leaked reference text: %r", leaked_phrases)
             raise ValueError(f"Audio validation failed: TTS leaked reference text into output: {leaked_phrases}")
+
+    # 3. Check fidelity (word coverage and ordering)
+    # Using difflib.SequenceMatcher ensures we catch stuttering and out-of-order words.
+    # At least 85% sequence similarity is required for the audio to be accepted.
+    matcher = difflib.SequenceMatcher(None, script_words, asr_words)
+    similarity = matcher.ratio()
+    
+    LOG.info("Audio ASR sequence similarity: %.1f%%", similarity * 100)
+    if similarity < 0.85:
+        raise ValueError(f"Audio validation failed: ASR fidelity too low ({similarity*100:.1f}% sequence match). TTS likely stuttered or hallucinated.")
 
     LOG.info("Audio validation PASSED.")
