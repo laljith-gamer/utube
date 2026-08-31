@@ -63,11 +63,18 @@ jobs:
           uv pip install --system "numpy<2" torch torchvision torchaudio torchcodec --index-url https://download.pytorch.org/whl/cpu
       - name: Install Python deps
         run: uv pip install --system -r requirements.txt
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Puter.js
+        run: npm install @heyputer/puter.js
       - name: Produce and upload videos
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
           F5_REF_AUDIO: assets/voice_ref.wav
           F5_REF_TEXT: ${{ secrets.F5_REF_TEXT }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}

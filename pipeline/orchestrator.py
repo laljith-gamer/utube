@@ -131,9 +131,25 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
                 break
 
         if not qc_result or not qc_result.get("passed"):
-            result["reason"] = "Failed script QC."
-            write_json(out / "result.json", result)
-            return result
+            # Before failing outright, give the premium rewrite a chance
+            from .stages.premium_rewrite import evaluate_and_rewrite
+            sc = evaluate_and_rewrite(sc, qc_result, topic=best, concept=top_concept)
+            # Re-run QC on the rewritten script
+            qc_result = script_qc.evaluate_script(sc, topic=best, concept=top_concept)
+            write_json(out / "5_premium_qc.json", qc_result)
+            
+            if not qc_result.get("passed"):
+                result["reason"] = "Failed script QC (even after premium rewrite)."
+                write_json(out / "result.json", result)
+                return result
+        else:
+            # Script passed QC, but might still qualify for premium enhancement
+            from .stages.premium_rewrite import evaluate_and_rewrite
+            sc_enhanced = evaluate_and_rewrite(sc, qc_result, topic=best, concept=top_concept)
+            if sc_enhanced is not sc:
+                sc = sc_enhanced
+                write_json(out / "5_premium_script.json", sc)
+
         # Repetition issues are advisory after exhausting attempts — proceed
         # with the best version but log a warning.
         if rep_result and not rep_result.passed:

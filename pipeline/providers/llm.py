@@ -72,7 +72,21 @@ class LLMRouter:
                 )
                 
                 is_gemini = "gemini" in p["model"].lower() or p.get("api_key_env") == "GEMINI_API_KEY"
-                if is_gemini:
+                is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or p["name"] == "puter_rewrite"
+
+                if is_puter:
+                    from .puter import PuterProvider
+                    content = PuterProvider.chat(
+                        model=p["model"],
+                        messages=messages,
+                        max_tokens=provider_params.get("max_tokens", max_tokens),
+                        temperature=provider_params.get("temperature", temperature),
+                        json_mode=json_mode
+                    )
+                    if not content:
+                        raise RuntimeError("Empty response from Puter.")
+                    return content
+                elif is_gemini:
                     from google import genai
                     from google.genai import types
                     

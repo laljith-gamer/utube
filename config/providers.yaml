@@ -125,6 +125,20 @@ llm_qc:
         top_p: 0.95
         max_tokens: 3000
 
+llm_premium_rewrite:
+  chain: [puter_rewrite]
+  request_timeout_sec: 180
+  retry_on_rate_limit_seconds: 10
+  providers:
+    puter_rewrite:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-3-opus
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.2
+        max_tokens: 4000
+        max_credits_per_run: 500
+
 image:
   chain: [pollinations]
   default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
