@@ -104,7 +104,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             })
 
             # ── Factual Consistency Check ──
-            from .factual_consistency import validate_facts
+            from .stages.factual_consistency import validate_facts
             try:
                 validate_facts(LLMRouter("llm_qc"), brief, sc)
                 fact_passed = True
