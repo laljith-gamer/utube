@@ -1,0 +1,40 @@
+{
+  "title": "How Sweden built one of Europe’s hottest startup ecosystems",
+  "url": "https://techcrunch.com/2026/08/28/how-sweden-built-one-of-europes-hottest-startup-ecosystems/",
+  "score": 92,
+  "summary": "Sophia Bendz, general partner at Cherry Ventures, stopped by Equity to break down the latest in the Swedish tech ecosystem.",
+  "source": "rss:TechCrunch",
+  "raw_score": 92,
+  "normalized_hotness": 95,
+  "content_hash": "how-sweden-built-one-of-europe-s-hottest-39086b49",
+  "keywords": [
+    "sweden",
+    "built",
+    "one",
+    "europe",
+    "hottest",
+    "startup",
+    "ecosystems"
+  ],
+  "scores": {
+    "freshness": 95.0,
+    "source_quality": 72,
+    "specificity": 65,
+    "novelty": 75,
+    "evergreen_value": 50,
+    "strategy_alignment": 50,
+    "audience_fit": 40,
+    "curiosity_gap": 40,
+    "story_potential": 40,
+    "visual_potential": 40,
+    "shareability": 40
+  },
+  "hard_rejection": null,
+  "memory_adjustment": 0.0,
+  "memory_evidence": {
+    "topic_family": "other",
+    "matches": []
+  },
+  "total_score": 50.4,
+  "selection_mode": "best_valid"
+}

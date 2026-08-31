@@ -1,8 +1,35 @@
 {
-  "winning_patterns": [],
-  "weak_patterns": [],
-  "videos": [],
-  "topic_families": {},
-  "hook_type_stats": {},
-  "updated_at": null
+  "version": 3,
+  "winning_patterns": {
+    "topic_families": {},
+    "hook_types": {},
+    "emotional_drivers": {},
+    "duration_buckets": {},
+    "title_patterns": {},
+    "visual_sources": {},
+    "topic_hook": {},
+    "topic_emotion": {},
+    "hook_emotion": {},
+    "topic_hook_emotion": {}
+  },
+  "weak_patterns": {
+    "topic_families": {},
+    "hook_types": {},
+    "emotional_drivers": {},
+    "duration_buckets": {},
+    "title_patterns": {},
+    "visual_sources": {},
+    "topic_hook": {},
+    "topic_emotion": {},
+    "hook_emotion": {},
+    "topic_hook_emotion": {}
+  },
+  "recent_hashes": [
+    "apple-tv-now-costs-14-99-a-month-after-i-045748ef",
+    "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d",
+    "hollywood-celebs-are-getting-into-microd-1788f74f",
+    "lawmakers-added-1-to-car-insurance-polic-512c7a56",
+    "techcrunch-mobility-the-hidden-human-cos-b882f405"
+  ],
+  "updated_at": "2026-08-31T13:30:16.774727+00:00"
 }

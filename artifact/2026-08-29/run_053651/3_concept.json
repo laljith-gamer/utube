@@ -1,0 +1,76 @@
+{
+  "topic_title": "How Sweden built one of Europe’s hottest startup ecosystems",
+  "topic_url": "https://techcrunch.com/2026/08/28/how-sweden-built-one-of-europes-hottest-startup-ecosystems/",
+  "topic_source": "rss:TechCrunch",
+  "topic_score": 50.4,
+  "chosen_angle": "Frame the paradox of Sweden's high-tax, socialist safety net being the secret fuel for its aggressive capitalist tech founders.",
+  "hook_type": "contradiction",
+  "core_claim": "Sweden's generous welfare state—free healthcare, education, and unemployment benefits—actually encourages risk-taking because founders know they won't starve if they fail.",
+  "viewer_problem": "If you've ever hesitated to take a career risk because of fear of losing health insurance or savings, Sweden's model reveals a counter-intuitive truth about risk.",
+  "curiosity_gap": "Why would a system that taxes the rich heavily produce some of the world's most successful billionaires?",
+  "emotional_driver": "curiosity",
+  "payoff": "The safety net acts as a 'risk subsidy'—it lowers the cost of failure, so Swedes are more willing to bet everything on a crazy idea.",
+  "concept_score": 92.0,
+  "risk_flags": [
+    "Political sensitivity around 'socialism' might trigger some viewers, but it's a factual economic observation",
+    "Need to keep it balanced and not overly political"
+  ],
+  "all_angles": [
+    {
+      "angle": "Highlight the jaw-dropping stat that Sweden produces more unicorns per capita than any other country, using a specific ratio.",
+      "hook_type": "surprising_number",
+      "core_claim": "Sweden's 10 million people have produced over 40 tech unicorns, giving it the highest unicorn-per-capita ratio in the world.",
+      "viewer_problem": "You don't need a massive market to build a massive company—this changes how you think about job security and where the next big tech employer might be hiding.",
+      "curiosity_gap": "How does a country with the population of New York City out-innovate the entire United States?",
+      "emotional_driver": "surprise",
+      "payoff": "Because Sweden's tiny domestic market forces its startups to think globally from day one, creating hyper-competitive, export-ready companies.",
+      "concept_score": 88,
+      "risk_flags": [
+        "Need to verify the exact number of unicorns to avoid factual errors",
+        "Might feel like a generic 'top 10' stat if not visually grounded with maps or charts"
+      ]
+    },
+    {
+      "angle": "Frame the paradox of Sweden's high-tax, socialist safety net being the secret fuel for its aggressive capitalist tech founders.",
+      "hook_type": "contradiction",
+      "core_claim": "Sweden's generous welfare state—free healthcare, education, and unemployment benefits—actually encourages risk-taking because founders know they won't starve if they fail.",
+      "viewer_problem": "If you've ever hesitated to take a career risk because of fear of losing health insurance or savings, Sweden's model reveals a counter-intuitive truth about risk.",
+      "curiosity_gap": "Why would a system that taxes the rich heavily produce some of the world's most successful billionaires?",
+      "emotional_driver": "curiosity",
+      "payoff": "The safety net acts as a 'risk subsidy'—it lowers the cost of failure, so Swedes are more willing to bet everything on a crazy idea.",
+      "concept_score": 92,
+      "risk_flags": [
+        "Political sensitivity around 'socialism' might trigger some viewers, but it's a factual economic observation",
+        "Need to keep it balanced and not overly political"
+      ]
+    },
+    {
+      "angle": "Reveal the hidden cause of Sweden's startup boom: the early adoption of mobile internet and the legacy of Ericsson, not just random talent.",
+      "hook_type": "hidden_cause",
+      "core_claim": "Sweden's startup ecosystem was built on the back of Ericsson's telecom infrastructure, which gave the country a 10-year head start in mobile technology.",
+      "viewer_problem": "The apps you use daily were shaped by a 100-year-old phone company—understanding this helps you predict which current technologies will birth the next Spotify.",
+      "curiosity_gap": "What did a 150-year-old phone company have to do with the creation of Spotify and Klarna?",
+      "emotional_driver": "curiosity",
+      "payoff": "Ericsson's early 3G and mobile tech created a generation of engineers and a culture obsessed with connectivity, which directly spawned the streaming and fintech revolutions.",
+      "concept_score": 85,
+      "risk_flags": [
+        "Might be slightly technical for the general audience if not explained simply",
+        "Need strong visuals of old phones vs. modern apps"
+      ]
+    },
+    {
+      "angle": "Compare Silicon Valley's massive resources to Sweden's small, cold, and collaborative environment to show why the underdog wins.",
+      "hook_type": "comparison",
+      "core_claim": "Silicon Valley relies on cutthroat competition and massive capital, while Sweden's small size and 'Law of Jante' culture force collaboration and humility, leading to better products.",
+      "viewer_problem": "Your office culture might be toxic because it's too competitive—Sweden's humble, collaborative approach proves you don't need to be a jerk to build a billion-dollar product.",
+      "curiosity_gap": "Why does a culture that actively discourages bragging (Jantelagen) produce more successful global tech brands than the ego-driven Valley?",
+      "emotional_driver": "surprise",
+      "payoff": "Because when you can't boast, you have to let your product speak for itself—and collaboration beats ego when you're all in the same small boat.",
+      "concept_score": 90,
+      "risk_flags": [
+        "Risk of oversimplifying Silicon Valley's complexity",
+        "Need to clearly define Jantelagen for a non-Swedish audience"
+      ]
+    }
+  ]
+}

@@ -33,12 +33,12 @@ research:
   brief:
     max_tokens: 3000
     temperature: 0.4
-    reasoning_effort: null
+    reasoning_effort: medium
 
 script:
   max_tokens: 12000                 # raised from 8000: prevents mid-JSON truncation
   temperature: 0.7
-  reasoning_effort: low
+  reasoning_effort: medium
   words_per_second: 2.5
   hook_max_seconds: 1.5             # tightened from 2 — Shorts need sub-2s hooks
   min_scenes: 5                     # story-rhythm range instead of fixed count

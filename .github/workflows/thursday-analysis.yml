@@ -30,6 +30,7 @@ jobs:
           uv pip install --system google-api-python-client google-auth-oauthlib google-auth-httplib2 requests
       - name: Run Thursday Learning Loop
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}

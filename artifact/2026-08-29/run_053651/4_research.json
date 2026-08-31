@@ -1,0 +1,28 @@
+{
+  "key_facts": [
+    "Sweden's startup ecosystem raised $2.8 billion in 2026 and is projected to reach $5 billion, indicating strong growth despite a cooler market.",
+    "Notable Swedish startups include Spotify, Klarna, Legora, Lovable, Neko Health, and Einride, spanning music, finance, legal AI, coding, health, and autonomous freight.",
+    "Sophia Bendz of Cherry Ventures attributes Sweden's success to the 'cool' factor of being a founder, shifting from traditional banking and consulting careers to entrepreneurship.",
+    "The first generation of Swedish entrepreneurs is now providing resources and mentorship to the latest wave, fostering a sustainable ecosystem.",
+    "American investors are actively scouting Swedish startups, reflecting global recognition of the region's innovation potential."
+  ],
+  "reveal_fact": "Despite Sweden being known for its high taxes and socialist policies, it has cultivated one of Europe's most aggressive capitalist tech ecosystems, with founders prioritizing wealth creation over public service.",
+  "context": "Sweden's tech boom began with the rise of Spotify and has since diversified into numerous sectors. The country's unique blend of social safety nets and a culture that celebrates entrepreneurial success has created an environment where risk-taking is both encouraged and supported.",
+  "comment_bait_question": "How does Sweden's 'high-tax, low-risk' environment paradoxically drive such aggressive startup growth compared to other European nations?",
+  "open_questions": [
+    "What specific government policies or tax breaks exist for Swedish startups, if any?",
+    "How does the high cost of living in Sweden affect the viability of small tech companies or solo founders?",
+    "Are there any cultural or educational factors unique to Sweden that drive people toward tech entrepreneurship?"
+  ],
+  "citations": [
+    "https://techcrunch.com/2026/08/28/how-sweden-built-one-of-europes-hottest-startup-ecosystems/"
+  ],
+  "confidence": 85,
+  "risk_flags": [
+    "The source relies heavily on a single interview (Sophia Bendz) for qualitative insights, which may introduce bias. While funding numbers are factual, the characterization of the Swedish entrepreneurial spirit requires broader sampling for full validation."
+  ],
+  "concept_angle": "Frame the paradox of Sweden's high-tax, socialist safety net being the secret fuel for its aggressive capitalist tech founders.",
+  "concept_hook_type": "contradiction",
+  "concept_curiosity_gap": "Why would a system that taxes the rich heavily produce some of the world's most successful billionaires?",
+  "concept_payoff": "The safety net acts as a 'risk subsidy'—it lowers the cost of failure, so Swedes are more willing to bet everything on a crazy idea."
+}

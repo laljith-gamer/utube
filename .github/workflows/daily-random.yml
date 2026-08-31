@@ -65,6 +65,7 @@ jobs:
         run: uv pip install --system -r requirements.txt
       - name: Produce and upload videos
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           F5_REF_AUDIO: assets/voice_ref.wav

@@ -6,6 +6,7 @@ tenacity>=8.2.3
 pydantic>=2.5.0
 
 # LLM clients (OpenAI-compatible works for NIM, Cerebras, Groq, OpenRouter)
+google-genai>=0.1.2
 openai>=1.40.0
 
 # TTS — F5-TTS local inference (zero-shot voice cloning, no API key).

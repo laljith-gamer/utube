@@ -9,7 +9,7 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import narration_archive, themes as themes_mod
+from . import narration_archive, repetition, themes as themes_mod
 from .config import get_config
 from .ledger import Ledger
 from .providers.image import ImageRouter
@@ -95,7 +95,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / f"5_script_v{attempt+1}.json", sc)
 
             # ── Repetition check (deterministic, no LLM call) ──
-            rep_result = script.check_repetition(sc)
+            rep_result = repetition.RepetitionChecker().check(sc, history=narration_archive.load_recent())
             write_json(out / f"5_repetition_v{attempt+1}.json", {
                 "passed": rep_result.passed,
                 "intra_issues": rep_result.intra_issues,

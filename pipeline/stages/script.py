@@ -96,7 +96,7 @@ def _validate_script_structure(script: dict[str, Any]) -> None:
         raise ValueError("Script repetition detected: " + "; ".join(issues))
 
 
-def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, concept: dict | None = None, previous_qc: dict | None = None) -> dict[str, Any]:
+def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, concept: dict | None = None, previous_qc: dict | None = None, previous_repetition: Any | None = None) -> dict[str, Any]:
     cfg = get_config()
     scfg = cfg.get_path("script", {}) or {}
     template = (repo_root() / "prompts" / "script.txt").read_text(encoding="utf-8")
@@ -127,6 +127,10 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     qc_feedback = ""
     if previous_qc and previous_qc.get("feedback"):
         qc_feedback = f"\n\n[PREVIOUS QC FEEDBACK TO FIX]\n{previous_qc['feedback']}\nIssues: {', '.join(previous_qc.get('issues', []))}"
+        
+    rep_feedback = ""
+    if previous_repetition and not previous_repetition.passed:
+        rep_feedback = f"\n\n[REPETITION FEEDBACK TO FIX]\nIssues: {', '.join(previous_repetition.all_issues)}"
 
     prompt = template.format(
         goal=goal_summary(), niche_title=slot.get("title", ""), voice_style=slot.get("voice_style", "neutral"), visual_style=slot.get("style", ""),
@@ -137,7 +141,7 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
         title_max_chars=title_max, ai_disclosure=cfg.get_path("channel.ai_disclosure", "AI-assisted"),
         hashtags_count=hashtags_count, hashtags_count_minus_one=hashtags_count - 1,
     )
-    prompt += strategy_context + qc_feedback
+    prompt += strategy_context + qc_feedback + rep_feedback
 
     def _call(extra_feedback: str = "") -> dict[str, Any]:
         call_prompt = prompt + extra_feedback

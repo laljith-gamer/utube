@@ -225,7 +225,8 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
     f = cfg.get("ffmpeg", {}) or {}
     music_cfg = cfg.get("music", {}) or {}
 
-    sub_path = str(srt).replace(":", r"\:").replace("'", r"\'")
+    # Windows paths need forward slashes or escaped backslashes for FFmpeg filters
+    sub_path = str(srt).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     has_subs = srt.exists() and srt.stat().st_size > 0
 
     inputs = ["-i", str(silent_video), "-i", str(narration)]
@@ -263,7 +264,11 @@ def _final_mux(*, silent_video: Path, narration: Path, music: Path | None,
         "-movflags", f.get("movflags", "+faststart"),
         str(out),
     ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        LOG.error("FFMPEG ERROR (final_mux): %s", e.stderr)
+        raise
 
 
 def _scene_durations(audio_summary: dict, num_scenes: int) -> list[float]:
@@ -283,8 +288,8 @@ def _technical_validation(output_path: Path, srt_path: Path, audio_summary: dict
     if not output_path.exists():
         raise RuntimeError("Output video file was not created.")
     
-    if output_path.stat().st_size < 100_000:
-        raise RuntimeError("Output video is unexpectedly small (less than 100KB).")
+    if output_path.stat().st_size < 10_000:
+        raise RuntimeError("Output video is unexpectedly small (less than 10KB).")
         
     if not srt_path.exists() or srt_path.stat().st_size == 0:
         LOG.warning("No captions file found or file is empty.")

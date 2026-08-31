@@ -1,0 +1,1205 @@
+[
+  {
+    "title": "GUIs should be fully keyboard-driven",
+    "url": "https://ckardaris.com/blog/2026/08/28/keyboard-driven-guis.html",
+    "score": 697,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 337,
+    "raw_score": 697,
+    "normalized_hotness": 100,
+    "content_hash": "guis-should-be-fully-keyboard-driven-e6cbd89c",
+    "keywords": [
+      "guis",
+      "fully",
+      "keyboard",
+      "driven"
+    ]
+  },
+  {
+    "title": "GLM-5.3 is now open-weight",
+    "url": "https://huggingface.co/zai-org/GLM-5.3",
+    "score": 638,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 218,
+    "raw_score": 638,
+    "normalized_hotness": 91,
+    "content_hash": "glm-5-3-is-now-open-weight-a3d01719",
+    "keywords": [
+      "glm",
+      "open",
+      "weight"
+    ]
+  },
+  {
+    "title": "Htmx 4.0",
+    "url": "https://four.htmx.org/announcements/2026-08-28-htmx-4.0.0-is-released",
+    "score": 586,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 144,
+    "raw_score": 586,
+    "normalized_hotness": 84,
+    "content_hash": "htmx-4-0-8c268c69",
+    "keywords": [
+      "htmx"
+    ]
+  },
+  {
+    "title": "U.S. sanctions against the A/I Collective",
+    "url": "https://www.inventati.org/",
+    "score": 540,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 520,
+    "raw_score": 540,
+    "normalized_hotness": 77,
+    "content_hash": "u-s-sanctions-against-the-a-i-collective-35c83760",
+    "keywords": [
+      "sanctions",
+      "against",
+      "collective"
+    ]
+  },
+  {
+    "title": "Inception-style curved map for turn-by-turn directions",
+    "url": "https://www.orbify.eu/demo/",
+    "score": 460,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 149,
+    "raw_score": 460,
+    "normalized_hotness": 65,
+    "content_hash": "inception-style-curved-map-for-turn-by-t-49d2607f",
+    "keywords": [
+      "inception",
+      "style",
+      "curved",
+      "map",
+      "turn",
+      "turn",
+      "directions"
+    ]
+  },
+  {
+    "title": "Our decision on Cursor following its acquisition by SpaceX",
+    "url": "https://openai.com/index/our-decision-on-cursor-following-its-acquisition-by-spacex/",
+    "score": 288,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 107,
+    "raw_score": 288,
+    "normalized_hotness": 41,
+    "content_hash": "our-decision-on-cursor-following-its-acq-436b6f38",
+    "keywords": [
+      "our",
+      "decision",
+      "cursor",
+      "following",
+      "acquisition",
+      "spacex"
+    ]
+  },
+  {
+    "title": "Just the rumour of a bug is enough to find an exploit these days",
+    "url": "https://anil.recoil.org/notes/rumour-is-the-exploit",
+    "score": 283,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 102,
+    "raw_score": 283,
+    "normalized_hotness": 40,
+    "content_hash": "just-the-rumour-of-a-bug-is-enough-to-fi-fa47a2c9",
+    "keywords": [
+      "rumour",
+      "bug",
+      "enough",
+      "find",
+      "exploit",
+      "days"
+    ]
+  },
+  {
+    "title": "The Twelve-Factor App (2025)",
+    "url": "https://12factor.net/",
+    "score": 249,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 131,
+    "raw_score": 249,
+    "normalized_hotness": 35,
+    "content_hash": "the-twelve-factor-app-2025-634488b5",
+    "keywords": [
+      "twelve",
+      "factor",
+      "app"
+    ]
+  },
+  {
+    "title": "Migrating to HTTPX2",
+    "url": "https://github.com/openai/openai-python/blob/main/httpx2.md",
+    "score": 190,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 81,
+    "raw_score": 190,
+    "normalized_hotness": 27,
+    "content_hash": "migrating-to-httpx2-704783fd",
+    "keywords": [
+      "migrating",
+      "httpx"
+    ]
+  },
+  {
+    "title": "Boot a Virtual iPhone via Apple's Virtualization.framework",
+    "url": "https://github.com/Lakr233/vphone-cli",
+    "score": 190,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 63,
+    "raw_score": 190,
+    "normalized_hotness": 27,
+    "content_hash": "boot-a-virtual-iphone-via-apple-s-virtua-1ce7322d",
+    "keywords": [
+      "boot",
+      "virtual",
+      "iphone",
+      "via",
+      "apple",
+      "virtualization",
+      "framework"
+    ]
+  },
+  {
+    "title": "Verschlimmbesserung: The Word Your Software Updates Need",
+    "url": "https://geekyschmidt.com/post/2026-08-25-verschlimmbesserung/",
+    "score": 120,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 73,
+    "raw_score": 120,
+    "normalized_hotness": 17,
+    "content_hash": "verschlimmbesserung-the-word-your-softwa-1b747b22",
+    "keywords": [
+      "verschlimmbesserung",
+      "word",
+      "your",
+      "software",
+      "updates",
+      "need"
+    ]
+  },
+  {
+    "title": "EasyEffects can improve laptop speaker sound quality",
+    "url": "https://www.osnews.com/story/145883/easyeffects-should-be-part-of-every-linux-distribution-and-desktop-environment-to-massively-improve-laptop-speaker-sound-quality/",
+    "score": 119,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 50,
+    "raw_score": 119,
+    "normalized_hotness": 17,
+    "content_hash": "easyeffects-can-improve-laptop-speaker-s-851d031b",
+    "keywords": [
+      "easyeffects",
+      "improve",
+      "laptop",
+      "speaker",
+      "sound",
+      "quality"
+    ]
+  },
+  {
+    "title": "9th Circuit sides with states in Kalshi gambling fight",
+    "url": "https://azmirror.com/2026/08/28/9th-circuit-sides-with-states-in-kalshi-gambling-fight-potentially-reviving-arizonas-prosecution/",
+    "score": 104,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 79,
+    "raw_score": 104,
+    "normalized_hotness": 14,
+    "content_hash": "9th-circuit-sides-with-states-in-kalshi--0382e90a",
+    "keywords": [
+      "circuit",
+      "sides",
+      "states",
+      "kalshi",
+      "gambling",
+      "fight"
+    ]
+  },
+  {
+    "title": "Curvature Beziers: Improving on a timeless recipe",
+    "url": "https://acko.net/blog/curvature-beziers/",
+    "score": 100,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 11,
+    "raw_score": 100,
+    "normalized_hotness": 14,
+    "content_hash": "curvature-beziers-improving-on-a-timeles-1e1d5e8e",
+    "keywords": [
+      "curvature",
+      "beziers",
+      "improving",
+      "timeless",
+      "recipe"
+    ]
+  },
+  {
+    "title": "Autonomous Mathematical Discovery in an Open-World Multi-Agent Environment",
+    "url": "https://arxiv.org/abs/2608.23691",
+    "score": 93,
+    "summary": "",
+    "source": "hackernews",
+    "num_comments": 23,
+    "raw_score": 93,
+    "normalized_hotness": 13,
+    "content_hash": "autonomous-mathematical-discovery-in-an--90303c98",
+    "keywords": [
+      "autonomous",
+      "mathematical",
+      "discovery",
+      "open",
+      "world",
+      "multi",
+      "agent",
+      "environment"
+    ]
+  },
+  {
+    "title": "Chinese automakers are following Tesla’s bet that robots are the next big profit machine",
+    "url": "https://techcrunch.com/2026/08/28/chinese-automakers-are-following-teslas-bet-that-robots-are-the-next-big-profit-machine/",
+    "score": 96,
+    "summary": "Technical progress has encouraged a new batch of companies to jump in on the promise of profits from humanoid robots. And they're all Chinese automakers.",
+    "source": "rss:TechCrunch",
+    "raw_score": 96,
+    "normalized_hotness": 100,
+    "content_hash": "chinese-automakers-are-following-tesla-s-cb0632c1",
+    "keywords": [
+      "chinese",
+      "automakers",
+      "following",
+      "tesla",
+      "bet",
+      "robots",
+      "next",
+      "big",
+      "profit",
+      "machine"
+    ]
+  },
+  {
+    "title": "Is the best way to watch a movie on a pair of sunglasses?",
+    "url": "https://techcrunch.com/2026/08/28/is-the-best-way-to-watch-a-movie-on-a-pair-of-sunglasses/",
+    "score": 95,
+    "summary": "Are XREAL's smart glasses the way of the future for home entertainment?",
+    "source": "rss:TechCrunch",
+    "raw_score": 95,
+    "normalized_hotness": 98,
+    "content_hash": "is-the-best-way-to-watch-a-movie-on-a-pa-67b4296c",
+    "keywords": [
+      "best",
+      "way",
+      "watch",
+      "movie",
+      "pair",
+      "sunglasses"
+    ]
+  },
+  {
+    "title": "Neocloud Lambda secures $1B in debt to buy more chips",
+    "url": "https://techcrunch.com/2026/08/28/neocloud-lambda-secures-1b-in-debt-to-buy-more-chips/",
+    "score": 94,
+    "summary": "Neocloud Lambda has raised $1B in private debt to buy Nvidia AI chips and lease them to Microsoft. It's the latest in a string of loans, underscoring the high cost of the AI boom.",
+    "source": "rss:TechCrunch",
+    "raw_score": 94,
+    "normalized_hotness": 97,
+    "content_hash": "neocloud-lambda-secures-1b-in-debt-to-bu-986b21d9",
+    "keywords": [
+      "neocloud",
+      "lambda",
+      "secures",
+      "debt",
+      "buy",
+      "chips"
+    ]
+  },
+  {
+    "title": "An Anthropic researcher just gave us a peek at self-improving AI",
+    "url": "https://techcrunch.com/2026/08/28/an-anthropic-researcher-just-gave-us-a-peek-at-self-improving-ai/",
+    "score": 93,
+    "summary": "Given 10 benchmarks for specific misaligned behaviors, the automated systems were able to improve performance on every single one without degrading overall performance.",
+    "source": "rss:TechCrunch",
+    "raw_score": 93,
+    "normalized_hotness": 96,
+    "content_hash": "an-anthropic-researcher-just-gave-us-a-p-38396f36",
+    "keywords": [
+      "anthropic",
+      "researcher",
+      "gave",
+      "peek",
+      "self",
+      "improving"
+    ]
+  },
+  {
+    "title": "Brave’s browser one-ups Chrome with its new support for email aliases",
+    "url": "https://techcrunch.com/2026/08/28/braves-browser-one-ups-chrome-with-its-new-support-for-email-aliases/",
+    "score": 93,
+    "summary": "The feature, announced this week, allows Brave's users to sign up for websites and other online services without having to share their personal email addresses.",
+    "source": "rss:TechCrunch",
+    "raw_score": 93,
+    "normalized_hotness": 96,
+    "content_hash": "brave-s-browser-one-ups-chrome-with-its--c2dfab30",
+    "keywords": [
+      "brave",
+      "browser",
+      "one",
+      "ups",
+      "chrome",
+      "support",
+      "email",
+      "aliases"
+    ]
+  },
+  {
+    "title": "Open-weight AI companies are the Valley’s hottest acquisition targets",
+    "url": "https://techcrunch.com/2026/08/28/open-weight-ai-companies-are-the-valleys-hottest-acquisition-targets/",
+    "score": 93,
+    "summary": "There's a lot of capital pouring into the business of giving models away.",
+    "source": "rss:TechCrunch",
+    "raw_score": 93,
+    "normalized_hotness": 96,
+    "content_hash": "open-weight-ai-companies-are-the-valley--9f922949",
+    "keywords": [
+      "open",
+      "weight",
+      "companies",
+      "valley",
+      "hottest",
+      "acquisition",
+      "targets"
+    ]
+  },
+  {
+    "title": "How Sweden built one of Europe’s hottest startup ecosystems",
+    "url": "https://techcrunch.com/2026/08/28/how-sweden-built-one-of-europes-hottest-startup-ecosystems/",
+    "score": 92,
+    "summary": "Sophia Bendz, general partner at Cherry Ventures, stopped by Equity to break down the latest in the Swedish tech ecosystem.",
+    "source": "rss:TechCrunch",
+    "raw_score": 92,
+    "normalized_hotness": 95,
+    "content_hash": "how-sweden-built-one-of-europe-s-hottest-39086b49",
+    "keywords": [
+      "sweden",
+      "built",
+      "one",
+      "europe",
+      "hottest",
+      "startup",
+      "ecosystems"
+    ]
+  },
+  {
+    "title": "More Americans oppose police license plate cameras than support them: survey",
+    "url": "https://techcrunch.com/2026/08/28/more-americans-oppose-police-license-plate-cameras-than-support-them-survey/",
+    "score": 91,
+    "summary": "The backlash against license plate readers comes amid a wave of police abuses of surveillance cameras.",
+    "source": "rss:TechCrunch",
+    "raw_score": 91,
+    "normalized_hotness": 94,
+    "content_hash": "more-americans-oppose-police-license-pla-9b1a2fb6",
+    "keywords": [
+      "americans",
+      "oppose",
+      "police",
+      "license",
+      "plate",
+      "cameras",
+      "support",
+      "them",
+      "survey"
+    ]
+  },
+  {
+    "title": "Google further buries search results under AI mode",
+    "url": "https://www.theverge.com/tech/986364/google-search-ai-overviews-auto-expand",
+    "score": 95,
+    "summary": "Google is now automatically expanding its AI search summaries at the top of the results page for some searches, as reported by Search Engine Roundtable. The change, when it kicks in, pushes the typical list of links from a search much farther down Google's results page; instead of seeing part of an AI Overview with [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "google-further-buries-search-results-und-fea34feb",
+    "keywords": [
+      "google",
+      "further",
+      "buries",
+      "search",
+      "results",
+      "under",
+      "mode"
+    ]
+  },
+  {
+    "title": "Xbox CEO calls Project Helix a ‘family of devices’",
+    "url": "https://www.theverge.com/games/986337/xbox-ceo-asha-sharma-project-helix-family-of-devices",
+    "score": 95,
+    "summary": "According to Xbox CEO Asha Sharma, Project Helix, which she announced in March as a codename for Microsoft's \"next generation console\" - phrasing that seemingly implied a singular device - will actually be a \"family\" of devices.\" \"We've been hard at work on a great next generation and a great family of devices for Helix, [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "xbox-ceo-calls-project-helix-a-family-of-1a0caf03",
+    "keywords": [
+      "xbox",
+      "ceo",
+      "calls",
+      "project",
+      "helix",
+      "family",
+      "devices"
+    ]
+  },
+  {
+    "title": "Save hundreds on a TCL mini-LED TV with quantum dots and high refresh rate",
+    "url": "https://www.theverge.com/gadgets/985741/tcl-qm7l-belkin-thunderbolt-dock-deal-sale",
+    "score": 92,
+    "summary": "Amazon and Best Buy have the TCL QM7L mini-LED TV on sale for as low as $797.99 for the 55-inch model, a $200 discount from the usual price. We spotted scaling discounts on larger sizes as well, although Amazon already listed low stock on the 65-inch version. While OLED televisions are great for deep black [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "save-hundreds-on-a-tcl-mini-led-tv-with--94710c60",
+    "keywords": [
+      "save",
+      "hundreds",
+      "tcl",
+      "mini",
+      "led",
+      "quantum",
+      "dots",
+      "high",
+      "refresh",
+      "rate"
+    ]
+  },
+  {
+    "title": "Trump’s EPA wants to let data centers hide their air pollution",
+    "url": "https://www.theverge.com/ai-artificial-intelligence/986176/data-center-pollution-epa-rule-change-air-permit",
+    "score": 92,
+    "summary": "Just as new data centers face growing backlash from neighboring communities, the US Environmental Protection Agency (EPA) is about to make it harder for people to weigh in on any pollution those centers create. The EPA plans to toss out a federal rule requiring public notice and an opportunity to comment when certain industrial sites [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "trump-s-epa-wants-to-let-data-centers-hi-2d15a15c",
+    "keywords": [
+      "trump",
+      "epa",
+      "wants",
+      "let",
+      "data",
+      "centers",
+      "hide",
+      "their",
+      "air",
+      "pollution"
+    ]
+  },
+  {
+    "title": "DLSS 5 leaked and modders are putting Nvidia&#8217;s AI effects on everything",
+    "url": "https://www.theverge.com/games/986197/nvidia-dlss-5-leak-ai",
+    "score": 92,
+    "summary": "Modders are trying out an unofficial version of Nvidia's DLSS 5 on Skyrim, Cyberpunk 2077, GTA V, and a bunch of other games after code for the AI upscaling tech appeared in an early-access build of NBA 2K27. Members of the RenoDX modding channel on Discord reportedly found a way to extract the DLSS \"Neural [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "dlss-5-leaked-and-modders-are-putting-nv-da681aac",
+    "keywords": [
+      "dlss",
+      "leaked",
+      "modders",
+      "putting",
+      "nvidia",
+      "effects",
+      "everything"
+    ]
+  },
+  {
+    "title": "The iPhone Fold could make concerts even worse",
+    "url": "https://www.theverge.com/podcast/986145/m6-mac-mini-meta-settlement-gta-6-vergecast",
+    "score": 91,
+    "summary": "You know the person blocking your view of the concert because their phone is swaying in the air, recording the entire thing? Get ready for the unfolded version of it. This week on The Vergecast, we dive right into the big week of Apple news. First, it's the refreshed Mac Mini and Mac Studio, as [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 91,
+    "normalized_hotness": 95,
+    "content_hash": "the-iphone-fold-could-make-concerts-even-8f709f13",
+    "keywords": [
+      "iphone",
+      "fold",
+      "make",
+      "concerts",
+      "even",
+      "worse"
+    ]
+  },
+  {
+    "title": "Apple TV now costs $14.99 a month after its fourth price hike in four years",
+    "url": "https://www.theverge.com/tech/986130/apple-tv-plus-price-hike",
+    "score": 90,
+    "summary": "Apple raised the price of its streaming service for new and current subscribers on Friday, bumping it up from $12.99 per month to $14.99, Deadline and Variety are reporting. An annual subscription now costs $119, up from $99. Apple also increased the cost of its individual Apple One subscription, which includes Apple TV and Apple's [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 90,
+    "normalized_hotness": 94,
+    "content_hash": "apple-tv-now-costs-14-99-a-month-after-i-045748ef",
+    "keywords": [
+      "apple",
+      "costs",
+      "month",
+      "fourth",
+      "price",
+      "hike",
+      "four",
+      "years"
+    ]
+  },
+  {
+    "title": "Apple TV’s sci-fi thriller Dark Matter gets even trippier in season 2",
+    "url": "https://www.theverge.com/entertainment/983263/dark-matter-season-2-review-apple-tv",
+    "score": 89,
+    "summary": "Confusion is a generally accepted side effect of mystery box shows. They slather on secrets with the promise of a satisfying payoff in the end, and sometimes the cast and crew even have a hard time following what's going on. But even by the standards of the genre, Dark Matter is extreme. Its multiversal premise, [&#8230;]",
+    "source": "rss:The Verge",
+    "raw_score": 89,
+    "normalized_hotness": 93,
+    "content_hash": "apple-tv-s-sci-fi-thriller-dark-matter-g-f03fd01d",
+    "keywords": [
+      "apple",
+      "sci",
+      "thriller",
+      "dark",
+      "matter",
+      "gets",
+      "even",
+      "trippier",
+      "season"
+    ]
+  },
+  {
+    "title": "Berlin Refuses to Pay Hackers Who Stole Data From the City's State Network",
+    "url": "https://thehackernews.com/2026/08/berlin-refuses-to-pay-hackers-who-stole.html",
+    "score": 95,
+    "summary": "Berlin's state government has confirmed that it is the target of an extortion attempt following the August compromise of the city's state administrative network, and said it will not meet the extortionists' demands.\n\nThe same statement disclosed that forensic work had found further data outflows in the portfolio of the Senate Department for Mobility, Transport, Climate Protection and Environment",
+    "source": "rss:The Hacker News",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "berlin-refuses-to-pay-hackers-who-stole--0b4dec75",
+    "keywords": [
+      "berlin",
+      "refuses",
+      "pay",
+      "hackers",
+      "stole",
+      "data",
+      "city",
+      "state",
+      "network"
+    ]
+  },
+  {
+    "title": "Cosmos EVM Flaw Exploited After Cosmos Labs Knew Every Blockchain Running It Was Vulnerable",
+    "url": "https://thehackernews.com/2026/08/cosmos-evm-flaw-exploited-after-cosmos.html",
+    "score": 94,
+    "summary": "Cosmos Labs has warned that a critical balance-handling flaw in the shared Cosmos EVM module was exploited to drain funds from six blockchains between August 20 and August 25, 2026.\n\nThe vulnerability, designated GHSA-7g4w-cg88-2cq2, is rated Critical by Cosmos Labs and was published without a CVE identifier, a weakness classification, or a CVSS score.\n\nAffected versions are &lt; 0.6.2 and &gt;=",
+    "source": "rss:The Hacker News",
+    "raw_score": 94,
+    "normalized_hotness": 98,
+    "content_hash": "cosmos-evm-flaw-exploited-after-cosmos-l-fa9f6deb",
+    "keywords": [
+      "cosmos",
+      "evm",
+      "flaw",
+      "exploited",
+      "cosmos",
+      "labs",
+      "knew",
+      "blockchain",
+      "running",
+      "vulnerable"
+    ]
+  },
+  {
+    "title": "Attackers Chain Two PaperCut Flaws to Execute Code Without Authentication",
+    "url": "https://thehackernews.com/2026/08/attackers-chain-two-papercut-flaws-to.html",
+    "score": 92,
+    "summary": "Malicious actors are exploiting a newly patched security flaw in PaperCut NG and MF to execute arbitrary code on susceptible instances, as the company released a fresh emergency fix with additional hardening.\n\n\"This vulnerability gives an unauthenticated attacker remote control over PaperCut's trusted configuration, which could be used to execute arbitrary Java code inside the application's",
+    "source": "rss:The Hacker News",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "attackers-chain-two-papercut-flaws-to-ex-c02ed220",
+    "keywords": [
+      "attackers",
+      "chain",
+      "two",
+      "papercut",
+      "flaws",
+      "execute",
+      "code",
+      "without",
+      "authentication"
+    ]
+  },
+  {
+    "title": "Android 17 Adds OS-Wide ECH to Hide Website Visits From Network Providers",
+    "url": "https://thehackernews.com/2026/08/android-17-adds-os-wide-ech-to-hide.html",
+    "score": 92,
+    "summary": "Google on Thursday announced new network security protections in Android 17 to bolster connection privacy, address cellular vulnerabilities, and safeguard the privacy of users' home networks.\n\nTopping the list is support for Encrypted Client Hello (ECH), a privacy standard that prevents networks from eavesdropping on which websites a user is visiting.\n\n\"This new privacy standard works in tandem",
+    "source": "rss:The Hacker News",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "android-17-adds-os-wide-ech-to-hide-webs-1d912714",
+    "keywords": [
+      "android",
+      "adds",
+      "wide",
+      "ech",
+      "hide",
+      "website",
+      "visits",
+      "network",
+      "providers"
+    ]
+  },
+  {
+    "title": "ownCloud Flaw Exploited to Steal Nuclear Records From Philippine Research Body",
+    "url": "https://thehackernews.com/2026/08/snowflake-github-actions-flaw-lets.html",
+    "score": 91,
+    "summary": "The U.S. Cybersecurity and Infrastructure Security Agency (CISA) on Thursday added a critical security flaw impacting ownCloud to its Known Exploited Vulnerabilities (KEV) catalog following reports that a Chinese-speaking threat actor weaponized the vulnerability to target a nuclear research body in the Philippines.\n\nThe vulnerability, tracked as CVE-2023-49105 (CVSS score: 9.8), is a case of",
+    "source": "rss:The Hacker News",
+    "raw_score": 91,
+    "normalized_hotness": 95,
+    "content_hash": "owncloud-flaw-exploited-to-steal-nuclear-b32e034d",
+    "keywords": [
+      "owncloud",
+      "flaw",
+      "exploited",
+      "steal",
+      "nuclear",
+      "records",
+      "philippine",
+      "research",
+      "body"
+    ]
+  },
+  {
+    "title": "19 Chrome and Edge Extensions Found With Wallet-Stealing and Crypto-Draining Code",
+    "url": "https://thehackernews.com/2026/08/19-chrome-and-edge-extensions-found.html",
+    "score": 91,
+    "summary": "Cybersecurity researchers have discovered a cluster of 18 Google Chrome and one Microsoft Edge extensions that were published over the last six months and harbored wallet secret stealing and cryptocurrency draining capabilities.\n\n\nThe extensions, per Socket security researcher Karlo Zanki, share similarities in code and tradecraft, with evidence indicating that the campaign may have been active",
+    "source": "rss:The Hacker News",
+    "raw_score": 91,
+    "normalized_hotness": 95,
+    "content_hash": "19-chrome-and-edge-extensions-found-with-a54cbcba",
+    "keywords": [
+      "chrome",
+      "edge",
+      "extensions",
+      "found",
+      "wallet",
+      "stealing",
+      "crypto",
+      "draining",
+      "code"
+    ]
+  },
+  {
+    "title": "Two Unitree G1 EDU Humanoid Robot Flaws Enable Root RCE, One Starts Over Bluetooth",
+    "url": "https://thehackernews.com/2026/08/two-unitree-g1-edu-humanoid-robot-flaws.html",
+    "score": 89,
+    "summary": "Security researcher Olivier Laflamme has disclosed two independent root remote code execution (RCE) chains affecting the Unitree G1 EDU, including a Bluetooth Low Energy (BLE) path that can reach root on the robot's Locomotion PC.\n\nThe flaws are tracked as&nbsp;CVE-2026-76639&nbsp;and&nbsp;CVE-2026-76640, with the first involving a network-adjacent path through chat_go and bashrunner and the",
+    "source": "rss:The Hacker News",
+    "raw_score": 89,
+    "normalized_hotness": 93,
+    "content_hash": "two-unitree-g1-edu-humanoid-robot-flaws--53a4b4c7",
+    "keywords": [
+      "two",
+      "unitree",
+      "edu",
+      "humanoid",
+      "robot",
+      "flaws",
+      "enable",
+      "root",
+      "rce",
+      "one",
+      "starts",
+      "bluetooth"
+    ]
+  },
+  {
+    "title": "Key Reasons Why Identity Fabric Matters in 2026",
+    "url": "https://thehackernews.com/2026/08/key-reasons-why-identity-fabric-matters.html",
+    "score": 89,
+    "summary": "An Identity Fabric knits fragmented identity systems into a coherent layer that observes how identities behave across applications, APIs, and infrastructure. As enterprise access spans more cloud services and automated workloads, identity security depends less on static configuration and more on runtime visibility. This article covers the architecture, the risks of unmanaged identities, and",
+    "source": "rss:The Hacker News",
+    "raw_score": 89,
+    "normalized_hotness": 93,
+    "content_hash": "key-reasons-why-identity-fabric-matters--3338150b",
+    "keywords": [
+      "key",
+      "reasons",
+      "identity",
+      "fabric",
+      "matters"
+    ]
+  },
+  {
+    "title": "Court rules Kalshi sports bets aren't \"swaps,\" just gambling with a different name",
+    "url": "https://arstechnica.com/tech-policy/2026/08/kalshi-cant-evade-nevada-gambling-laws-by-calling-bets-swaps-court-rules/",
+    "score": 95,
+    "summary": "Kalshi can't evade Nevada gambling laws by calling bets \"swaps,\" judges rule.",
+    "source": "rss:Ars Technica",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "court-rules-kalshi-sports-bets-aren-t-sw-732b188f",
+    "keywords": [
+      "court",
+      "rules",
+      "kalshi",
+      "sports",
+      "bets",
+      "aren",
+      "swaps",
+      "gambling",
+      "different",
+      "name"
+    ]
+  },
+  {
+    "title": "Cities terminate Flock contracts at record pace in August",
+    "url": "https://arstechnica.com/tech-policy/2026/08/cities-terminate-flock-contracts-at-record-pace-in-august/",
+    "score": 95,
+    "summary": "Cancellations have accelerated.",
+    "source": "rss:Ars Technica",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "cities-terminate-flock-contracts-at-reco-dbb440fa",
+    "keywords": [
+      "cities",
+      "terminate",
+      "flock",
+      "contracts",
+      "record",
+      "pace",
+      "august"
+    ]
+  },
+  {
+    "title": "\"RFK Jr. has lied to the Senate\": Lawmakers call for criminal probe, ouster",
+    "url": "https://arstechnica.com/health/2026/08/rfk-jr-has-lied-to-the-senate-lawmakers-call-for-criminal-probe-ouster/",
+    "score": 95,
+    "summary": "RFK Jr. went to Samoa to spread vaccine fears. The measles outbreak after killed 83.",
+    "source": "rss:Ars Technica",
+    "raw_score": 95,
+    "normalized_hotness": 100,
+    "content_hash": "rfk-jr-has-lied-to-the-senate-lawmakers--bf969b9f",
+    "keywords": [
+      "rfk",
+      "lied",
+      "senate",
+      "lawmakers",
+      "call",
+      "criminal",
+      "probe",
+      "ouster"
+    ]
+  },
+  {
+    "title": "Trump blacklisting of \"woke\" Anthropic deemed illegal by federal judge",
+    "url": "https://arstechnica.com/tech-policy/2026/08/trump-blacklisting-of-woke-anthropic-deemed-illegal-by-federal-judge/",
+    "score": 93,
+    "summary": "Anthropic refused to support lethal autonomous warfare and mass surveillance.",
+    "source": "rss:Ars Technica",
+    "raw_score": 93,
+    "normalized_hotness": 97,
+    "content_hash": "trump-blacklisting-of-woke-anthropic-dee-6ae34fca",
+    "keywords": [
+      "trump",
+      "blacklisting",
+      "woke",
+      "anthropic",
+      "deemed",
+      "illegal",
+      "federal",
+      "judge"
+    ]
+  },
+  {
+    "title": "Here's what we know about the \"space academy\" Trump just announced",
+    "url": "https://arstechnica.com/space/2026/08/trump-calls-for-creation-of-a-space-academy-to-train-future-nasa-leaders/",
+    "score": 92,
+    "summary": "\"It's called the US Space Academy. That's a big deal.\"",
+    "source": "rss:Ars Technica",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "here-s-what-we-know-about-the-space-acad-04f42130",
+    "keywords": [
+      "here",
+      "know",
+      "space",
+      "academy",
+      "trump",
+      "announced"
+    ]
+  },
+  {
+    "title": "Apple One and Apple TV subscription prices increase by up to 20 percent",
+    "url": "https://arstechnica.com/gadgets/2026/08/apple-one-and-apple-tv-subscription-prices-increase-by-up-to-20-percent/",
+    "score": 92,
+    "summary": "Annual Apple TV subscriptions get the biggest bump.",
+    "source": "rss:Ars Technica",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "apple-one-and-apple-tv-subscription-pric-a404d487",
+    "keywords": [
+      "apple",
+      "one",
+      "apple",
+      "subscription",
+      "prices",
+      "increase",
+      "percent"
+    ]
+  },
+  {
+    "title": "Our 10 favorite scenes from T2: Judgment Day",
+    "url": "https://arstechnica.com/culture/2026/08/our-10-favorite-scenes-from-t2-judgment-day/",
+    "score": 92,
+    "summary": "James Cameron's 1991 sci-fi blockbuster returns to theaters this weekend for its 35th anniversary.",
+    "source": "rss:Ars Technica",
+    "raw_score": 92,
+    "normalized_hotness": 96,
+    "content_hash": "our-10-favorite-scenes-from-t2-judgment--3a100483",
+    "keywords": [
+      "our",
+      "favorite",
+      "scenes",
+      "judgment",
+      "day"
+    ]
+  },
+  {
+    "title": "Meta makes AI glasses slightly less creepy with limit on nonconsensual recording",
+    "url": "https://arstechnica.com/tech-policy/2026/08/meta-tweaks-ai-glasses-to-block-some-creepy-recordings-but-privacy-risks-remain/",
+    "score": 91,
+    "summary": "Meta fixes AI glasses to stop recording any time users cover up the safety light.",
+    "source": "rss:Ars Technica",
+    "raw_score": 91,
+    "normalized_hotness": 95,
+    "content_hash": "meta-makes-ai-glasses-slightly-less-cree-dcf01b8c",
+    "keywords": [
+      "meta",
+      "makes",
+      "glasses",
+      "slightly",
+      "less",
+      "creepy",
+      "limit",
+      "nonconsensual",
+      "recording"
+    ]
+  },
+  {
+    "title": "On August 29, 2022: Russo-Ukrainian war: Ukraine begins its southern counteroffensive in the Kherson Oblast, eventually culminating in the liberation of the city of Kherson.",
+    "url": "https://en.wikipedia.org/wiki/Russo-Ukrainian_war",
+    "score": 0,
+    "summary": "Russo-Ukrainian war: Ukraine begins its southern counteroffensive in the Kherson Oblast, eventually culminating in the liberation of the city of Kherson.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2022-russo-ukrainian-war-uk-42399da3",
+    "keywords": [
+      "august",
+      "russo",
+      "ukrainian",
+      "war",
+      "ukraine",
+      "begins",
+      "southern",
+      "counteroffensive",
+      "kherson",
+      "oblast",
+      "eventually",
+      "culminating",
+      "liberation",
+      "city",
+      "kherson"
+    ]
+  },
+  {
+    "title": "On August 29, 2020: 2020 Women's FA Community Shield.",
+    "url": "https://en.wikipedia.org/wiki/2020_Women's_FA_Community_Shield",
+    "score": 0,
+    "summary": "2020 Women's FA Community Shield.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2020-2020-women-s-fa-commun-ba848e7c",
+    "keywords": [
+      "august",
+      "women",
+      "community",
+      "shield"
+    ]
+  },
+  {
+    "title": "On August 29, 2012: At least 26 Chinese miners are killed and 21 missing after a blast in the Xiaojiawan coal mine, located at Panzhihua, Sichuan Province.",
+    "url": "https://en.wikipedia.org/wiki/Xiaojiawan_coal_mine_disaster",
+    "score": 0,
+    "summary": "At least 26 Chinese miners are killed and 21 missing after a blast in the Xiaojiawan coal mine, located at Panzhihua, Sichuan Province.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2012-at-least-26-chinese-mi-d5435a19",
+    "keywords": [
+      "august",
+      "least",
+      "chinese",
+      "miners",
+      "killed",
+      "missing",
+      "blast",
+      "xiaojiawan",
+      "coal",
+      "mine",
+      "located",
+      "panzhihua",
+      "sichuan",
+      "province"
+    ]
+  },
+  {
+    "title": "On August 29, 2012: The XIV Paralympic Games open in London, England, United Kingdom.",
+    "url": "https://en.wikipedia.org/wiki/2012_Summer_Paralympics",
+    "score": 0,
+    "summary": "The XIV Paralympic Games open in London, England, United Kingdom.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2012-the-xiv-paralympic-gam-462237ca",
+    "keywords": [
+      "august",
+      "xiv",
+      "paralympic",
+      "games",
+      "open",
+      "london",
+      "england",
+      "united",
+      "kingdom"
+    ]
+  },
+  {
+    "title": "On August 29, 2005: Hurricane Katrina devastates much of the U.S. Gulf Coast from Louisiana to the Florida Panhandle, killing up to 1,392 people and causing $125 billion in damage.",
+    "url": "https://en.wikipedia.org/wiki/Hurricane_Katrina",
+    "score": 0,
+    "summary": "Hurricane Katrina devastates much of the U.S. Gulf Coast from Louisiana to the Florida Panhandle, killing up to 1,392 people and causing $125 billion in damage.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2005-hurricane-katrina-deva-5e599767",
+    "keywords": [
+      "august",
+      "hurricane",
+      "katrina",
+      "devastates",
+      "much",
+      "gulf",
+      "coast",
+      "louisiana",
+      "florida",
+      "panhandle",
+      "killing",
+      "people",
+      "causing",
+      "billion",
+      "damage"
+    ]
+  },
+  {
+    "title": "On August 29, 2003: Sayed Ayatollah Mohammed Baqir al-Hakim, the Shia Muslim leader in Iraq, is assassinated in a terrorist bombing, along with nearly 100 worshippers as they leave a mosque in Najaf.",
+    "url": "https://en.wikipedia.org/wiki/Sayyid",
+    "score": 0,
+    "summary": "Sayed Ayatollah Mohammed Baqir al-Hakim, the Shia Muslim leader in Iraq, is assassinated in a terrorist bombing, along with nearly 100 worshippers as they leave a mosque in Najaf.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2003-sayed-ayatollah-mohamm-9e143428",
+    "keywords": [
+      "august",
+      "sayed",
+      "ayatollah",
+      "mohammed",
+      "baqir",
+      "hakim",
+      "shia",
+      "muslim",
+      "leader",
+      "iraq",
+      "assassinated",
+      "terrorist",
+      "bombing",
+      "along",
+      "nearly",
+      "worshippers",
+      "they",
+      "leave",
+      "mosque",
+      "najaf"
+    ]
+  },
+  {
+    "title": "On August 29, 2001: Four people are killed when Binter Mediterráneo Flight 8261 crashes into the N-340 highway near Málaga Airport.",
+    "url": "https://en.wikipedia.org/wiki/Binter_Mediterr%C3%A1neo_Flight_8261",
+    "score": 0,
+    "summary": "Four people are killed when Binter Mediterráneo Flight 8261 crashes into the N-340 highway near Málaga Airport.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-2001-four-people-are-killed-d0771554",
+    "keywords": [
+      "august",
+      "four",
+      "people",
+      "killed",
+      "binter",
+      "mediterr",
+      "neo",
+      "flight",
+      "crashes",
+      "highway",
+      "near",
+      "laga",
+      "airport"
+    ]
+  },
+  {
+    "title": "On August 29, 1998: Eighty people are killed when Cubana de Aviación Flight 389 crashes during a rejected takeoff from the Old Mariscal Sucre International Airport in Quito, Ecuador.",
+    "url": "https://en.wikipedia.org/wiki/Cubana_de_Aviaci%C3%B3n_Flight_389",
+    "score": 0,
+    "summary": "Eighty people are killed when Cubana de Aviación Flight 389 crashes during a rejected takeoff from the Old Mariscal Sucre International Airport in Quito, Ecuador.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-1998-eighty-people-are-kill-fdc5e152",
+    "keywords": [
+      "august",
+      "eighty",
+      "people",
+      "killed",
+      "cubana",
+      "aviaci",
+      "flight",
+      "crashes",
+      "rejected",
+      "takeoff",
+      "old",
+      "mariscal",
+      "sucre",
+      "international",
+      "airport",
+      "quito",
+      "ecuador"
+    ]
+  },
+  {
+    "title": "On August 29, 1997: Netflix is launched as an internet DVD rental service.",
+    "url": "https://en.wikipedia.org/wiki/Netflix",
+    "score": 0,
+    "summary": "Netflix is launched as an internet DVD rental service.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-1997-netflix-is-launched-as-ec44e893",
+    "keywords": [
+      "august",
+      "netflix",
+      "launched",
+      "internet",
+      "dvd",
+      "rental",
+      "service"
+    ]
+  },
+  {
+    "title": "On August 29, 1997: At least 98 villagers are killed by the Armed Islamic Group of Algeria GIA in the Rais massacre, Algeria.",
+    "url": "https://en.wikipedia.org/wiki/Armed_Islamic_Group_of_Algeria",
+    "score": 0,
+    "summary": "At least 98 villagers are killed by the Armed Islamic Group of Algeria GIA in the Rais massacre, Algeria.",
+    "source": "wikipedia_otd",
+    "raw_score": 0,
+    "normalized_hotness": 50,
+    "content_hash": "on-august-29-1997-at-least-98-villagers--4ade06c8",
+    "keywords": [
+      "august",
+      "least",
+      "villagers",
+      "killed",
+      "armed",
+      "islamic",
+      "group",
+      "algeria",
+      "gia",
+      "rais",
+      "massacre",
+      "algeria"
+    ]
+  },
+  {
+    "title": "The bizarre accident that created fiber optics",
+    "url": "",
+    "source": "theme_seed",
+    "summary": "The bizarre accident that created fiber optics",
+    "source_score": 1.0,
+    "freshness_score": 1.0,
+    "source_quality_score": 1.0,
+    "keywords": []
+  },
+  {
+    "title": "The dark history behind the QWERTY keyboard",
+    "url": "",
+    "source": "theme_seed",
+    "summary": "The dark history behind the QWERTY keyboard",
+    "source_score": 1.0,
+    "freshness_score": 1.0,
+    "source_quality_score": 1.0,
+    "keywords": []
+  },
+  {
+    "title": "Why you should never use public USB chargers",
+    "url": "",
+    "source": "theme_seed",
+    "summary": "Why you should never use public USB chargers",
+    "source_score": 1.0,
+    "freshness_score": 1.0,
+    "source_quality_score": 1.0,
+    "keywords": []
+  },
+  {
+    "title": "What nobody tells you about Bluetooth",
+    "url": "",
+    "source": "theme_seed",
+    "summary": "What nobody tells you about Bluetooth",
+    "source_score": 1.0,
+    "freshness_score": 1.0,
+    "source_quality_score": 1.0,
+    "keywords": []
+  },
+  {
+    "title": "Why USB drives have that logo",
+    "url": "",
+    "source": "theme_seed",
+    "summary": "Why USB drives have that logo",
+    "source_score": 1.0,
+    "freshness_score": 1.0,
+    "source_quality_score": 1.0,
+    "keywords": []
+  }
+]

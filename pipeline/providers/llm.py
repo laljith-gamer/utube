@@ -63,61 +63,108 @@ class LLMRouter:
         for p in self.active:
             try:
                 LOG.info("LLM call → %s (%s)", p["name"], p["model"])
-                client = OpenAI(api_key=p["api_key"], base_url=p["base_url"], timeout=self.timeout)
                 provider_params = p.get("params", {})
-                kwargs: dict[str, Any] = {
-                    "model": p["model"],
-                    "messages": messages,
-                    "max_tokens": provider_params.get("max_tokens", max_tokens),
-                    "temperature": provider_params.get("temperature", temperature),
-                }
-                if "top_p" in provider_params:
-                    kwargs["top_p"] = provider_params["top_p"]
-                if json_mode:
-                    kwargs["response_format"] = {"type": "json_object"}
-                if reasoning_effort and p.get("supports_reasoning_effort"):
-                    kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
-                resp = client.chat.completions.create(**kwargs)
-                choice = resp.choices[0]
-                msg = choice.message
-                content = (msg.content or "").strip()
-                finish = getattr(choice, "finish_reason", None)
-
-                if not content:
-                    # gpt-oss reasoning models put their thinking in
-                    # `reasoning_content`. Sometimes (rarely) the actual answer
-                    # also leaks there. Only treat it as the answer if it
-                    # *looks* like the kind of output we asked for —
-                    # otherwise it's just truncated thinking.
-                    extra = getattr(msg, "model_extra", None) or {}
-                    for key in ("reasoning_content", "reasoning", "thinking"):
-                        cand = extra.get(key)
-                        if not (isinstance(cand, str) and cand.strip()):
-                            continue
-                        cand = cand.strip()
-                        if json_mode and not _looks_like_json(cand):
-                            LOG.warning(
-                                "  %s present but does not look like JSON "
-                                "(finish_reason=%s, %d chars) — likely truncated reasoning, "
-                                "falling through to next provider",
-                                key, finish, len(cand),
-                            )
-                            continue
-                        content = cand
-                        LOG.info("  (used %s field as content)", key)
-                        break
-
-                if not content:
-                    raise RuntimeError(
-                        f"Empty response (finish_reason={finish}). "
-                        f"Likely the model ran out of tokens during reasoning. "
-                        f"Try lower reasoning_effort or higher max_tokens."
-                    )
-                return content
+                
+                is_gemini = "gemini" in p["model"].lower() or p.get("api_key_env") == "GEMINI_API_KEY"
+                if is_gemini:
+                    from google import genai
+                    from google.genai import types
+                    
+                    client = genai.Client(api_key=p["api_key"])
+                    
+                    sys_inst = None
+                    gemini_msgs = []
+                    for m in messages:
+                        if m["role"] == "system":
+                            sys_inst = m["content"]
+                        else:
+                            role = "user" if m["role"] == "user" else "model"
+                            gemini_msgs.append(types.Content(role=role, parts=[types.Part.from_text(text=m["content"])]))
+                    
+                    config_kwargs = {
+                        "max_output_tokens": provider_params.get("max_tokens", max_tokens),
+                    }
+                    if json_mode:
+                        config_kwargs["response_mime_type"] = "application/json"
+                        
+                    if reasoning_effort and p.get("supports_reasoning_effort"):
+                        if reasoning_effort == "low":
+                            tl = types.ThinkingLevel.LOW
+                        elif reasoning_effort == "high":
+                            tl = types.ThinkingLevel.HIGH
+                        else:
+                            tl = types.ThinkingLevel.MEDIUM
+                        config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=tl)
+                        
+                    if sys_inst:
+                        config_kwargs["system_instruction"] = sys_inst
+                        
+                    config = types.GenerateContentConfig(**config_kwargs)
+                    resp = client.models.generate_content(model=p["model"], contents=gemini_msgs, config=config)
+                    content = (resp.text or "").strip()
+                    finish = getattr(resp.candidates[0] if resp.candidates else None, "finish_reason", None)
+                    
+                    if not content:
+                        raise RuntimeError(
+                            f"Empty response from Gemini (finish_reason={finish}). "
+                            f"Try lower reasoning_effort or higher max_tokens."
+                        )
+                    return content
+                else:
+                    client = OpenAI(api_key=p["api_key"], base_url=p["base_url"], timeout=self.timeout)
+                    kwargs: dict[str, Any] = {
+                        "model": p["model"],
+                        "messages": messages,
+                        "max_tokens": provider_params.get("max_tokens", max_tokens),
+                        "temperature": provider_params.get("temperature", temperature),
+                    }
+                    if "top_p" in provider_params:
+                        kwargs["top_p"] = provider_params["top_p"]
+                    if json_mode:
+                        kwargs["response_format"] = {"type": "json_object"}
+                    if reasoning_effort and p.get("supports_reasoning_effort"):
+                        kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
+                    resp = client.chat.completions.create(**kwargs)
+                    choice = resp.choices[0]
+                    msg = choice.message
+                    content = (msg.content or "").strip()
+                    finish = getattr(choice, "finish_reason", None)
+    
+                    if not content:
+                        # gpt-oss reasoning models put their thinking in
+                        # `reasoning_content`. Sometimes (rarely) the actual answer
+                        # also leaks there. Only treat it as the answer if it
+                        # *looks* like the kind of output we asked for —
+                        # otherwise it's just truncated thinking.
+                        extra = getattr(msg, "model_extra", None) or {}
+                        for key in ("reasoning_content", "reasoning", "thinking"):
+                            cand = extra.get(key)
+                            if not (isinstance(cand, str) and cand.strip()):
+                                continue
+                            cand = cand.strip()
+                            if json_mode and not _looks_like_json(cand):
+                                LOG.warning(
+                                    "  %s present but does not look like JSON "
+                                    "(finish_reason=%s, %d chars) — likely truncated reasoning, "
+                                    "falling through to next provider",
+                                    key, finish, len(cand),
+                                )
+                                continue
+                            content = cand
+                            LOG.info("  (used %s field as content)", key)
+                            break
+    
+                    if not content:
+                        raise RuntimeError(
+                            f"Empty response (finish_reason={finish}). "
+                            f"Likely the model ran out of tokens during reasoning. "
+                            f"Try lower reasoning_effort or higher max_tokens."
+                        )
+                    return content
             except Exception as e:  # noqa: BLE001
                 LOG.warning("LLM provider %s failed: %s", p["name"], e)
                 last_err = e
-                if "429" in str(e) or "rate" in str(e).lower():
+                if "429" in str(e) or "rate" in str(e).lower() or "quota" in str(e).lower():
                     time.sleep(self.retry_pause)
                 continue
         raise RuntimeError(f"All LLM providers failed. Last error: {last_err}")
