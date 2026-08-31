@@ -8,7 +8,8 @@
       "lawmakers-added-1-to-car-insurance-polic-512c7a56": "2026-08-30T09:24:08.104284+00:00",
       "neocloud-lambda-secures-1b-in-debt-to-bu-986b21d9": "2026-08-29T08:12:56.228781+00:00",
       "techcrunch-mobility-the-hidden-human-cos-b882f405": "2026-08-30T16:06:44.055753+00:00",
-      "enormous-12tb-steam-leak-includes-abando-31ec7984": "2026-08-31T14:40:43.239000+00:00"
+      "enormous-12tb-steam-leak-includes-abando-31ec7984": "2026-08-31T14:40:43.239000+00:00",
+      "new-york-governor-to-3d-printed-gun-lead-02658952": "2026-08-31T15:20:41.089679+00:00"
     }
   },
   "families": {},
@@ -1142,6 +1143,190 @@
         "video_id": "ZYEeVEP7iUY",
         "url": "https://youtu.be/ZYEeVEP7iUY",
         "title": "The Hidden Human Cost of Robotaxis",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-08-31T15:52:55.539468+00:00",
+      "run_id": "run_151307",
+      "topic": {
+        "title": "New York governor to 3D-printed gun leader: &#8216;tell Cody I will get ahead of him&#8217;",
+        "url": "https://www.theverge.com/policy/986733/kathy-hochul-3d-printed-guns-cody-wilson-response",
+        "score": 99,
+        "summary": "Cody Wilson, the creator of the first 3D-printed gun, announced a tool last week aimed at skirting a New York law that prevents 3D printers from making firearms - and taunting governor Kathy Hochul in the process. But Hochul isn't having it. In this week's episode of Decoder, Hochul responded to Wilson's \"Hochulization\" tool, warning [&#8230;]",
+        "source": "rss:The Verge",
+        "raw_score": 99,
+        "normalized_hotness": 100,
+        "content_hash": "new-york-governor-to-3d-printed-gun-lead-02658952",
+        "keywords": [
+          "york",
+          "governor",
+          "printed",
+          "gun",
+          "leader",
+          "tell",
+          "cody",
+          "get",
+          "ahead",
+          "him"
+        ],
+        "scores": {
+          "freshness": 100,
+          "source_quality": 72,
+          "specificity": 70,
+          "novelty": 75,
+          "evergreen_value": 50,
+          "strategy_alignment": 50,
+          "audience_fit": 70,
+          "curiosity_gap": 90,
+          "story_potential": 85,
+          "visual_potential": 70,
+          "shareability": 85
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 76.6
+      },
+      "concept": {
+        "topic_title": "New York governor to 3D-printed gun leader: &#8216;tell Cody I will get ahead of him&#8217;",
+        "topic_url": "https://www.theverge.com/policy/986733/kathy-hochul-3d-printed-guns-cody-wilson-response",
+        "topic_source": "rss:The Verge",
+        "topic_score": 76.6,
+        "chosen_angle": "Cody Wilson claims his \"Hochulization\" tool liberates gun owners, but Governor Hochul reveals it actually endangers ordinary citizens\u2013here's the contradiction at the heart of the story.",
+        "hook_type": "contradiction",
+        "core_claim": "The \"Hochulization\" tool marketed as a freedom hack actually exposes how easily state laws can criminalize everyday 3D printing hobbyists.",
+        "viewer_problem": "You might just want to print a replacement part for a broken appliance, but this legal fight could suddenly make your printer illegal to use.",
+        "curiosity_gap": "What if the tool designed to break a law actually breaks your right to use your own 3D printer?",
+        "emotional_driver": "surprise / outrage",
+        "payoff": "The contradiction resolves when you realize the tool wasn't built for hobbyists\u2013it was a legal test case, and you're the unintended target.",
+        "concept_score": 83.0,
+        "risk_flags": [
+          "polarizing gun policy topic",
+          "requires neutral framing to avoid misinformation"
+        ],
+        "all_angles": [
+          {
+            "angle": "Cody Wilson claims his \"Hochulization\" tool liberates gun owners, but Governor Hochul reveals it actually endangers ordinary citizens\u2013here's the contradiction at the heart of the story.",
+            "hook_type": "contradiction",
+            "core_claim": "The \"Hochulization\" tool marketed as a freedom hack actually exposes how easily state laws can criminalize everyday 3D printing hobbyists.",
+            "viewer_problem": "You might just want to print a replacement part for a broken appliance, but this legal fight could suddenly make your printer illegal to use.",
+            "curiosity_gap": "What if the tool designed to break a law actually breaks your right to use your own 3D printer?",
+            "emotional_driver": "surprise / outrage",
+            "payoff": "The contradiction resolves when you realize the tool wasn't built for hobbyists\u2013it was a legal test case, and you're the unintended target.",
+            "concept_score": 83,
+            "risk_flags": [
+              "polarizing gun policy topic",
+              "requires neutral framing to avoid misinformation"
+            ]
+          },
+          {
+            "angle": "What if a few lines of code released by Cody Wilson can force New York to rewrite its entire approach to desktop manufacturing\u2013and you're the one who has to obey the new rules?",
+            "hook_type": "forbidden_question",
+            "core_claim": "The \"forbidden\" Hochulization tool isn't about guns\u2013it's about how easily a single script can bypass safety controls on millions of consumer 3D printers.",
+            "viewer_problem": "You don't need to own a gun to feel the impact; this tool could silently lock your printer's functionality overnight.",
+            "curiosity_gap": "What exactly does the \"Hochulization\" script do that has the governor warning of legal consequences for ordinary users?",
+            "emotional_driver": "curiosity / forbidden fruit",
+            "payoff": "The"
+          }
+        ]
+      },
+      "script": {
+        "hook": "What if the tool designed to break a law actually breaks your right to use your own 3D printer?",
+        "scenes": [
+          {
+            "narration": "Cody Wilson created the first 3D-printed gun, sparking controversy.",
+            "duration_sec": 3,
+            "visual_prompt": "A 3D printer creating a gun, with hands assembling it.",
+            "broll_keywords": [
+              "3D printer",
+              "gun",
+              "hands"
+            ]
+          },
+          {
+            "narration": "New York has a law preventing 3D printers from making firearms.",
+            "duration_sec": 2,
+            "visual_prompt": "A person trying to print a gun, with a 'blocked' sign on the printer.",
+            "broll_keywords": [
+              "3D printer",
+              "blocked",
+              "gun"
+            ]
+          },
+          {
+            "narration": "Wilson's 'Hochulization' tool bypasses this law, named after Governor Kathy Hochul.",
+            "duration_sec": 3,
+            "visual_prompt": "A close-up of a computer screen showing the 'Hochulization' tool.",
+            "broll_keywords": [
+              "computer screen",
+              "Hochulization",
+              "code"
+            ]
+          },
+          {
+            "narration": "Hochul warned about the tool's dangers on the show Decoder.",
+            "duration_sec": 2,
+            "visual_prompt": "Governor Kathy Hochul speaking on the show Decoder, with a concerned expression.",
+            "broll_keywords": [
+              "Governor Kathy Hochul",
+              "Decoder",
+              "concerned"
+            ]
+          },
+          {
+            "narration": "The tool wasn't built for hobbyists, but as a legal test case, targeting ordinary citizens.",
+            "duration_sec": 3,
+            "visual_prompt": "A person unknowingly using the 'Hochulization' tool, with a surprised expression.",
+            "broll_keywords": [
+              "person",
+              "surprised",
+              "Hochulization"
+            ]
+          }
+        ],
+        "cta": "Do you think Governor Hochul is right to be worried about the 'Hochulization' tool?",
+        "title": "The real reason 3D-printed guns are a threat to your rights",
+        "description": "Cody Wilson's 'Hochulization' tool bypasses New York's law on 3D-printed firearms. But what does it mean for ordinary citizens? AI-assisted.\n\n#shorts #3Dprintedguns #Hochulization",
+        "hashtags": [
+          "#shorts",
+          "#3Dprintedguns",
+          "#Hochulization",
+          "#guncontrol",
+          "#technology"
+        ],
+        "thumbnail_prompt": "A person holding a 3D-printed gun, with a surprised expression and a red 'X' symbol overlaid.",
+        "thumbnail_text": "3D Guns: A Threat to Your Rights?",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "contradiction",
+          "angle": "Cody Wilson claims his \"Hochulization\" tool liberates gun owners, but Governor Hochul reveals it actually endangers ordinary citizens\u2013here's the contradiction at the heart of the story.",
+          "emotional_driver": "surprise / outrage",
+          "concept_score": 83.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 5,
+        "sources": {
+          "svd": 0,
+          "stock": 5,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "lOqiwV2hZsA",
+        "video_id": "lOqiwV2hZsA",
+        "url": "https://youtu.be/lOqiwV2hZsA",
+        "title": "The real reason 3D-printed guns are a threat to your rights",
         "dry_run": false
       }
     }

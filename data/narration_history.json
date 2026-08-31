@@ -69,6 +69,20 @@
       ],
       "cta": "Like and subscribe mock.",
       "title": "Mocked Title for Video"
+    },
+    {
+      "run_id": "run_151307",
+      "timestamp": "2026-08-31T15:52:55.539490+00:00",
+      "hook": "What if the tool designed to break a law actually breaks your right to use your own 3D printer?",
+      "scenes": [
+        "Cody Wilson created the first 3D-printed gun, sparking controversy.",
+        "New York has a law preventing 3D printers from making firearms.",
+        "Wilson's 'Hochulization' tool bypasses this law, named after Governor Kathy Hochul.",
+        "Hochul warned about the tool's dangers on the show Decoder.",
+        "The tool wasn't built for hobbyists, but as a legal test case, targeting ordinary citizens."
+      ],
+      "cta": "Do you think Governor Hochul is right to be worried about the 'Hochulization' tool?",
+      "title": "The real reason 3D-printed guns are a threat to your rights"
     }
   ]
 }
