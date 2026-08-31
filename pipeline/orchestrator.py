@@ -166,7 +166,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         master_audio = out / audio_summary["master"]
         asr_text, asr_segments, asr_info = captions.transcribe_audio(master_audio)
         if asr_text:
-            from .audio_validation import validate_audio
+            from .stages.audio_validation import validate_audio
             ref_text = cfg.get_path("tts.providers.f5_tts.params.ref_text", env("F5_REF_TEXT", ""))
             validate_audio(sc, asr_text, ref_text)
         
