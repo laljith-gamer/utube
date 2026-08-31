@@ -20,7 +20,7 @@ llm_research:
       params:
         max_tokens: 6000
     nvidia_nim_research:
-      request_timeout_sec: 600
+      request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
       model: nvidia/nemotron-3.5-lightning-30b-a3b
@@ -57,7 +57,7 @@ llm_script:
       model: meta-llama/llama-3.1-70b-instruct
       supports_reasoning_effort: false
     nvidia_nim_script:
-      request_timeout_sec: 600
+      request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
       model: nvidia/llama-3.1-nemotron-70b-instruct
@@ -84,7 +84,7 @@ llm_concept:
         top_p: 0.95
         max_tokens: 4000
     nvidia_nim_research:
-      request_timeout_sec: 600
+      request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
       model: nvidia/nemotron-3.5-lightning-30b-a3b
@@ -115,7 +115,7 @@ llm_qc:
         top_p: 0.95
         max_tokens: 3000
     nvidia_nim_research:
-      request_timeout_sec: 600
+      request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
       model: nvidia/nemotron-3.5-lightning-30b-a3b
