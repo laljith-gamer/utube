@@ -74,7 +74,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: video-${{ inputs.lane }}-${{ github.run_id }}
+          name: video-test-${{ github.run_id }}
           path: |
             runs/**/*.mp4
             runs/**/thumbnail.jpg

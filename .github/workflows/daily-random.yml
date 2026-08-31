@@ -82,6 +82,11 @@ jobs:
           SKIP_SVD="${{ inputs.skip_svd || 'false' }}"
           SCRIPT_ONLY="${{ inputs.script_only || 'false' }}"
           BASE=""
+          # Branch guard: only allow uploads from the production branch (main)
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::warning::Non-main branch detected — forcing --no-upload"
+            BASE="$BASE --no-upload"
+          fi
           [ "$NO_UPLOAD" = "true" ] && BASE="$BASE --no-upload"
           [ "$SKIP_SVD" = "true" ] && BASE="$BASE --skip-svd"
           [ "$SCRIPT_ONLY" = "true" ] && BASE="$BASE --script-only"
@@ -106,6 +111,9 @@ jobs:
           git add ledger.json
           if [ -d runs ]; then
             git add runs/
+          fi
+          if [ -d data ]; then
+            git add data/
           fi
           if ! git diff --cached --quiet; then
             git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"

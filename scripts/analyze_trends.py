@@ -23,9 +23,11 @@ LOG = logging.getLogger("analyze_trends")
 
 
 def get_youtube_analytics() -> dict | None:
-    client_id = env("YOUTUBE_CLIENT_ID")
-    client_secret = env("YOUTUBE_CLIENT_SECRET")
-    refresh_token = env("YOUTUBE_REFRESH_TOKEN")
+    from pipeline.config import get_config
+    cfg = get_config().get_path("youtube", {}) or {}
+    client_id = env(cfg.get("client_id_env", "YOUTUBE_CLIENT_ID"))
+    client_secret = env(cfg.get("client_secret_env", "YOUTUBE_CLIENT_SECRET"))
+    refresh_token = env(cfg.get("refresh_token_env", "YOUTUBE_REFRESH_TOKEN"))
     if not client_id or not client_secret or not refresh_token:
         LOG.error("Missing YouTube OAuth credentials")
         return None
@@ -33,7 +35,7 @@ def get_youtube_analytics() -> dict | None:
     creds = Credentials(
         token=None,
         refresh_token=refresh_token,
-        token_uri="https://oauth2.googleapis.com/token",
+        token_uri=cfg.get("token_uri", "https://oauth2.googleapis.com/token"),
         client_id=client_id,
         client_secret=client_secret,
     )
@@ -158,8 +160,14 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO)
     root = repo_root()
     stats = get_youtube_analytics()
-    if not stats:
-        raise RuntimeError("YouTube Analytics unavailable; refusing to overwrite learning state")
+    analytics_available = stats is not None
+    if not analytics_available:
+        LOG.warning("YouTube Analytics unavailable — refreshing learning state from ledger only")
+        stats = {
+            "weekly": {k: 0 for k in ("views", "estimatedMinutesWatched", "averageViewDuration", "likes", "comments", "shares", "subscribersGained")},
+            "monthly": {k: 0 for k in ("views", "estimatedMinutesWatched", "averageViewDuration", "likes", "comments", "shares", "subscribersGained")},
+            "best_days": {},
+        }
 
     ledger = Ledger.load(root / "ledger.json")
     update_performance_records(ledger.data.get("runs", []))
@@ -218,6 +226,17 @@ new_goal_summary: 4-5 sentences; preserve the channel identity and quality bar
         if not isinstance(result, dict) or not isinstance(result.get("dynamic_strategy"), dict):
             raise ValueError("Strategist returned invalid dynamic_strategy JSON")
         dynamic = result["dynamic_strategy"]
+        # Validate required strategy keys
+        required_strategy_keys = ["overall_direction", "focused_themes", "avoid_themes",
+                                  "recommended_hooks", "recommended_emotions"]
+        missing_keys = [k for k in required_strategy_keys if k not in dynamic]
+        if missing_keys:
+            LOG.warning("Strategy missing keys: %s — filling with defaults", missing_keys)
+            dynamic.setdefault("overall_direction", "Stay focused on surprising technology that matters to ordinary people.")
+            dynamic.setdefault("focused_themes", [])
+            dynamic.setdefault("avoid_themes", [])
+            dynamic.setdefault("recommended_hooks", [])
+            dynamic.setdefault("recommended_emotions", [])
         _write_strategy(dynamic, learning["video_count"])
 
         goal = result.get("new_goal_summary")

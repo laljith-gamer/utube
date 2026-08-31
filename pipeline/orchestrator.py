@@ -9,7 +9,7 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from . import themes as themes_mod
+from . import narration_archive, themes as themes_mod
 from .config import get_config
 from .ledger import Ledger
 from .providers.image import ImageRouter
@@ -84,17 +84,41 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         lane = cfg.get_path("lane", {}) or {}
         sc = None
         qc_result = None
-        for attempt in range(int(qual_cfg.get("max_regenerations", 2)) + 1):
-            sc = script.generate_script(llm_script, slot=lane, topic=best, concept=top_concept, research=brief, previous_qc=qc_result)
+        rep_result = None
+        max_attempts = int(qual_cfg.get("max_regenerations", 2)) + 1
+        for attempt in range(max_attempts):
+            sc = script.generate_script(
+                llm_script, slot=lane, topic=best, concept=top_concept,
+                research=brief, previous_qc=qc_result,
+                previous_repetition=rep_result,
+            )
             write_json(out / f"5_script_v{attempt+1}.json", sc)
+
+            # ── Repetition check (deterministic, no LLM call) ──
+            rep_result = script.check_repetition(sc)
+            write_json(out / f"5_repetition_v{attempt+1}.json", {
+                "passed": rep_result.passed,
+                "intra_issues": rep_result.intra_issues,
+                "cross_issues": rep_result.cross_issues,
+                "flagged_phrases": rep_result.flagged_phrases[:10],
+            })
+
+            # ── Script QC (LLM-based quality evaluation) ──
             qc_result = script_qc.evaluate_script(sc, topic=best, concept=top_concept)
             write_json(out / f"5_qc_v{attempt+1}.json", qc_result)
-            if qc_result.get("passed"):
+
+            if qc_result.get("passed") and rep_result.passed:
                 break
+
         if not qc_result or not qc_result.get("passed"):
             result["reason"] = "Failed script QC."
             write_json(out / "result.json", result)
             return result
+        # Repetition issues are advisory after exhausting attempts — proceed
+        # with the best version but log a warning.
+        if rep_result and not rep_result.passed:
+            LOG.warning("Proceeding with repetition issues after %d attempts: %s",
+                        max_attempts, rep_result.all_issues[:3])
         if script_only:
             result.update({"ok": True, "title": sc.get("title"), "script": sc})
             write_json(out / "result.json", result)
@@ -135,6 +159,9 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
 
         result["ok"] = True
         ledger.record_run({"run_id": run_id, "topic": best, "concept": top_concept, "script": sc, "visual_qc": v_qc, "upload": result.get("upload", {})})
+
+        # Archive narration for future cross-video repetition checking
+        narration_archive.append(sc, run_id=run_id, timestamp=datetime.now(timezone.utc).isoformat())
         write_json(out / "result.json", result)
         return result
     except Exception as exc:

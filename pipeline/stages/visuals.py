@@ -27,14 +27,33 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
         prompt = scene.get("visual_prompt", "")
         broll = scene.get("broll_keywords") or []
         record = {"index": i, "prompt": prompt, "attempts": []}
+
+        # ── Priority 1: Stock B-roll (always motion, cheapest) ──
+        if broll:
+            try:
+                stock_bytes = stock.find_video(broll, orientation="portrait")
+                if stock_bytes:
+                    path = scene_dir / "stock.mp4"
+                    path.write_bytes(stock_bytes)
+                    record.update({"video": str(path.relative_to(out_dir)), "source": "stock"})
+                    record["attempts"].append({"type": "stock", "status": "ok", "relevance": None, "relevance_status": "unavailable"})
+                    LOG.info("scene %d: stock B-roll used", i)
+                    return record
+                else:
+                    record["attempts"].append({"type": "stock", "status": "not_found"})
+            except Exception as exc:
+                record["attempts"].append({"type": "stock", "status": "failed", "error": str(exc)})
+                LOG.warning("scene %d: stock search failed: %s", i, exc)
+
+        # ── Priority 2: Generated still (+ optional SVD animation) ──
         still_path = scene_dir / "still.png"
+        still_ok = False
         try:
             png = image.generate(prompt, width=width, height=height)
             still_path.write_bytes(png)
             still_ok = True
             record["attempts"].append({"type": "image", "provider": "pollinations", "status": "ok"})
         except Exception as exc:
-            still_ok = False
             record["attempts"].append({"type": "image", "provider": "pollinations", "status": "failed", "error": str(exc)})
             LOG.warning("scene %d: image generation failed: %s", i, exc)
 
@@ -49,28 +68,18 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                 record["attempts"].append({"type": "svd", "status": "failed", "error": str(exc)})
                 LOG.warning("scene %d: SVD failed: %s", i, exc)
 
-        if "video" not in record and broll:
-            try:
-                stock_bytes = stock.find_video(broll, orientation="portrait")
-                if stock_bytes:
-                    # The stock provider returns bytes only; it does not expose a semantic relevance score.
-                    # Do not fabricate one. Visual QC can inspect provenance and file validity instead.
-                    path = scene_dir / "stock.mp4"
-                    path.write_bytes(stock_bytes)
-                    record.update({"video": str(path.relative_to(out_dir)), "source": "stock"})
-                    record["attempts"].append({"type": "stock", "status": "ok", "relevance": None, "relevance_status": "unavailable"})
-                    LOG.info("scene %d: stock video fallback used", i)
-                else:
-                    record["attempts"].append({"type": "stock", "status": "not_found"})
-            except Exception as exc:
-                record["attempts"].append({"type": "stock", "status": "failed", "error": str(exc)})
+        # If SVD produced a video, we're done
+        if "video" in record:
+            return record
 
-        if "video" not in record and still_ok:
+        # Still image with Ken Burns motion treatment
+        if still_ok:
             record.update({"image": str(still_path.relative_to(out_dir)), "source": "image_motion", "motion_treatment": "zoom_pan"})
+            return record
 
-        if "video" not in record and "image" not in record:
-            record.update({"motion_fallback": True, "source": "filler"})
-            record["attempts"].append({"type": "filler", "status": "used"})
+        # ── Priority 3: Animated-gradient filler (last resort) ──
+        record.update({"motion_fallback": True, "source": "filler"})
+        record["attempts"].append({"type": "filler", "status": "used"})
         return record
 
     return [generate_scene(i, scene) for i, scene in enumerate(script["scenes"])]

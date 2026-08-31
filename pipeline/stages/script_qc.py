@@ -95,24 +95,53 @@ def evaluate_script(
         "channel_fit": 0.13,
     }
 
+    # Fail closed: missing or invalid scores are errors, not defaults.
+    missing_dims = [d for d in dimension_weights if d not in scores]
+    if missing_dims:
+        LOG.warning("Script QC FAILED: LLM omitted dimensions: %s", missing_dims)
+        return {
+            "passed": False,
+            "overall_score": 0,
+            "scores": scores,
+            "feedback": f"QC evaluation incomplete — missing dimensions: {', '.join(missing_dims)}. Regenerate.",
+            "issues": [f"Missing QC dimension: {d}" for d in missing_dims],
+            "failed_dimensions": [f"{d}: MISSING" for d in missing_dims],
+        }
+
     total_w = 0.0
     weighted_sum = 0.0
+    invalid_dims: list[str] = []
     for dim, weight in dimension_weights.items():
-        val = scores.get(dim, 70)
+        raw = scores.get(dim)
         try:
-            val = int(val)
+            val = int(raw)
         except (TypeError, ValueError):
-            val = 70
+            invalid_dims.append(f"{dim}: non-integer value {raw!r}")
+            val = 0  # Penalize invalid scores — don't mask them
+        if val < 0 or val > 100:
+            invalid_dims.append(f"{dim}: out of range ({val})")
+            val = max(0, min(100, val))
         scores[dim] = val
         weighted_sum += val * weight
         total_w += weight
 
-    overall = round(weighted_sum / total_w, 1) if total_w > 0 else 70
+    if invalid_dims:
+        LOG.warning("Script QC FAILED: invalid score values: %s", invalid_dims)
+        return {
+            "passed": False,
+            "overall_score": 0,
+            "scores": scores,
+            "feedback": f"QC evaluation returned invalid scores: {'; '.join(invalid_dims)}. Regenerate.",
+            "issues": invalid_dims,
+            "failed_dimensions": invalid_dims,
+        }
+
+    overall = round(weighted_sum / total_w, 1) if total_w > 0 else 0
 
     # Check per-dimension minimums
     failed_dims = []
     for dim, min_val in min_scores.items():
-        actual = scores.get(dim, 70)
+        actual = scores.get(dim, 0)
         if actual < min_val:
             failed_dims.append(f"{dim}: {actual} < {min_val}")
 

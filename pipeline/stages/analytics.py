@@ -16,12 +16,16 @@ LOG = logging.getLogger("utube.analytics")
 def _youtube_data_service(api_key: str | None = None):
     if api_key:
         return None
-    client_id, client_secret, refresh_token = env("YOUTUBE_CLIENT_ID"), env("YOUTUBE_CLIENT_SECRET"), env("YOUTUBE_REFRESH_TOKEN")
+    from ..config import get_config
+    cfg = get_config().get_path("youtube", {}) or {}
+    client_id = env(cfg.get("client_id_env", "YOUTUBE_CLIENT_ID"))
+    client_secret = env(cfg.get("client_secret_env", "YOUTUBE_CLIENT_SECRET"))
+    refresh_token = env(cfg.get("refresh_token_env", "YOUTUBE_REFRESH_TOKEN"))
     if not (client_id and client_secret and refresh_token):
         return None
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
-    creds = Credentials(token=None, refresh_token=refresh_token, token_uri="https://oauth2.googleapis.com/token", client_id=client_id, client_secret=client_secret)
+    creds = Credentials(token=None, refresh_token=refresh_token, token_uri=cfg.get("token_uri", "https://oauth2.googleapis.com/token"), client_id=client_id, client_secret=client_secret)
     return build("youtube", "v3", credentials=creds)
 
 
@@ -103,13 +107,17 @@ def _classify_performance(videos: list[dict]) -> None:
 
 
 def collect_video_analytics(video_ids: list[str]) -> dict:
-    client_id, client_secret, refresh_token = env("YOUTUBE_CLIENT_ID"), env("YOUTUBE_CLIENT_SECRET"), env("YOUTUBE_REFRESH_TOKEN")
+    from ..config import get_config
+    cfg = get_config().get_path("youtube", {}) or {}
+    client_id = env(cfg.get("client_id_env", "YOUTUBE_CLIENT_ID"))
+    client_secret = env(cfg.get("client_secret_env", "YOUTUBE_CLIENT_SECRET"))
+    refresh_token = env(cfg.get("refresh_token_env", "YOUTUBE_REFRESH_TOKEN"))
     if not (client_id and client_secret and refresh_token):
         LOG.warning("Missing OAuth credentials for YouTube Analytics API")
         return {}
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
-    creds = Credentials(token=None, refresh_token=refresh_token, token_uri="https://oauth2.googleapis.com/token", client_id=client_id, client_secret=client_secret)
+    creds = Credentials(token=None, refresh_token=refresh_token, token_uri=cfg.get("token_uri", "https://oauth2.googleapis.com/token"), client_id=client_id, client_secret=client_secret)
     analytics = build("youtubeAnalytics", "v2", credentials=creds)
     result = {}
     today = datetime.now(timezone.utc).date()
