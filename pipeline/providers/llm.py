@@ -258,6 +258,15 @@ def _parse_json(text: str) -> dict[str, Any]:
     except json.JSONDecodeError:
         pass
 
+    # Attempt 2.5: Extract from a markdown code block if present anywhere
+    m = re.search(r"```(?:json)?\s*(.*?)\s*```", text, flags=re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1).strip())
+        except json.JSONDecodeError:
+            pass
+
+
     # Attempt 3: find first { ... } (greedy) block and parse
     m = re.search(r"\{.*\}", clean, flags=re.DOTALL)
     if m:
