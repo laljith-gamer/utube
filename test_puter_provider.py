@@ -10,7 +10,7 @@ def test_puter():
     print("Testing PuterProvider...")
     try:
         response = PuterProvider.chat(
-            model="claude-3-5-sonnet", # Just pick a widely available model on puter
+            model="claude-opus-4-6", # Testing claude-opus-4-6 as requested
             messages=[{"role": "user", "content": "Respond with a simple JSON object: {\"status\": \"ok\", \"message\": \"hello world\"}"}],
             max_tokens=100,
             temperature=0.1,

@@ -47,9 +47,16 @@ class PuterProvider:
             # Puter JS chat returns OpenAI-compatible format
             # e.g. { message: { content: "..." } } or { choices: [ { message: { content: "..." } } ] }
             if "message" in out and "content" in out["message"]:
-                return out["message"]["content"]
+                content = out["message"]["content"]
+                if isinstance(content, list):
+                    # Handle Anthropic-style blocks: [{'type': 'text', 'text': '...'}]
+                    content = "".join(b.get("text", "") for b in content if b.get("type") == "text")
+                return content
             elif "choices" in out and len(out["choices"]) > 0:
-                return out["choices"][0]["message"]["content"]
+                content = out["choices"][0]["message"]["content"]
+                if isinstance(content, list):
+                    content = "".join(b.get("text", "") for b in content if b.get("type") == "text")
+                return content
             else:
                 return json.dumps(out)
                 

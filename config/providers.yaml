@@ -132,7 +132,7 @@ llm_premium_rewrite:
   providers:
     puter_rewrite:
       api_key_env: PUTER_AUTH_TOKEN
-      model: claude-3-opus
+      model: claude-opus-4-6
       supports_reasoning_effort: false
       params:
         temperature: 0.2

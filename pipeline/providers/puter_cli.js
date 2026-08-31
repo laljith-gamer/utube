@@ -1,6 +1,10 @@
 const puterRaw = require('@heyputer/puter.js');
 const puter = puterRaw.puter || puterRaw.default || puterRaw;
 
+if (process.env.PUTER_AUTH_TOKEN) {
+    puter.authToken = process.env.PUTER_AUTH_TOKEN;
+}
+
 async function main() {
     const args = process.argv.slice(2);
     if (args.length < 1) {
