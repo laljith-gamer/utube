@@ -66,7 +66,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install Puter.js
         run: npm install @heyputer/puter.js
       - name: Produce and upload videos

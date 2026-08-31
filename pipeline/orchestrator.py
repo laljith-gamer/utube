@@ -60,9 +60,9 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             ledger.record_family(family)
         write_json(out / "2_best_topic.json", best)
 
-        top_concept = concept.generate_concept(best, content_memory=mem_ctx)
+        top_concept = concept.generate_concept(best, content_memory=mem_ctx, out_dir=out)
         if not top_concept:
-            result["reason"] = "Concept generation failed."
+            result["reason"] = "Concept generation rejected due to low score."
             write_json(out / "result.json", result)
             return result
         write_json(out / "3_concept.json", top_concept)

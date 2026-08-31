@@ -1,17 +1,20 @@
-const puter = require('@heyputer/puter.js');
+const puterRaw = require('@heyputer/puter.js');
+const puter = puterRaw.puter || puterRaw.default || puterRaw;
 
 async function main() {
     const token = process.env.PUTER_AUTH_TOKEN;
     if (token) {
-        // Authenticate - we'll assume puter.js supports initialization via a function like `puter.init(token)` or we can just hope it uses the env variable.
-        // Or Puter is a global singleton, we can just login. Wait, there's no UI here, so maybe `process.env.PUTER_AUTH_TOKEN` is automatically picked up, or we need to pass it.
+        puter.authToken = token;
+        console.log("authenticated: true");
+    } else {
+        console.log("authenticated: false");
     }
     
     try {
         const models = await puter.ai.listModels();
-        console.log(JSON.stringify(models));
+        console.log("Puter connected successfully. Models count: " + (models ? models.length : 0));
     } catch (e) {
-        console.error(e.message);
+        console.error("Puter connection failed: " + e.message);
         process.exit(1);
     }
 }
