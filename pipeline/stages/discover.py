@@ -351,21 +351,31 @@ def _hackernews(limit: int) -> list[dict]:
         return []
 
 
+_REDDIT_RATE_LIMITED = False
+
 def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
+    global _REDDIT_RATE_LIMITED
+    if _REDDIT_RATE_LIMITED:
+        return []
+        
     """Fetch Reddit JSON, with an RSS fallback for hosted CI runners."""
     ledger = Ledger.load(repo_root() / "ledger.json")
     src_key = f"reddit:{subreddit}"
     health_score = ledger.get_source_health(src_key)
     if health_score < 0.5:
         limit = max(1, int(limit * health_score))
-        
     params = {"t": time_filter, "limit": limit}
     headers = {"User-Agent": _ua()}
+    
+    # Polite delay to prevent Reddit from immediately 429'ing the IP
+    time.sleep(1.5)
+    
     url = f"https://www.reddit.com/r/{subreddit}/top.json"
     try:
         r = requests.get(url, params=params, headers=headers, timeout=_timeout())
         if r.status_code == 429:
-            LOG.warning("Reddit rate-limited for r/%s; trying RSS fallback", subreddit)
+            LOG.warning("Reddit rate-limited for r/%s (429). Skipping RSS fallback.", subreddit)
+            return []
         elif r.status_code == 403:
             LOG.warning("Reddit blocked JSON access for r/%s; trying RSS fallback", subreddit)
         else:
@@ -399,6 +409,10 @@ def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
             headers=headers,
             timeout=_timeout(),
         )
+        if rss.status_code == 429:
+            LOG.warning("Reddit RSS rate-limited (429). Halting all further Reddit fetches.")
+            _REDDIT_RATE_LIMITED = True
+            return []
         rss.raise_for_status()
         feed = feedparser.parse(rss.content)
         out = []
@@ -517,6 +531,9 @@ def _github_trending(limit: int) -> list[dict]:
             headers=headers,
             timeout=_timeout(),
         )
+        if r.status_code == 401:
+            LOG.warning("GitHub API Unauthorized (401). Ensure GITHUB_TOKEN is set. Skipping.")
+            return []
         r.raise_for_status()
         out = []
         for repo in r.json().get("items", [])[:limit]:
