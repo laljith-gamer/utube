@@ -28,18 +28,18 @@ topic_scoring:
 
   # LLM scoring config
   llm:
-    max_tokens: 3000
+    max_tokens: 6000
     temperature: 0.3
-    reasoning_effort: null
+    reasoning_effort: high
 
 # ── Concept Generation ──────────────────────────────────────────────────────
 concept:
   angles_to_generate: 4       # How many angles to brainstorm per topic
   min_concept_score: 70        # Reject concepts scoring below this
   llm:
-    max_tokens: 3000
+    max_tokens: 6000
     temperature: 0.6
-    reasoning_effort: null
+    reasoning_effort: high
 
 # ── Script Quality Control ──────────────────────────────────────────────────
 script_qc:
@@ -61,9 +61,9 @@ script_qc:
   max_regenerations: 2
 
   llm:
-    max_tokens: 2000
+    max_tokens: 4000
     temperature: 0.3
-    reasoning_effort: null
+    reasoning_effort: high
 
 # ── Visual Quality Control ──────────────────────────────────────────────────
 visual_qc:

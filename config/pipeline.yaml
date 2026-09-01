@@ -32,14 +32,14 @@ discover:
 research:
   source_text_max_chars: 6000
   brief:
-    max_tokens: 3000
+    max_tokens: 6000
     temperature: 0.4
-    reasoning_effort: medium
+    reasoning_effort: high
 
 script:
-  max_tokens: 12000                 # raised from 8000: prevents mid-JSON truncation
+  max_tokens: 15000                 # raised from 12000 for maximum depth
   temperature: 0.7
-  reasoning_effort: medium
+  reasoning_effort: high
   words_per_second: 2.5
   hook_max_seconds: 1.5             # tightened from 2 — Shorts need sub-2s hooks
   min_scenes: 5                     # story-rhythm range instead of fixed count
