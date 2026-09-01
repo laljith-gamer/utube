@@ -155,7 +155,7 @@ class LLMRouter:
                             from .puter import PuterProvider
                             
                             # Preflight & get the exact model ID
-                            actual_model = PuterProvider.preflight()
+                            actual_model = PuterProvider.preflight(auth_token=p.get("key"))
                             if retry_attempt == 0:
                                 LOG.info("  (Using exact Puter runtime model ID: %s)", actual_model)
                             resp_dict = PuterProvider.chat(
@@ -163,7 +163,8 @@ class LLMRouter:
                                 messages=current_messages,
                                 max_tokens=provider_params.get("max_tokens", max_tokens),
                                 temperature=provider_params.get("temperature", temperature),
-                                json_mode=json_mode
+                                json_mode=json_mode,
+                                auth_token=p.get("key")
                             )
                             if resp_dict.get("error"):
                                 if resp_dict.get("is_rate_limit"):

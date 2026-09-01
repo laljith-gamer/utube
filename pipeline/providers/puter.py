@@ -17,17 +17,24 @@ class PuterProvider:
     _verified_opus_model: str | None = None
 
     @classmethod
-    def preflight(cls) -> str:
+    def preflight(cls, auth_token: str | None = None) -> str:
         if cls._verified_opus_model:
             return cls._verified_opus_model
 
         cli_script = repo_root() / "pipeline" / "providers" / "puter_cli.js"
         
+        my_env = None
+        if auth_token:
+            import os
+            my_env = os.environ.copy()
+            my_env["PUTER_AUTH_TOKEN"] = auth_token
+            
         try:
             result = subprocess.run(
                 ["node", str(cli_script), "listModels"],
                 capture_output=True,
-                text=True
+                text=True,
+                env=my_env
             )
             import re
             combined_output = result.stdout + "\n" + result.stderr
@@ -100,6 +107,7 @@ class PuterProvider:
         max_tokens: int,
         temperature: float,
         json_mode: bool = False,
+        auth_token: str | None = None,
     ) -> dict[str, Any]:
         cli_script = repo_root() / "pipeline" / "providers" / "puter_cli.js"
         
@@ -112,11 +120,18 @@ class PuterProvider:
             "stream": False
         }
         
+        my_env = None
+        if auth_token:
+            import os
+            my_env = os.environ.copy()
+            my_env["PUTER_AUTH_TOKEN"] = auth_token
+            
         try:
             result = subprocess.run(
                 ["node", str(cli_script), "chat", json.dumps(payload)],
                 capture_output=True,
-                text=True
+                text=True,
+                env=my_env
             )
             
             # Use a regex to extract the first JSON block from stdout or stderr
