@@ -183,8 +183,11 @@ def select_best(scored: list[dict[str, Any]], *, min_score: float | None = None,
             qualified.append(c)
             
     if not qualified:
-        LOG.warning("No candidate met the strict quality floor. Aborting selection.")
-        return None
+        LOG.warning("No candidate met the strict quality floor. Falling back to the best available candidates.")
+        qualified = [c for c in scored if not c.get("hard_rejection")]
+        if not qualified:
+            LOG.warning("No candidates available without hard rejection. Aborting.")
+            return None
 
     shortlist = _generate_shortlist(qualified, size=15)
     if not shortlist: return None
