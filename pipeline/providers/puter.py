@@ -189,6 +189,7 @@ class PuterProvider:
                         continue
                     return out
                     
+                out["_account_index"] = tokens.index(current_token) + 1 if current_token in tokens else 1
                 return out
                     
             except subprocess.CalledProcessError as e:

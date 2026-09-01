@@ -41,6 +41,8 @@ class ProviderResult:
     latency_ms: float = 0.0
     attempt: int = 1
     retryable: bool = False
+    usage: dict[str, int] = dataclasses.field(default_factory=dict)
+    account_index: int | None = None
 
 
 class LLMRouter:
@@ -174,6 +176,8 @@ class LLMRouter:
                                 
                             chunk_content = resp_dict.get("text", "")
                             finish = resp_dict.get("finishReason", "stop")
+                            result.usage = resp_dict.get("usage", {})
+                            result.account_index = resp_dict.get("_account_index")
 
                         elif is_gemini:
                             from google import genai
@@ -398,14 +402,21 @@ class LLMRouter:
         temperature: float = 0.7,
         reasoning_effort: str | None = None,
     ) -> dict[str, Any]:
-        text = self.chat(
+        res = self.chat_json_structured(
             messages,
             max_tokens=max_tokens,
             temperature=temperature,
-            json_mode=True,
             reasoning_effort=reasoning_effort,
         )
-        return _parse_json(text)
+        if res.status != ProviderStatus.SUCCESS:
+            raise RuntimeError(f"Chat failed: {res.error_summary}")
+            
+        parsed = res.parsed or {}
+        parsed["_llm_usage"] = res.usage
+        parsed["_llm_provider"] = res.provider
+        if res.account_index is not None:
+            parsed["_llm_account_index"] = res.account_index
+        return parsed
 
 
 # ---------- robust JSON extraction ----------
