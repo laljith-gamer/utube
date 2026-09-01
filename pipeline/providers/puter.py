@@ -23,82 +23,101 @@ class PuterProvider:
 
         cli_script = repo_root() / "pipeline" / "providers" / "puter_cli.js"
         
-        my_env = None
-        if auth_token:
-            import os
-            my_env = os.environ.copy()
-            my_env["PUTER_AUTH_TOKEN"] = auth_token
+        import os
+        tokens = [auth_token] if auth_token else []
+        for i in range(2, 6):
+            t = os.environ.get(f"PUTER_AUTH_TOKEN_{i}")
+            if t and t not in tokens:
+                tokens.append(t)
+        if not tokens:
+            tokens = [None]
             
-        try:
-            result = subprocess.run(
-                ["node", str(cli_script), "listModels"],
-                capture_output=True,
-                text=True,
-                env=my_env
-            )
-            import re
-            combined_output = result.stdout + "\n" + result.stderr
-            m = re.search(r"(\[.*\]|\{.*\})", combined_output, re.DOTALL)
-            if not m:
-                if result.returncode != 0:
-                    err_msg = result.stderr.strip() or result.stdout.strip()
-                    raise RuntimeError(f"Puter CLI listModels failed (code {result.returncode}): {err_msg}")
-                raise RuntimeError(f"Puter CLI listModels returned empty/invalid output: {combined_output}")
-            
-            json_str = m.group(1)
+        last_error = None
+        for current_token in tokens:
+            my_env = None
+            if current_token:
+                my_env = os.environ.copy()
+                my_env["PUTER_AUTH_TOKEN"] = current_token
+                
             try:
-                models = json.loads(json_str)
-            except json.JSONDecodeError:
-                if result.returncode != 0:
-                    err_msg = result.stderr.strip() or result.stdout.strip()
-                    raise RuntimeError(f"Puter CLI listModels failed (code {result.returncode}): {err_msg}")
-                raise RuntimeError(f"Puter CLI listModels returned invalid JSON: {json_str}")
+                result = subprocess.run(
+                    ["node", str(cli_script), "listModels"],
+                    capture_output=True,
+                    text=True,
+                    env=my_env
+                )
+                import re
+                combined_output = result.stdout + "\n" + result.stderr
+                m = re.search(r"(\[.*\]|\{.*\})", combined_output, re.DOTALL)
+                if not m:
+                    if result.returncode != 0:
+                        err_msg = result.stderr.strip() or result.stdout.strip()
+                        raise RuntimeError(f"Puter CLI listModels failed (code {result.returncode}): {err_msg}")
+                    raise RuntimeError(f"Puter CLI listModels returned empty/invalid output: {combined_output}")
                 
-            if isinstance(models, dict) and "error" in models:
-                raise RuntimeError(f"Puter preflight failed: {models['error']}")
+                json_str = m.group(1)
+                try:
+                    models = json.loads(json_str)
+                except json.JSONDecodeError:
+                    if result.returncode != 0:
+                        err_msg = result.stderr.strip() or result.stdout.strip()
+                        raise RuntimeError(f"Puter CLI listModels failed (code {result.returncode}): {err_msg}")
+                    raise RuntimeError(f"Puter CLI listModels returned invalid JSON: {json_str}")
+                    
+                if isinstance(models, dict) and "error" in models:
+                    err_str = str(models.get("error", ""))
+                    if "rate limit" in err_str.lower() or "usage" in err_str.lower() or "unauthorized" in err_str.lower():
+                        last_error = f"Puter preflight failed: {err_str}"
+                        continue
+                    raise RuntimeError(f"Puter preflight failed: {models['error']}")
+                    
+                if not isinstance(models, list):
+                    raise RuntimeError(f"Puter listModels returned unexpected format: {type(models)}")
+                    
+                available_ids = [m.get("id", "") for m in models]
                 
-            if not isinstance(models, list):
-                raise RuntimeError(f"Puter listModels returned unexpected format: {type(models)}")
-                
-            available_ids = [m.get("id", "") for m in models]
-            
-            # Model selection priority
-            target = None
-            for priority in ["claude-opus-4-8", "claude-opus-4-6"]:
-                for mid in available_ids:
-                    if priority in mid:
-                        target = mid
+                target = None
+                for priority in ["claude-opus-4-8", "claude-opus-4-6"]:
+                    for mid in available_ids:
+                        if priority in mid:
+                            target = mid
+                            break
+                    if target:
                         break
-                if target:
-                    break
-            
-            if not target:
-                for mid in available_ids:
-                    if "claude-opus" in mid:
-                        target = mid
-                        break
-            
-            if not target:
-                for mid in available_ids:
-                    if "claude-sonnet-4-6" in mid:
-                        target = mid
-                        break
-                        
-            if not target:
-                raise RuntimeError(f"No preferred Claude model found in Puter catalog. Available: {available_ids}")
                 
-            LOG.info("Puter preflight authentication: OK")
-            LOG.info("Puter preflight model discovery: OK")
-            LOG.info("Puter preflight preferred model: %s", target)
-            LOG.info("Puter preflight provider: claude")
-            LOG.info("Puter preflight status: READY")
-            
-            cls._verified_opus_model = target
-            return target
-            
-        except subprocess.CalledProcessError as e:
-            err_msg = e.stderr.strip() or e.stdout.strip()
-            raise RuntimeError(f"Puter CLI listModels failed: {err_msg}")
+                if not target:
+                    for mid in available_ids:
+                        if "claude-opus" in mid:
+                            target = mid
+                            break
+                
+                if not target:
+                    for mid in available_ids:
+                        if "claude-sonnet-4-6" in mid:
+                            target = mid
+                            break
+                            
+                if not target:
+                    raise RuntimeError(f"No preferred Claude model found in Puter catalog. Available: {available_ids}")
+                    
+                LOG.info("Puter preflight authentication: OK")
+                LOG.info("Puter preflight model discovery: OK")
+                LOG.info("Puter preflight preferred model: %s", target)
+                LOG.info("Puter preflight provider: claude")
+                LOG.info("Puter preflight status: READY")
+                
+                cls._verified_opus_model = target
+                return target
+                
+            except subprocess.CalledProcessError as e:
+                err_msg = e.stderr.strip() or e.stdout.strip()
+                last_error = f"Puter CLI listModels failed: {err_msg}"
+                continue
+            except Exception as e:
+                last_error = str(e)
+                continue
+                
+        raise RuntimeError(last_error or "Puter preflight failed: All tokens exhausted or invalid.")
 
     @staticmethod
     def chat(
@@ -120,46 +139,66 @@ class PuterProvider:
             "stream": False
         }
         
-        my_env = None
-        if auth_token:
-            import os
-            my_env = os.environ.copy()
-            my_env["PUTER_AUTH_TOKEN"] = auth_token
+        import os
+        tokens = [auth_token] if auth_token else []
+        for i in range(2, 6):
+            t = os.environ.get(f"PUTER_AUTH_TOKEN_{i}")
+            if t and t not in tokens:
+                tokens.append(t)
+        if not tokens:
+            tokens = [None]
             
-        try:
-            result = subprocess.run(
-                ["node", str(cli_script), "chat", json.dumps(payload)],
-                capture_output=True,
-                text=True,
-                env=my_env
-            )
-            
-            # Use a regex to extract the first JSON block from stdout or stderr
-            # to avoid node.js assertions and other junk printed
-            import re
-            combined_output = result.stdout + "\n" + result.stderr
-            m = re.search(r"(\{.*\})", combined_output, re.DOTALL)
-            if not m:
-                if result.returncode != 0:
-                    err_msg = result.stderr.strip() or result.stdout.strip()
-                    raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
-                raise RuntimeError(f"Puter CLI returned empty/invalid output: {combined_output}")
+        last_out = None
+        for current_token in tokens:
+            my_env = None
+            if current_token:
+                my_env = os.environ.copy()
+                my_env["PUTER_AUTH_TOKEN"] = current_token
                 
-            json_str = m.group(1)
             try:
-                out = json.loads(json_str)
-            except json.JSONDecodeError:
-                if result.returncode != 0:
-                    err_msg = result.stderr.strip() or result.stdout.strip()
-                    raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
-                raise RuntimeError(f"Puter CLI returned invalid JSON: {json_str}")
-            
-            # If the script returned a JSON error block or exited with error
-            if "error" in out or result.returncode != 0:
+                result = subprocess.run(
+                    ["node", str(cli_script), "chat", json.dumps(payload)],
+                    capture_output=True,
+                    text=True,
+                    env=my_env
+                )
+                
+                import re
+                combined_output = result.stdout + "\n" + result.stderr
+                m = re.search(r"(\{.*\})", combined_output, re.DOTALL)
+                if not m:
+                    if result.returncode != 0:
+                        err_msg = result.stderr.strip() or result.stdout.strip()
+                        raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
+                    raise RuntimeError(f"Puter CLI returned empty/invalid output: {combined_output}")
+                    
+                json_str = m.group(1)
+                try:
+                    out = json.loads(json_str)
+                except json.JSONDecodeError:
+                    if result.returncode != 0:
+                        err_msg = result.stderr.strip() or result.stdout.strip()
+                        raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
+                    raise RuntimeError(f"Puter CLI returned invalid JSON: {json_str}")
+                
+                if "error" in out or result.returncode != 0:
+                    err_str = str(out.get("error", ""))
+                    if "No usage left" in err_str or "rate limit" in err_str.lower():
+                        LOG.warning("Puter account out of credits or rate limited. Falling back to next token if available...")
+                        last_out = out
+                        continue
+                    return out
+                    
                 return out
+                    
+            except subprocess.CalledProcessError as e:
+                err_msg = e.stderr.strip() or e.stdout.strip()
+                last_out = {"error": f"Puter CLI failed: {err_msg}"}
+                continue
+            except Exception as e:
+                last_out = {"error": str(e)}
+                continue
                 
-            return out
-                
-        except subprocess.CalledProcessError as e:
-            err_msg = e.stderr.strip() or e.stdout.strip()
-            raise RuntimeError(f"Puter CLI failed: {err_msg}")
+        if last_out is not None:
+            return last_out
+        raise RuntimeError("Puter CLI failed: All tokens exhausted.")
