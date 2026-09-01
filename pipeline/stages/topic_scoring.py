@@ -189,7 +189,7 @@ def select_best(scored: list[dict[str, Any]], *, min_score: float | None = None,
             LOG.warning("No candidates available without hard rejection. Aborting.")
             return None
 
-    shortlist = _generate_shortlist(qualified, size=30)
+    shortlist = _generate_shortlist(qualified, size=20)
     if not shortlist: return None
     
     LOG.info("Generated diverse shortlist of %d candidates for Opus Stage A.", len(shortlist))
