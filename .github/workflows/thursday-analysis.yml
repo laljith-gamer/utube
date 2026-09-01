@@ -35,6 +35,9 @@ jobs:
         env:
           PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
           PUTER_AUTH_TOKEN_2: ${{ secrets.PUTER_AUTH_TOKEN_2 }}
+          PUTER_AUTH_TOKEN_3: ${{ secrets.PUTER_AUTH_TOKEN_3 }}
+          PUTER_AUTH_TOKEN_4: ${{ secrets.PUTER_AUTH_TOKEN_4 }}
+          PUTER_AUTH_TOKEN_5: ${{ secrets.PUTER_AUTH_TOKEN_5 }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
