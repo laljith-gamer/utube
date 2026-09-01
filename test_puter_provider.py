@@ -9,8 +9,11 @@ logging.basicConfig(level=logging.INFO)
 def test_puter():
     print("Testing PuterProvider...")
     try:
+        model = PuterProvider.preflight()
+        print(f"Preflight selected model: {model}")
+        
         response = PuterProvider.chat(
-            model="claude-opus-4-6", # Testing claude-opus-4-6 as requested
+            model=model, # Use discovered model
             messages=[{"role": "user", "content": "Respond with a simple JSON object: {\"status\": \"ok\", \"message\": \"hello world\"}"}],
             max_tokens=100,
             temperature=0.1,

@@ -147,11 +147,19 @@ class LLMRouter:
                         
                         is_gemini = "gemini" in model_name.lower() or p.get("api_key_env") == "GEMINI_API_KEY"
                         is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or "puter" in provider_name.lower()
+                        
+                        if not is_puter:
+                            raise RuntimeError(f"HARD ASSERTION FAILED: NON-PUTER PROVIDER DETECTED IN PUTER-ONLY MODE ({provider_name})")
 
                         if is_puter:
                             from .puter import PuterProvider
+                            
+                            # Preflight & get the exact model ID
+                            actual_model = PuterProvider.preflight()
+                            if retry_attempt == 0:
+                                LOG.info("  (Using exact Puter runtime model ID: %s)", actual_model)
                             resp_dict = PuterProvider.chat(
-                                model=model_name,
+                                model=actual_model,
                                 messages=current_messages,
                                 max_tokens=provider_params.get("max_tokens", max_tokens),
                                 temperature=provider_params.get("temperature", temperature),
@@ -209,7 +217,7 @@ class LLMRouter:
                                 api_key=p["api_key"], 
                                 base_url=p["base_url"], 
                                 timeout=provider_timeout,
-                                max_retries=provider_retries
+                                max_retries=max_provider_retries
                             )
                             kwargs: dict[str, Any] = {
                                 "model": model_name,

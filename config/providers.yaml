@@ -3,10 +3,10 @@
 # `chain` = order in which providers are tried.
 
 llm_research:
-  # Prefer a current general-purpose text model. The previous Ising Calibration
-  # model is a quantum-calibration VLM and is not an appropriate research model.
-  chain: [puter_opus, gemini_flash, nvidia_nim_research, openrouter_research]
-  request_timeout_sec: 120
+  # PUTER ONLY MODE ENABLED: Do not use other providers. 
+  # This chain is currently constrained to Puter-only per configuration.
+  chain: [puter_opus]
+  request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
     medium: 8000
@@ -46,8 +46,8 @@ llm_research:
         max_tokens: 12000
 
 llm_script:
-  # OpenRouter is first — NIM llama models (3.3 and 3.1) both hit EOL 2026-08-26
-  chain: [puter_opus, gemini_flash, openrouter_script, nvidia_nim_script]
+  # PUTER ONLY MODE ENABLED
+  chain: [puter_opus]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -76,8 +76,9 @@ llm_script:
       supports_reasoning_effort: false
 
 llm_concept:
-  chain: [puter_opus, gemini_flash, openrouter_research, nvidia_nim_research]
-  request_timeout_sec: 120
+  # PUTER ONLY MODE ENABLED
+  chain: [puter_opus]
+  request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
     puter_opus:
@@ -113,8 +114,9 @@ llm_concept:
         max_tokens: 4000
 
 llm_qc:
-  chain: [puter_opus, gemini_flash, openrouter_research, nvidia_nim_research]
-  request_timeout_sec: 120
+  # PUTER ONLY MODE ENABLED
+  chain: [puter_opus]
+  request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
     puter_opus:
@@ -150,8 +152,9 @@ llm_qc:
         max_tokens: 3000
 
 llm_premium_rewrite:
+  # PUTER ONLY MODE ENABLED
   chain: [puter_opus]
-  request_timeout_sec: 180
+  request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
     puter_opus:
