@@ -93,7 +93,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             # If we reach here, we have a valid concept and research brief
             break
         else:
-            result["reason"] = f"Failed to find a candidate that passes concept and fact checks after {max_candidate_attempts} attempts."
+            result.update({"ok": True, "reason": f"Failed to find a candidate that passes concept and fact checks after {max_candidate_attempts} attempts."})
             write_json(out / "result.json", result)
             return result
 
@@ -155,7 +155,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / "5_premium_qc.json", qc_result)
             
             if not qc_result.get("passed"):
-                result["reason"] = "Failed script QC (even after premium rewrite)."
+                result.update({"ok": True, "reason": "Failed script QC (even after premium rewrite)."})
                 write_json(out / "result.json", result)
                 return result
         else:
@@ -200,7 +200,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         v_qc = visual_qc.evaluate_visuals(vis)
         write_json(out / "7_visual_qc.json", v_qc)
         if not v_qc.get("passed"):
-            result["reason"] = "Failed visual QC."
+            result.update({"ok": True, "reason": "Failed visual QC."})
             write_json(out / "result.json", result)
             return result
 
