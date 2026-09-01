@@ -62,7 +62,8 @@ class LLMRouter:
                 LOG.warning("LLM provider %r in chain but not defined in providers", name)
                 continue
             key = env(p.get("api_key_env", ""))
-            if not key:
+            is_puter_cfg = "puter" in name.lower() or p.get("api_key_env") == "PUTER_AUTH_TOKEN"
+            if not key and not is_puter_cfg:
                 continue
             self.active.append({"name": name, "api_key": key, **p})
 
