@@ -2,7 +2,7 @@
   "events": {
     "mapquest-s-app-surges-to-no-1-in-navigat-a40228b7": {
       "first_seen_at": "2026-09-01T08:11:04.724706+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409280+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327043+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724706+00:00",
@@ -12,6 +12,11 @@
           "timestamp": "2026-09-01T09:00:00.409280+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327043+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -19,7 +24,7 @@
     },
     "amazon-workers-on-food-stamps-nearly-tri-1736fd69": {
       "first_seen_at": "2026-09-01T08:11:04.724732+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409311+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327074+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724732+00:00",
@@ -29,6 +34,11 @@
           "timestamp": "2026-09-01T09:00:00.409311+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327074+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -36,7 +46,7 @@
     },
     "sony-lawyers-argue-that-nobody-is-stupid-1cd6d7c2": {
       "first_seen_at": "2026-09-01T08:11:04.724749+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409328+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327092+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724749+00:00",
@@ -46,6 +56,11 @@
           "timestamp": "2026-09-01T09:00:00.409328+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327092+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -53,7 +68,7 @@
     },
     "florida-orders-removal-of-flock-cameras--9898088b": {
       "first_seen_at": "2026-09-01T08:11:04.724761+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409340+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327105+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724761+00:00",
@@ -63,6 +78,11 @@
           "timestamp": "2026-09-01T09:00:00.409340+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327105+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -70,7 +90,7 @@
     },
     "i-expected-tech-fatalism-americans-are-p-1ec80127": {
       "first_seen_at": "2026-09-01T08:11:04.724774+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409352+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327118+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724774+00:00",
@@ -80,6 +100,11 @@
           "timestamp": "2026-09-01T09:00:00.409352+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327118+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -87,7 +112,7 @@
     },
     "man-uses-robot-vacuum-to-covertly-record-1d5ad8c8": {
       "first_seen_at": "2026-09-01T08:11:04.724796+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409371+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327139+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724796+00:00",
@@ -97,6 +122,11 @@
           "timestamp": "2026-09-01T09:00:00.409371+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327139+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -104,7 +134,7 @@
     },
     "gamer-complained-that-he-turned-on-his-o-adf59419": {
       "first_seen_at": "2026-09-01T08:11:04.724812+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409385+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327152+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724812+00:00",
@@ -114,6 +144,11 @@
           "timestamp": "2026-09-01T09:00:00.409385+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327152+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -121,7 +156,7 @@
     },
     "kalshi-bans-ex-congressman-george-santos-13414ecf": {
       "first_seen_at": "2026-09-01T08:11:04.724826+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409399+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327167+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724826+00:00",
@@ -131,6 +166,11 @@
           "timestamp": "2026-09-01T09:00:00.409399+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327167+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -138,7 +178,7 @@
     },
     "playa-phone-eea9cc3e": {
       "first_seen_at": "2026-09-01T08:11:04.724836+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409412+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327181+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724836+00:00",
@@ -148,6 +188,11 @@
           "timestamp": "2026-09-01T09:00:00.409412+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327181+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -155,7 +200,7 @@
     },
     "i-turned-my-security-cameras-into-an-aut-60c6a88d": {
       "first_seen_at": "2026-09-01T08:11:04.724847+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409425+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327193+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724847+00:00",
@@ -165,6 +210,11 @@
           "timestamp": "2026-09-01T09:00:00.409425+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327193+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -172,7 +222,7 @@
     },
     "dwarf-fortress-is-getting-the-mother-of--c17315cb": {
       "first_seen_at": "2026-09-01T08:11:04.724857+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409445+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327215+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724857+00:00",
@@ -182,6 +232,11 @@
           "timestamp": "2026-09-01T09:00:00.409445+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327215+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -189,7 +244,7 @@
     },
     "terence-tao-explains-6-essential-mathema-9cac337a": {
       "first_seen_at": "2026-09-01T08:11:04.724869+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409435+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327204+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724869+00:00",
@@ -199,6 +254,11 @@
           "timestamp": "2026-09-01T09:00:00.409435+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327204+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -206,7 +266,7 @@
     },
     "apple-caught-off-guard-by-ai-demand-for--d4b6bd79": {
       "first_seen_at": "2026-09-01T08:11:04.724880+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409455+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327226+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724880+00:00",
@@ -216,6 +276,11 @@
           "timestamp": "2026-09-01T09:00:00.409455+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327226+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -223,7 +288,7 @@
     },
     "i-think-the-military-commissary-s-freeze-c8b5f9b8": {
       "first_seen_at": "2026-09-01T08:11:04.724890+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409473+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327244+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724890+00:00",
@@ -233,6 +298,11 @@
           "timestamp": "2026-09-01T09:00:00.409473+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327244+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -240,7 +310,7 @@
     },
     "a-walkable-ascii-cyberpunk-city-in-one-h-dcbbfc92": {
       "first_seen_at": "2026-09-01T08:11:04.724899+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409482+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327254+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724899+00:00",
@@ -250,6 +320,11 @@
           "timestamp": "2026-09-01T09:00:00.409482+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327254+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -257,7 +332,7 @@
     },
     "fastpotify-92312ddd": {
       "first_seen_at": "2026-09-01T08:11:04.724907+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409463+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327234+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724907+00:00",
@@ -265,6 +340,11 @@
         },
         {
           "timestamp": "2026-09-01T09:00:00.409463+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327234+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -291,7 +371,7 @@
     },
     "chatgpt-work-tool-and-skill-reference-5f40d477": {
       "first_seen_at": "2026-09-01T08:11:04.724924+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409518+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327282+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724924+00:00",
@@ -301,6 +381,11 @@
           "timestamp": "2026-09-01T09:00:00.409518+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327282+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -308,7 +393,7 @@
     },
     "reverse-engineering-my-adhd-test-90ca95ff": {
       "first_seen_at": "2026-09-01T08:11:04.724933+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409509+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327273+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724933+00:00",
@@ -318,6 +403,11 @@
           "timestamp": "2026-09-01T09:00:00.409509+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327273+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -325,7 +415,7 @@
     },
     "evidence-of-fraud-in-an-influential-stud-fe4b7ce4": {
       "first_seen_at": "2026-09-01T08:11:04.724943+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409491+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327264+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724943+00:00",
@@ -335,6 +425,11 @@
           "timestamp": "2026-09-01T09:00:00.409491+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327264+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -342,7 +437,7 @@
     },
     "smartphone-led-detects-hidden-cameras-wi-7b691f7f": {
       "first_seen_at": "2026-09-01T08:11:04.724952+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409527+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327300+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724952+00:00",
@@ -352,6 +447,11 @@
           "timestamp": "2026-09-01T09:00:00.409527+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327300+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -359,7 +459,7 @@
     },
     "ravynos-pre-alpha-open-source-os-based-o-ecfb6917": {
       "first_seen_at": "2026-09-01T08:11:04.724964+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409544+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327311+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724964+00:00",
@@ -369,6 +469,11 @@
           "timestamp": "2026-09-01T09:00:00.409544+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327311+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -376,18 +481,24 @@
     },
     "show-hn-laser-graffiti-108a9bf8": {
       "first_seen_at": "2026-09-01T08:11:04.724973+00:00",
-      "last_seen_at": "2026-09-01T08:11:04.724973+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327319+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724973+00:00",
           "mentions": 1
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327319+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
-      "max_mentions": 1
+      "max_mentions": 1,
+      "max_traffic": 0
     },
     "magna-increases-bet-on-battery-swapping--3c653f8b": {
       "first_seen_at": "2026-09-01T08:11:04.724985+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409574+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327352+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724985+00:00",
@@ -397,6 +508,11 @@
           "timestamp": "2026-09-01T09:00:00.409574+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327352+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -404,7 +520,7 @@
     },
     "lachy-groom-backs-indian-startup-aiming--8f898ce4": {
       "first_seen_at": "2026-09-01T08:11:04.724996+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409584+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327363+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.724996+00:00",
@@ -414,6 +530,11 @@
           "timestamp": "2026-09-01T09:00:00.409584+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327363+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -421,7 +542,7 @@
     },
     "apple-shares-shocking-evidence-against-f-767642d8": {
       "first_seen_at": "2026-09-01T08:11:04.725009+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409595+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327376+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725009+00:00",
@@ -431,6 +552,11 @@
           "timestamp": "2026-09-01T09:00:00.409595+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327376+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -438,7 +564,7 @@
     },
     "polymarket-reportedly-raises-300-million-6d3fa695": {
       "first_seen_at": "2026-09-01T08:11:04.725020+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409606+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327387+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725020+00:00",
@@ -448,6 +574,11 @@
           "timestamp": "2026-09-01T09:00:00.409606+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327387+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -455,7 +586,7 @@
     },
     "a16z-brings-growth-fund-to-8-5b-days-aft-012ef117": {
       "first_seen_at": "2026-09-01T08:11:04.725082+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409615+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327398+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725082+00:00",
@@ -465,6 +596,11 @@
           "timestamp": "2026-09-01T09:00:00.409615+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327398+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -472,7 +608,7 @@
     },
     "a-group-funded-by-andreessen-horowitz-an-ae4fba16": {
       "first_seen_at": "2026-09-01T08:11:04.725105+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409624+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327409+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725105+00:00",
@@ -482,6 +618,11 @@
           "timestamp": "2026-09-01T09:00:00.409624+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327409+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -489,7 +630,7 @@
     },
     "ftc-accuses-amazon-of-running-a-secret-a-c8fffb61": {
       "first_seen_at": "2026-09-01T08:11:04.725119+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409635+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327419+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725119+00:00",
@@ -499,6 +640,11 @@
           "timestamp": "2026-09-01T09:00:00.409635+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327419+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -506,7 +652,7 @@
     },
     "the-pentagon-now-has-its-own-version-of--bc411627": {
       "first_seen_at": "2026-09-01T08:11:04.725131+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409644+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327429+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725131+00:00",
@@ -516,6 +662,11 @@
           "timestamp": "2026-09-01T09:00:00.409644+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327429+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -523,7 +674,7 @@
     },
     "the-google-tv-streamer-now-costs-50-more-bb52bbb9": {
       "first_seen_at": "2026-09-01T08:11:04.725140+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409654+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327439+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725140+00:00",
@@ -533,6 +684,11 @@
           "timestamp": "2026-09-01T09:00:00.409654+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327439+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -540,7 +696,7 @@
     },
     "jmgo-s-very-bright-all-in-one-projector--fa67f19a": {
       "first_seen_at": "2026-09-01T08:11:04.725152+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409664+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327450+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725152+00:00",
@@ -550,6 +706,11 @@
           "timestamp": "2026-09-01T09:00:00.409664+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327450+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -557,7 +718,7 @@
     },
     "ftc-lawsuit-alleges-amazon-has-been-secr-87db3fbd": {
       "first_seen_at": "2026-09-01T08:11:04.725164+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409675+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327461+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725164+00:00",
@@ -567,6 +728,11 @@
           "timestamp": "2026-09-01T09:00:00.409675+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327461+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -574,7 +740,7 @@
     },
     "i-went-to-the-loneliest-baseball-game-on-942e560d": {
       "first_seen_at": "2026-09-01T08:11:04.725175+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409684+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327470+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725175+00:00",
@@ -584,6 +750,11 @@
           "timestamp": "2026-09-01T09:00:00.409684+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327470+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -591,7 +762,7 @@
     },
     "alienware-s-budget-friendly-qd-oled-is-d-8b7bff8c": {
       "first_seen_at": "2026-09-01T08:11:04.725186+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409696+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327481+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725186+00:00",
@@ -601,6 +772,11 @@
           "timestamp": "2026-09-01T09:00:00.409696+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327481+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -608,7 +784,7 @@
     },
     "car-owners-want-tech-they-can-ignore-b10812c2": {
       "first_seen_at": "2026-09-01T08:11:04.725196+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409705+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327490+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725196+00:00",
@@ -618,6 +794,11 @@
           "timestamp": "2026-09-01T09:00:00.409705+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327490+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -625,7 +806,7 @@
     },
     "phil-schiller-is-leaving-his-biggest-job-c93cd274": {
       "first_seen_at": "2026-09-01T08:11:04.725206+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409715+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327500+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725206+00:00",
@@ -635,6 +816,11 @@
           "timestamp": "2026-09-01T09:00:00.409715+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327500+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -642,7 +828,7 @@
     },
     "markiplier-is-now-gopro-s-biggest-shareh-ab76f9e4": {
       "first_seen_at": "2026-09-01T08:11:04.725215+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409725+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327509+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725215+00:00",
@@ -652,6 +838,11 @@
           "timestamp": "2026-09-01T09:00:00.409725+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327509+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -659,7 +850,7 @@
     },
     "attackers-exploit-critical-langflow-and--f6d85cfa": {
       "first_seen_at": "2026-09-01T08:11:04.725227+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409745+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327577+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725227+00:00",
@@ -669,6 +860,11 @@
           "timestamp": "2026-09-01T09:00:00.409745+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327577+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -676,7 +872,7 @@
     },
     "north-korean-job-fraud-expands-beyond-it-caff5e7e": {
       "first_seen_at": "2026-09-01T08:11:04.725237+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409755+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327588+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725237+00:00",
@@ -686,6 +882,11 @@
           "timestamp": "2026-09-01T09:00:00.409755+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327588+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -693,7 +894,7 @@
     },
     "weekly-recap-chinese-spy-proxy-ai-agents-dc788e82": {
       "first_seen_at": "2026-09-01T08:11:04.725250+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409776+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327600+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725250+00:00",
@@ -703,6 +904,11 @@
           "timestamp": "2026-09-01T09:00:00.409776+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327600+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -710,7 +916,7 @@
     },
     "valleyrat-backdoor-hides-in-signed-adwar-9f4855ed": {
       "first_seen_at": "2026-09-01T08:11:04.725260+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409787+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327610+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725260+00:00",
@@ -720,6 +926,11 @@
           "timestamp": "2026-09-01T09:00:00.409787+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327610+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -727,7 +938,7 @@
     },
     "aurora-ransomware-operators-use-cursor-a-1a9f1cd8": {
       "first_seen_at": "2026-09-01T08:11:04.725271+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409797+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327619+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725271+00:00",
@@ -737,6 +948,11 @@
           "timestamp": "2026-09-01T09:00:00.409797+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327619+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -744,7 +960,7 @@
     },
     "securing-claude-code-the-new-compliance--08a47097": {
       "first_seen_at": "2026-09-01T08:11:04.725281+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409807+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327629+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725281+00:00",
@@ -754,6 +970,11 @@
           "timestamp": "2026-09-01T09:00:00.409807+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327629+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -761,7 +982,7 @@
     },
     "china-linked-fire-ant-hijacks-cisco-rout-85345509": {
       "first_seen_at": "2026-09-01T08:11:04.725292+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409818+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327639+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725292+00:00",
@@ -769,6 +990,11 @@
         },
         {
           "timestamp": "2026-09-01T09:00:00.409818+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327639+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -789,7 +1015,7 @@
     },
     "the-bentley-supersports-a-stripped-out-e-8b85fa62": {
       "first_seen_at": "2026-09-01T08:11:04.725311+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409827+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327648+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725311+00:00",
@@ -799,6 +1025,11 @@
           "timestamp": "2026-09-01T09:00:00.409827+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327648+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -806,7 +1037,7 @@
     },
     "trump-admin-shelves-cyclospora-research--eb679f92": {
       "first_seen_at": "2026-09-01T08:11:04.725321+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409836+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327658+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725321+00:00",
@@ -816,6 +1047,11 @@
           "timestamp": "2026-09-01T09:00:00.409836+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327658+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -823,7 +1059,7 @@
     },
     "get-in-on-the-ars-community-that-doesn-t-b2d53b3b": {
       "first_seen_at": "2026-09-01T08:11:04.725333+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409897+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327668+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725333+00:00",
@@ -833,6 +1069,11 @@
           "timestamp": "2026-09-01T09:00:00.409897+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327668+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -840,7 +1081,7 @@
     },
     "review-coyote-vs-acme-is-an-unabashed-lo-3b413dc1": {
       "first_seen_at": "2026-09-01T08:11:04.725343+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409908+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327677+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725343+00:00",
@@ -850,6 +1091,11 @@
           "timestamp": "2026-09-01T09:00:00.409908+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327677+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -857,7 +1103,7 @@
     },
     "trump-tells-fcc-to-punish-journalist-for-4b7e2a97": {
       "first_seen_at": "2026-09-01T08:11:04.725354+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409919+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327687+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725354+00:00",
@@ -867,6 +1113,11 @@
           "timestamp": "2026-09-01T09:00:00.409919+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327687+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -874,7 +1125,7 @@
     },
     "zlibrary-my-beloved-anthropic-staff-chat-791a38f0": {
       "first_seen_at": "2026-09-01T08:11:04.725365+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409930+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327710+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725365+00:00",
@@ -884,6 +1135,11 @@
           "timestamp": "2026-09-01T09:00:00.409930+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327710+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -891,7 +1147,7 @@
     },
     "raindrops-are-tiny-lightning-bolts-and-t-93849548": {
       "first_seen_at": "2026-09-01T08:11:04.725376+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409941+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327720+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725376+00:00",
@@ -901,6 +1157,11 @@
           "timestamp": "2026-09-01T09:00:00.409941+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327720+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -908,7 +1169,7 @@
     },
     "think-twice-before-installing-this-devic-7644cacd": {
       "first_seen_at": "2026-09-01T08:11:04.725386+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409951+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327731+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725386+00:00",
@@ -916,6 +1177,11 @@
         },
         {
           "timestamp": "2026-09-01T09:00:00.409951+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327731+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -958,7 +1224,7 @@
     },
     "on-september-01-2008-iraq-war-the-united-89a93ae9": {
       "first_seen_at": "2026-09-01T08:11:04.725436+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409969+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327744+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725436+00:00",
@@ -968,6 +1234,11 @@
           "timestamp": "2026-09-01T09:00:00.409969+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327744+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -975,7 +1246,7 @@
     },
     "on-september-01-2004-the-beslan-school-s-743b4d8c": {
       "first_seen_at": "2026-09-01T08:11:04.725453+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409985+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327762+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725453+00:00",
@@ -985,6 +1256,11 @@
           "timestamp": "2026-09-01T09:00:00.409985+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327762+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -992,7 +1268,7 @@
     },
     "on-september-01-1985-the-wreck-of-the-ti-00d8aed5": {
       "first_seen_at": "2026-09-01T08:11:04.725465+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409997+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327773+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725465+00:00",
@@ -1002,6 +1278,11 @@
           "timestamp": "2026-09-01T09:00:00.409997+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327773+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1009,7 +1290,7 @@
     },
     "on-september-01-1983-cold-war-korean-air-a3f6828d": {
       "first_seen_at": "2026-09-01T08:11:04.725479+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410010+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327787+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725479+00:00",
@@ -1019,6 +1300,11 @@
           "timestamp": "2026-09-01T09:00:00.410010+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327787+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1026,7 +1312,7 @@
     },
     "on-september-01-1982-the-united-states-a-86ee51d4": {
       "first_seen_at": "2026-09-01T08:11:04.725489+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410019+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327796+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725489+00:00",
@@ -1036,6 +1322,11 @@
           "timestamp": "2026-09-01T09:00:00.410019+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327796+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1043,7 +1334,7 @@
     },
     "on-september-01-1981-central-african-pre-013ed9a3": {
       "first_seen_at": "2026-09-01T08:11:04.725503+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410032+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327809+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725503+00:00",
@@ -1053,6 +1344,11 @@
           "timestamp": "2026-09-01T09:00:00.410032+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327809+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1060,7 +1356,7 @@
     },
     "on-september-01-1974-the-sr-71-blackbird-5a1f22ae": {
       "first_seen_at": "2026-09-01T08:11:04.725523+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410050+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327836+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725523+00:00",
@@ -1070,6 +1366,11 @@
           "timestamp": "2026-09-01T09:00:00.410050+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327836+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1077,7 +1378,7 @@
     },
     "on-september-01-1973-a-76-hour-multinati-6527caba": {
       "first_seen_at": "2026-09-01T08:11:04.725535+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410062+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327848+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725535+00:00",
@@ -1087,6 +1388,11 @@
           "timestamp": "2026-09-01T09:00:00.410062+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327848+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1094,7 +1400,7 @@
     },
     "on-september-01-1969-a-coup-in-libya-bri-19a31b24": {
       "first_seen_at": "2026-09-01T08:11:04.725545+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410072+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327858+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725545+00:00",
@@ -1104,6 +1410,11 @@
           "timestamp": "2026-09-01T09:00:00.410072+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327858+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1111,7 +1422,7 @@
     },
     "on-september-01-1967-six-day-war-the-kha-524069e4": {
       "first_seen_at": "2026-09-01T08:11:04.725558+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410084+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327870+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725558+00:00",
@@ -1121,6 +1432,11 @@
           "timestamp": "2026-09-01T09:00:00.410084+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327870+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1128,7 +1444,7 @@
     },
     "public-apis-public-apis-a-collective-lis-90e2d260": {
       "first_seen_at": "2026-09-01T08:11:04.725568+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410095+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327879+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725568+00:00",
@@ -1138,6 +1454,11 @@
           "timestamp": "2026-09-01T09:00:00.410095+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327879+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1145,7 +1466,7 @@
     },
     "freecodecamp-freecodecamp-freecodecamp-o-96ffafc4": {
       "first_seen_at": "2026-09-01T08:11:04.725580+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410106+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327890+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725580+00:00",
@@ -1155,6 +1476,11 @@
           "timestamp": "2026-09-01T09:00:00.410106+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327890+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1162,7 +1488,7 @@
     },
     "ebookfoundation-free-programming-books-b-0f045c90": {
       "first_seen_at": "2026-09-01T08:11:04.725589+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410116+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327899+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725589+00:00",
@@ -1172,6 +1498,11 @@
           "timestamp": "2026-09-01T09:00:00.410116+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327899+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1179,7 +1510,7 @@
     },
     "openclaw-openclaw-your-own-personal-ai-a-5f7dbd23": {
       "first_seen_at": "2026-09-01T08:11:04.725602+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410130+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327912+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725602+00:00",
@@ -1189,6 +1520,11 @@
           "timestamp": "2026-09-01T09:00:00.410130+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327912+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1196,7 +1532,7 @@
     },
     "awesome-selfhosted-awesome-selfhosted-a--856a67d5": {
       "first_seen_at": "2026-09-01T08:11:04.725614+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410151+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327936+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725614+00:00",
@@ -1206,6 +1542,11 @@
           "timestamp": "2026-09-01T09:00:00.410151+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327936+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1213,7 +1554,7 @@
     },
     "practical-tutorials-project-based-learni-9d5f53be": {
       "first_seen_at": "2026-09-01T08:11:04.725623+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410161+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327947+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725623+00:00",
@@ -1223,6 +1564,11 @@
           "timestamp": "2026-09-01T09:00:00.410161+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327947+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1230,7 +1576,7 @@
     },
     "obra-superpowers-an-agentic-skills-frame-9e59785c": {
       "first_seen_at": "2026-09-01T08:11:04.725695+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410171+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327957+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725695+00:00",
@@ -1240,6 +1586,11 @@
           "timestamp": "2026-09-01T09:00:00.410171+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327957+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1247,7 +1598,7 @@
     },
     "react-react-the-library-for-web-and-nati-4a15ce5b": {
       "first_seen_at": "2026-09-01T08:11:04.725706+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410180+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327967+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725706+00:00",
@@ -1257,6 +1608,11 @@
           "timestamp": "2026-09-01T09:00:00.410180+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327967+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -1264,7 +1620,7 @@
     },
     "torvalds-linux-linux-kernel-source-tree-5893594d": {
       "first_seen_at": "2026-09-01T08:11:04.725716+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410189+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327975+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T08:11:04.725716+00:00",
@@ -1272,6 +1628,11 @@
         },
         {
           "timestamp": "2026-09-01T09:00:00.410189+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327975+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -1292,10 +1653,15 @@
     },
     "gpu-world-24824c7d": {
       "first_seen_at": "2026-09-01T09:00:00.409534+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409534+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327291+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T09:00:00.409534+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327291+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -1318,23 +1684,33 @@
     },
     "-d41d8cd9": {
       "first_seen_at": "2026-09-01T09:00:00.409563+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409563+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327339+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T09:00:00.409563+00:00",
           "mentions": 1,
           "traffic_volume": 500
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327339+00:00",
+          "mentions": 1,
+          "traffic_volume": 2000
         }
       ],
       "max_mentions": 1,
-      "max_traffic": 500
+      "max_traffic": 2000
     },
     "russia-aligned-uac-0099-plants-nuclear-w-5d8ea927": {
       "first_seen_at": "2026-09-01T09:00:00.409735+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.409735+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327521+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T09:00:00.409735+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327521+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -1344,10 +1720,15 @@
     },
     "vinta-awesome-python-the-definitive-list-3866ff9b": {
       "first_seen_at": "2026-09-01T09:00:00.410140+00:00",
-      "last_seen_at": "2026-09-01T09:00:00.410140+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327924+00:00",
       "history": [
         {
           "timestamp": "2026-09-01T09:00:00.410140+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-01T09:21:33.327924+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -1432,6 +1813,19 @@
       ],
       "max_mentions": 1,
       "max_traffic": 0
+    },
+    "pierre-damas-bel-d7e09549": {
+      "first_seen_at": "2026-09-01T09:21:33.327329+00:00",
+      "last_seen_at": "2026-09-01T09:21:33.327329+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-01T09:21:33.327329+00:00",
+          "mentions": 1,
+          "traffic_volume": 200
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 200
     }
   }
 }
