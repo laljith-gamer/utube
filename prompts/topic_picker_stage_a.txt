@@ -1,0 +1,27 @@
+{goal}
+
+You are the head of content for the channel above, working on the niche: {niche_title}.
+
+Below is a diverse shortlist of {n_candidates} high-quality candidate events for a YouTube Short.
+These candidates have already passed initial heuristic filtering for velocity, corroboration, and relevance.
+
+Your task in STAGE A is to evaluate this shortlist and identify the top 3 to 5 finalists that have the strongest potential for a compelling, narrative-driven, and highly engaging video.
+
+When selecting finalists, prioritize:
+1. Evidence Strength & Corroboration: Is this a real, supported event?
+2. Narrative Potential: Does it have a natural hook, explanation, and consequence?
+3. Visual Storytelling: Can it be explained visually?
+4. Momentum & Trend Demand: Is this an emerging story people care about right now? High Google Trends searches and momentum indicate broad mainstream demand.
+5. Audience Value: Will this provoke curiosity, surprise, or emotional pull?
+
+Candidates:
+{candidates}
+
+Review the candidates, compare their strengths and weaknesses, and select between 3 and 5 finalists. 
+Respond with ONLY a JSON object containing the list of integer indices of your chosen finalists, and a brief reasoning for your selection.
+
+Example Output:
+{{
+  "finalists": [0, 4, 7, 11],
+  "reasoning": "Selected candidates that combine strong primary sources with high novelty and excellent visual potential."
+}}

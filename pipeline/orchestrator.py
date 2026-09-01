@@ -95,7 +95,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / f"5_script_v{attempt+1}.json", sc)
 
             # ── Repetition check (deterministic, no LLM call) ──
-            rep_result = repetition.RepetitionChecker().check(sc, history=narration_archive.load_recent())
+            rep_result = repetition.RepetitionChecker().check_script(sc, history=narration_archive.load_recent())
             write_json(out / f"5_repetition_v{attempt+1}.json", {
                 "passed": rep_result.passed,
                 "intra_issues": rep_result.intra_issues,

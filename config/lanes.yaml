@@ -18,6 +18,8 @@ subtopics:
         time_filter: day
       - type: hackernews
         front_page: true
+      - type: google_trends
+        geos: [US, IN, GLOBAL]
       - type: rss
         urls:
           - https://techcrunch.com/feed/
@@ -37,6 +39,8 @@ subtopics:
         time_filter: day
       - type: hackernews
         front_page: true
+      - type: google_trends
+        geos: [US, IN, GLOBAL]
     voice: en-US-AriaNeural
     voice_style: curious
     palette: ["#7B61FF", "#0F0F23"]
@@ -50,6 +54,8 @@ subtopics:
       - type: reddit
         subreddits: [netsec, cybersecurity, privacy, Scams]
         time_filter: day
+      - type: google_trends
+        geos: [US, GLOBAL]
       - type: rss
         urls:
           - https://feeds.feedburner.com/TheHackersNews
@@ -65,6 +71,8 @@ subtopics:
     sources:
       - type: hackernews
         front_page: true
+      - type: google_trends
+        geos: [US, IN, GLOBAL]
       - type: rss
         urls:
           - https://techcrunch.com/feed/

@@ -71,6 +71,9 @@ def discover_candidates(*, limit: int | None = None) -> list[dict[str, Any]]:
                 candidates += _github_trending(int(per_limits.get("github_trending", 10)))
             elif t == "devto":
                 candidates += _devto(int(per_limits.get("devto", 10)))
+            elif t == "google_trends":
+                geos = src.get("geos", ["US"])
+                candidates += _google_trends(geos, int(per_limits.get("google_trends", 15)))
         except Exception as e:  # noqa: BLE001
             LOG.warning("Source %s failed: %s", src, e)
 
@@ -141,6 +144,9 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
                 candidates += _github_trending(int(per_limits.get("github_trending", 10)))
             elif t == "devto":
                 candidates += _devto(int(per_limits.get("devto", 10)))
+            elif t == "google_trends":
+                geos = src.get("geos", ["US"])
+                candidates += _google_trends(geos, int(per_limits.get("google_trends", 15)))
         except Exception as e:  # noqa: BLE001
             LOG.warning("Source %s failed: %s", src, e)
 
@@ -181,6 +187,8 @@ def _source_key(src: dict) -> str:
         return f"reddit:{','.join(sorted(src.get('subreddits', [])))}"
     if t == "rss":
         return f"rss:{','.join(sorted(src.get('urls', [])))}"
+    if t == "google_trends":
+        return f"google_trends:{','.join(sorted(src.get('geos', [])))}"
     return t
 
 
@@ -230,7 +238,9 @@ def _cluster_candidates(candidates: list[dict]) -> list[dict]:
         # Calculate best source score
         best_cand = max(cands, key=lambda x: x.get("normalized_hotness", 0))
         
-        mem_stats = memory.record_event(ev_id, len(cands))
+        gt_cand_for_vol = next((c for c in cands if c["source"].startswith("google_trends")), None)
+        traffic_vol = gt_cand_for_vol.get("traffic_volume", 0) if gt_cand_for_vol else 0
+        mem_stats = memory.record_event(ev_id, len(cands), traffic_vol)
         
         packet = {
             "event_id": ev_id,
@@ -242,9 +252,23 @@ def _cluster_candidates(candidates: list[dict]) -> list[dict]:
             "mention_count": len(cands),
             "velocity": mem_stats["velocity"],
             "acceleration": mem_stats["acceleration"],
-            "novelty": mem_stats["novelty"]
+            "novelty": mem_stats["novelty"],
+            "trend_momentum": mem_stats.get("trend_momentum", 0)
         }
         
+        # Extract Google Trends specific signal
+        gt_cand = next((c for c in cands if c["source"].startswith("google_trends")), None)
+        if gt_cand:
+            packet["google_trends_signal"] = {
+                "present": True,
+                "query": gt_cand["title"],
+                "geography": gt_cand.get("geography", "GLOBAL"),
+                "traffic_volume": gt_cand.get("traffic_volume", 0),
+                "news_context": gt_cand.get("summary", "")
+            }
+            # Remove google_trends from canonical_sources as it's demand, not evidence
+            packet["canonical_sources"] = [s for s in packet["canonical_sources"] if not s.startswith("google_trends")]
+
         out.append({
             "title": cl["title"],
             "url": cl["url"],
@@ -539,3 +563,72 @@ def _devto(limit: int) -> list[dict]:
         ledger.record_source_health("devto", False, str(exc))
         LOG.warning("devto failed: %s", exc)
         return []
+
+
+def _google_trends(geos: list[str], limit: int) -> list[dict]:
+    import xml.etree.ElementTree as ET
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    
+    out = []
+    for geo in geos:
+        geo_str = "" if geo == "GLOBAL" else geo
+        url = f"https://trends.google.com/trending/rss?geo={geo_str}" if geo_str else "https://trends.google.com/trending/rss"
+        health_score = ledger.get_source_health(f"google_trends:{geo}")
+        
+        current_limit = limit
+        if health_score < 0.5:
+            current_limit = max(1, int(limit * health_score))
+            
+        try:
+            r = requests.get(url, headers={"User-Agent": _ua()}, timeout=_timeout())
+            r.raise_for_status()
+            root = ET.fromstring(r.content)
+            
+            # Find all <item> tags
+            items = root.findall(".//item")
+            for item in items[:current_limit]:
+                title = item.findtext("title", "")
+                
+                # Extract traffic volume (e.g. "50K+", "2M+")
+                traffic_str = item.findtext("{https://trends.google.com/trending/rss}approx_traffic", "0")
+                traffic_str_clean = traffic_str.replace("+", "").replace(",", "")
+                traffic_vol = 0
+                if "K" in traffic_str_clean:
+                    traffic_vol = int(float(traffic_str_clean.replace("K", "")) * 1000)
+                elif "M" in traffic_str_clean:
+                    traffic_vol = int(float(traffic_str_clean.replace("M", "")) * 1000000)
+                elif traffic_str_clean.isdigit():
+                    traffic_vol = int(traffic_str_clean)
+                
+                news_items = item.findall("{https://trends.google.com/trending/rss}news_item")
+                news_context = []
+                for ni in news_items:
+                    ni_title = ni.findtext("{https://trends.google.com/trending/rss}news_item_title", "")
+                    ni_snippet = ni.findtext("{https://trends.google.com/trending/rss}news_item_snippet", "")
+                    if ni_title:
+                        news_context.append(f"{ni_title} - {ni_snippet}")
+                summary = " | ".join(news_context)
+                
+                # Derive a score from traffic volume to fit into the normalized hotness 0-100 system
+                # A baseline of 100K searches will be a 50 score
+                score = min(100, int((math.log10(max(1, traffic_vol)) / 6.0) * 100))
+                
+                link = item.findtext("link", "")
+                
+                out.append({
+                    "title": title,
+                    "url": link,
+                    "score": score,
+                    "summary": summary,
+                    "source": f"google_trends:{geo}",
+                    "source_class": "demand_signal",
+                    "credibility_tier": 0,  # Not factual evidence
+                    "geography": geo,
+                    "traffic_volume": traffic_vol
+                })
+            ledger.record_source_health(f"google_trends:{geo}", True)
+        except Exception as exc:
+            ledger.record_source_health(f"google_trends:{geo}", False, str(exc))
+            LOG.warning("Google Trends RSS failed for geo %s: %s", geo, exc)
+            
+    return out

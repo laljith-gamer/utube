@@ -41,7 +41,7 @@ class DiscoveryMemory:
 
         self.path.write_text(json.dumps(self.data, indent=2), encoding="utf-8")
 
-    def record_event(self, event_id: str, current_mentions: int) -> dict:
+    def record_event(self, event_id: str, current_mentions: int, traffic_volume: int = 0) -> dict:
         """Records an event and returns its historical metrics (velocity, etc)."""
         now_iso = datetime.now(timezone.utc).isoformat()
         events = self.data.setdefault("events", {})
@@ -50,10 +50,11 @@ class DiscoveryMemory:
             events[event_id] = {
                 "first_seen_at": now_iso,
                 "last_seen_at": now_iso,
-                "history": [{"timestamp": now_iso, "mentions": current_mentions}],
-                "max_mentions": current_mentions
+                "history": [{"timestamp": now_iso, "mentions": current_mentions, "traffic_volume": traffic_volume}],
+                "max_mentions": current_mentions,
+                "max_traffic": traffic_volume
             }
-            return {"novelty": 1.0, "velocity": current_mentions, "acceleration": 0.0, "age_hours": 0.0, "prior_mentions": 0}
+            return {"novelty": 1.0, "velocity": current_mentions, "acceleration": 0.0, "age_hours": 0.0, "prior_mentions": 0, "trend_momentum": traffic_volume}
         
         ev = events[event_id]
         ev["last_seen_at"] = now_iso
@@ -67,7 +68,7 @@ class DiscoveryMemory:
 
         # Calculate velocity and acceleration
         history = ev.setdefault("history", [])
-        history.append({"timestamp": now_iso, "mentions": current_mentions})
+        history.append({"timestamp": now_iso, "mentions": current_mentions, "traffic_volume": traffic_volume})
         
         # Prune history to last 10 records for this event
         if len(history) > 10:
@@ -76,17 +77,22 @@ class DiscoveryMemory:
         prior_mentions = history[-2]["mentions"] if len(history) > 1 else current_mentions
         velocity = current_mentions - prior_mentions
         
+        prior_traffic = history[-2].get("traffic_volume", 0) if len(history) > 1 else traffic_volume
+        trend_momentum = traffic_volume - prior_traffic
+        
         acceleration = 0.0
         if len(history) >= 3:
             prev_velocity = history[-2]["mentions"] - history[-3]["mentions"]
             acceleration = velocity - prev_velocity
 
         ev["max_mentions"] = max(ev.get("max_mentions", 0), current_mentions)
+        ev["max_traffic"] = max(ev.get("max_traffic", 0), traffic_volume)
         
         return {
             "novelty": max(0.0, 1.0 - (age_hours / 168.0)), # 168 hours = 7 days
             "velocity": velocity,
             "acceleration": acceleration,
             "age_hours": age_hours,
-            "prior_mentions": prior_mentions
+            "prior_mentions": prior_mentions,
+            "trend_momentum": trend_momentum
         }

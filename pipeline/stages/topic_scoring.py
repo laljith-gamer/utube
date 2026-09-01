@@ -98,6 +98,11 @@ def score_candidates(candidates: list[dict[str, Any]], *, content_memory: dict |
         c["scores"]["velocity"] = max(0, min(100, int(ev.get("velocity", 0) * 10)))
         c["scores"]["acceleration"] = max(0, min(100, int(ev.get("acceleration", 0) * 20)))
         c["scores"]["corroboration"] = min(100, int(ev.get("independent_source_count", 1) * 25))
+        
+        gt_signal = ev.get("google_trends_signal", {})
+        c["scores"]["trend_momentum"] = max(0, min(100, int(ev.get("trend_momentum", 0) / 1000)))
+        c["scores"]["trend_volume"] = max(0, min(100, int(gt_signal.get("traffic_volume", 0) / 10000))) if gt_signal.get("present") else 0
+        
         novelty_mem = int(ev.get("novelty", 1.0) * 100)
         
         content_hash = c.get("content_hash", ""); c["scores"]["novelty"] = 0 if any(content_hash.startswith(rh[:20]) for rh in recent_hashes if rh) else novelty_mem
@@ -107,17 +112,8 @@ def score_candidates(candidates: list[dict[str, Any]], *, content_memory: dict |
         c["hard_rejection"] = _obvious_hard_rejection(c, recent_hashes, content_memory)
         if c["hard_rejection"]: c["scores"]["hard_rejection"] = 0
         memory_bonus, memory_evidence = _memory_adjustment(c, content_memory); c["memory_adjustment"] = round(memory_bonus, 2); c["memory_evidence"] = memory_evidence
-    batch_size = max(1, int(scoring_cfg.get("llm_batch_size", 12)))
-    for c in candidates: c["_heuristic_avg"] = sum(c["scores"].values()) / max(1, len(c["scores"]))
-    candidates.sort(key=lambda c: c["_heuristic_avg"], reverse=True); top_batch = candidates[:batch_size]
-    try:
-        llm_scores = _llm_batch_score(top_batch, scoring_cfg)
-        for c, scores in zip(top_batch, llm_scores): c["scores"].update(scores)
-    except Exception as exc:
-        LOG.warning("LLM batch scoring failed (%s), using heuristics only", exc)
-        for c in top_batch: c["scores"].update({"audience_fit": 50, "curiosity_gap": 50, "story_potential": 50, "visual_potential": 50, "shareability": 50})
-    for c in candidates[batch_size:]: c["scores"].update({"audience_fit": 40, "curiosity_gap": 40, "story_potential": 40, "visual_potential": 40, "shareability": 40})
-    default_weights = {"audience_fit": .15, "curiosity_gap": .12, "story_potential": .12, "visual_potential": .08, "strategy_alignment": .10, "freshness": .05, "specificity": .05, "shareability": .05, "novelty": .05, "source_quality": .02, "evergreen_value": .01, "velocity": .08, "acceleration": .07, "corroboration": .05}; w = {**default_weights, **weights}; total_w = sum(w.values())
+        default_weights = {"strategy_alignment": .15, "freshness": .10, "specificity": .10, "novelty": .10, "source_quality": .10, "evergreen_value": .05, "velocity": .10, "acceleration": .10, "corroboration": .10, "trend_momentum": .05, "trend_volume": .05}
+    w = {**default_weights, **weights}; total_w = sum(w.values())
     if total_w > 0: w = {k: v / total_w for k, v in w.items()}
     for c in candidates:
         if c.get("hard_rejection"): c["total_score"] = 0.0
@@ -128,61 +124,166 @@ def score_candidates(candidates: list[dict[str, Any]], *, content_memory: dict |
     return candidates
 
 
+def _generate_shortlist(scored: list[dict], size: int = 12) -> list[dict]:
+    # Need to get top overall, top emerging (velocity/acceleration), top corroboration, and diverse lanes
+    valid = [c for c in scored if not c.get("hard_rejection") and c.get("total_score", 0) > 0]
+    if not valid: return []
+    shortlist = []
+    seen = set()
+    
+    def add_candidates(cands: list[dict], count: int):
+        added = 0
+        for c in cands:
+            h = c.get("content_hash", "") or c.get("title", "")
+            if h not in seen and added < count:
+                shortlist.append(c)
+                seen.add(h)
+                added += 1
+
+    # Top 3 overall
+    add_candidates(valid, 3)
+    
+    # Top 3 emerging
+    emerging = sorted(valid, key=lambda c: c.get("scores", {}).get("velocity", 0) + c.get("scores", {}).get("acceleration", 0), reverse=True)
+    add_candidates(emerging, 3)
+    
+    # Top 3 evidence-rich
+    evidence = sorted(valid, key=lambda c: c.get("scores", {}).get("corroboration", 0), reverse=True)
+    add_candidates(evidence, 3)
+    
+    # Top from diverse lanes (topic_family)
+    families = {}
+    for c in valid:
+        fam = _topic_family(c.get("title", ""), c.get("summary", ""))
+        if fam not in families: families[fam] = []
+        families[fam].append(c)
+    
+    for fam, cands in families.items():
+        add_candidates(cands, 1)
+        if len(shortlist) >= size: break
+        
+    # Fill remaining
+    add_candidates(valid, size - len(shortlist))
+    return shortlist[:size]
+
+
 def select_best(scored: list[dict[str, Any]], *, min_score: float | None = None, exploration_ratio: float | None = None) -> dict[str, Any] | None:
-    cfg = get_config(); scoring_cfg = cfg.get_path("topic_scoring", {}) or {}; min_score = float(scoring_cfg.get("min_topic_score", 72)) if min_score is None else min_score; exploration_ratio = float(scoring_cfg.get("exploration_ratio", .20)) if exploration_ratio is None else exploration_ratio
-    qualified = [c for c in scored if c.get("total_score", 0) >= min_score and not c.get("hard_rejection")]
+    cfg = get_config(); scoring_cfg = cfg.get_path("topic_scoring", {}) or {}
+    min_score = float(scoring_cfg.get("min_topic_score", 65)) if min_score is None else min_score
+    
+    # Floor: Must meet min_score OR have high corroboration/novelty
+    qualified = []
+    for c in scored:
+        if c.get("hard_rejection"): continue
+        ts = c.get("total_score", 0)
+        ev = c.get("evidence_packet", {})
+        corr = ev.get("independent_source_count", 1)
+        novelty = c.get("scores", {}).get("novelty", 0)
+        if ts >= min_score or (corr >= 3 and novelty >= 60):
+            qualified.append(c)
+            
     if not qualified:
-        if not scored: return None
-        # Production mode: scoring ranks candidates; it does not block the day.
-        # Hard rejections remain absolute. If every candidate is hard-rejected,
-        # stopping is safer than manufacturing a topic.
-        valid = [c for c in scored if not c.get("hard_rejection")]
-        if not valid:
-            LOG.warning("All candidates are hard-rejected; no safe topic to publish")
-            return None
-        best = valid[0]
-        LOG.warning("No candidate met %.1f; production mode selecting best valid candidate %.1f: %s", min_score, best.get("total_score", 0), best.get("title", "")[:60])
-        best["selection_mode"] = "best_valid"
-        return best
-    if len(qualified) > 1 and random.random() < exploration_ratio:
-        chosen = random.choice(qualified[1:min(5, len(qualified))]); LOG.info("Exploration pick: %s (%.1f)", chosen.get("title", "")[:50], chosen.get("total_score", 0)); return chosen
-    LOG.info("Top pick: %s (%.1f)", qualified[0].get("title", "")[:50], qualified[0].get("total_score", 0)); return qualified[0]
+        LOG.warning("No candidate met the strict quality floor. Aborting selection.")
+        return None
+
+    shortlist = _generate_shortlist(qualified, size=15)
+    if not shortlist: return None
+    
+    LOG.info("Generated diverse shortlist of %d candidates for Opus Stage A.", len(shortlist))
+    
+    # Stage A: Shortlist -> Finalists
+    finalist_indices = _llm_stage_a(shortlist, scoring_cfg)
+    if not finalist_indices:
+        LOG.warning("LLM Stage A failed to pick finalists. Falling back to top 3 deterministic.")
+        finalist_indices = [0, 1, 2][:len(shortlist)]
+    
+    finalists = [shortlist[i] for i in finalist_indices if 0 <= i < len(shortlist)]
+    LOG.info("Opus Stage A selected %d finalists.", len(finalists))
+    
+    # Retrieval Enrichment
+    _enrich_finalists(finalists)
+    
+    # Stage B: Finalists -> Winner
+    decision = _llm_stage_b(finalists, scoring_cfg)
+    
+    winner_idx = decision.get("selected_index", -1)
+    if winner_idx == -1 or not (0 <= winner_idx < len(finalists)):
+        LOG.warning("LLM Stage B rejected all finalists or returned invalid index.")
+        return None
+        
+    winner = finalists[winner_idx]
+    winner["decision_object"] = decision
+    LOG.info("Winner selected via Stage B: %s (Reason: %s)", winner.get("title", "")[:50], decision.get("overall_reason", ""))
+    return winner
 
 
-def _llm_batch_score(candidates: list[dict], scoring_cfg: dict) -> list[dict]:
-    llm = LLMRouter("llm_research"); llm_cfg = scoring_cfg.get("llm", {}) or {}; goal = goal_summary(); candidate_lines = []
-    for i, c in enumerate(candidates):
+def _llm_stage_a(shortlist: list[dict], scoring_cfg: dict) -> list[int]:
+    llm = LLMRouter("llm_research")
+    candidate_lines = []
+    for i, c in enumerate(shortlist):
+        ev = c.get('evidence_packet', {})
+        corrob = ev.get('independent_source_count', 1)
+        vel = c.get('scores', {}).get('velocity', 0)
+        gt_signal = ev.get('google_trends_signal', {})
+        trend_str = f", Google Trends: {gt_signal.get('traffic_volume', 0)} searches (momentum: {ev.get('trend_momentum', 0)})" if gt_signal.get("present") else ""
+        sources = ", ".join(ev.get('canonical_sources', [c.get('source', '')]))
+        candidate_lines.append(f"[{i}] {c.get('title', '')} (Sources: {sources}, Corrob: {corrob}, Velocity: {vel}{trend_str})\n    Summary: {str(c.get('summary', ''))[:300]}")
+        
+    prompt_path = repo_root() / "prompts" / "topic_picker_stage_a.txt"
+    if not prompt_path.exists(): return []
+    prompt = prompt_path.read_text(encoding="utf-8").format(
+        goal=goal_summary(),
+        niche_title=get_config().get_path("channel.niche", "Technology"),
+        n_candidates=len(shortlist),
+        candidates="\n".join(candidate_lines)
+    )
+    
+    result = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=1000, temperature=0.3)
+    if isinstance(result, dict) and "finalists" in result and isinstance(result["finalists"], list):
+        return [int(x) for x in result["finalists"] if str(x).isdigit()]
+    return []
+
+
+def _enrich_finalists(finalists: list[dict]):
+    from .research import fetch_source_text
+    LOG.info("Enriching %d finalists...", len(finalists))
+    for c in finalists:
+        url = c.get("external_url") or c.get("url", "")
+        if url and not url.startswith("https://reddit.com"):
+            try:
+                text = fetch_source_text(url)
+                if text:
+                    if "evidence_packet" not in c: c["evidence_packet"] = {}
+                    c["evidence_packet"]["enriched_text"] = text[:3000]
+            except Exception as exc:
+                LOG.warning("Failed to enrich %s: %s", url, exc)
+
+
+def _llm_stage_b(finalists: list[dict], scoring_cfg: dict) -> dict:
+    llm = LLMRouter("llm_research")
+    cfg = get_config()
+    candidate_lines = []
+    for i, c in enumerate(finalists):
         ev = c.get('evidence_packet', {})
         corrob = ev.get('independent_source_count', 1)
         sources = ", ".join(ev.get('canonical_sources', [c.get('source', '')]))
-        candidate_lines.append(f"[{i}] {c.get('title', '')} (sources: {sources}, independent count: {corrob})\n    Summary: {str(c.get('summary', ''))[:250]}")
-    prompt_path = repo_root() / "prompts" / "topic_scoring.txt"; template = prompt_path.read_text(encoding="utf-8") if prompt_path.exists() else _DEFAULT_SCORING_PROMPT
-    prompt = template.format(goal=goal, target_duration=int(get_config().get_path("video.target_duration_sec", 35)), n_candidates=len(candidates), candidates="\n".join(candidate_lines))
-    result = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=int(llm_cfg.get("max_tokens", 3000)), temperature=float(llm_cfg.get("temperature", .3)), reasoning_effort=llm_cfg.get("reasoning_effort")); raw_scores = result.get("scores", []) if isinstance(result, dict) else []; raw_scores = raw_scores if isinstance(raw_scores, list) else []
-    out = []
-    for i in range(len(candidates)):
-        s = raw_scores[i] if i < len(raw_scores) and isinstance(raw_scores[i], dict) else {}; out.append({k: _clamp(s.get(k, 50)) for k in ("audience_fit", "curiosity_gap", "story_potential", "visual_potential", "shareability")})
-    return out
-
-
-def _clamp(v: Any, lo: int = 0, hi: int = 100) -> int:
-    try: return max(lo, min(hi, int(v)))
-    except (TypeError, ValueError): return 50
-
-
-_DEFAULT_SCORING_PROMPT = """{goal}
-
-Score each candidate for a YouTube Short on this channel. For each, rate 0-100:
-- audience_fit: Would the same viewer who watched yesterday want this?
-- curiosity_gap: How strong is the \"I need to know\" pull?
-- story_potential: Can this be told as a 30-second narrative arc?
-- visual_potential: Are there concrete, filmable visuals?
-- shareability: Would a viewer send this to a friend?
-
-Reject mentally any topic that is generic, has no viewer consequence, has no curiosity gap, has no concrete payoff, is only an announcement, is too broad, or requires code/charts to explain.
-
-Candidates:
-{candidates}
-
-Respond with ONLY a JSON object:
-{{\"scores\": [{{\"audience_fit\": N, \"curiosity_gap\": N, \"story_potential\": N, \"visual_potential\": N, \"shareability\": N}}, ...]}}"""
+        gt_signal = ev.get('google_trends_signal', {})
+        trend_str = f"\nGoogle Trends Signal: Volume {gt_signal.get('traffic_volume', 0)}, Momentum {ev.get('trend_momentum', 0)}, Region {gt_signal.get('geography', '')}\nTrends Context: {gt_signal.get('news_context', '')}" if gt_signal.get("present") else ""
+        enriched = ev.get('enriched_text', '(No full text available)')
+        candidate_lines.append(f"[{i}] {c.get('title', '')}\nSources: {sources}\nIndependent Count: {corrob}{trend_str}\nSummary: {str(c.get('summary', ''))[:300]}\nEnriched Evidence:\n{enriched[:1000]}\n")
+        
+    prompt_path = repo_root() / "prompts" / "topic_picker_stage_b.txt"
+    if not prompt_path.exists(): return {"selected_index": -1}
+    prompt = prompt_path.read_text(encoding="utf-8").format(
+        goal=goal_summary(),
+        niche_title=cfg.get_path("channel.niche", "Technology"),
+        n_finalists=len(finalists),
+        target_duration=cfg.get_path("video.target_duration_sec", 35),
+        format_label=cfg.get_path("channel.format", "shorts"),
+        finalists="\n".join(candidate_lines)
+    )
+    
+    result = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=1500, temperature=0.3)
+    if isinstance(result, dict):
+        return result
+    return {"selected_index": -1}

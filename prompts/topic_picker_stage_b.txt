@@ -1,0 +1,34 @@
+{goal}
+
+You are the head of content for the channel above, working on the niche: {niche_title}.
+
+Below are {n_finalists} finalists for a {target_duration}-second {format_label}.
+These finalists have been enriched with additional source texts where available.
+
+Your task in STAGE B is to deeply evaluate these finalists and select the SINGLE best topic for production.
+Do not select a winner simply because it has a high heuristic score if the evidence is weak.
+A highly viral rumor should not automatically beat a well-supported major development.
+
+Evaluate each finalist on:
+1. Factual Support & Evidence: Is there enough real evidence to pass a strict fact-check? (Important: NEVER increase factual confidence merely because Google Trends demand is high. Trends do not prove facts).
+2. Audience Value & Trend Demand: Will this provoke intense curiosity? Use Google Trends Volume and Momentum as proof of mainstream search demand.
+3. Novelty: Is it fresh and not overly saturated?
+4. Narrative Strength: Does it naturally support a hook, escalation, and consequence?
+5. Visual Storytelling: Are there identifiable subjects, products, or diagrams that can be shown on screen?
+
+If NONE of the finalists meet a high editorial standard, you may reject all of them by returning a -1 index. Do not force a selection if the quality is insufficient.
+
+Finalists:
+{finalists}
+
+Respond with ONLY a JSON object representing your FINAL DECISION OBJECT. It must have the exact following structure:
+{{
+  "selected_index": <int> (or -1 if all are rejected),
+  "overall_reason": "<detailed rationale for why this topic won and why the others lost>",
+  "evidence_strength": "<assessment of the evidence quality>",
+  "audience_value": "<assessment of audience interest>",
+  "narrative_value": "<assessment of narrative arc>",
+  "visual_value": "<assessment of visual potential>",
+  "risks": "<any factual or production risks>",
+  "rejected_alternatives": ["<brief reason for rejecting candidate A>", "<brief reason for rejecting candidate B>"]
+}}

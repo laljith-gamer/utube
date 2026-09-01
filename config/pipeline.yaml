@@ -26,6 +26,7 @@ discover:
     wikipedia_otd: 10
     github_trending: 10
     devto: 10
+    google_trends: 15
   request_timeout_sec: 20
 
 research:
@@ -142,5 +143,4 @@ stage_timeouts_sec:
   visual_qc: 30
   captions: 120
   thumbnail: 90
-  assemble: 240
   upload: 300
