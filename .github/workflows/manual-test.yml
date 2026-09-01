@@ -71,6 +71,7 @@ jobs:
           PUTER_AUTH_TOKEN_5: ${{ secrets.PUTER_AUTH_TOKEN_5 }}
           PUTER_AUTH_TOKEN_6: ${{ secrets.PUTER_AUTH_TOKEN_6 }}
           PUTER_AUTH_TOKEN_7: ${{ secrets.PUTER_AUTH_TOKEN_7 }}
+          PUTER_AUTH_TOKEN_8: ${{ secrets.PUTER_AUTH_TOKEN_8 }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
