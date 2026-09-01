@@ -53,6 +53,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         best = None
         top_concept = None
         brief = None
+        evaluated_candidates = []
         
         for candidate_attempt in range(max_candidate_attempts):
             available_scored = [c for c in scored if c.get("content_hash") not in blacklisted_hashes]
@@ -88,14 +89,20 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             if conf_val < float(qual_cfg.get("min_fact_confidence", 70)):
                 LOG.warning("Fact confidence too low (%s) for candidate %s. Blacklisting and retrying.", conf_val, topic_hash)
                 blacklisted_hashes.add(topic_hash)
+                evaluated_candidates.append((conf_val, best, top_concept, brief))
                 continue
                 
             # If we reach here, we have a valid concept and research brief
             break
         else:
-            result.update({"ok": True, "reason": f"Failed to find a candidate that passes concept and fact checks after {max_candidate_attempts} attempts."})
-            write_json(out / "result.json", result)
-            return result
+            if evaluated_candidates:
+                evaluated_candidates.sort(key=lambda x: x[0], reverse=True)
+                conf_val, best, top_concept, brief = evaluated_candidates[0]
+                LOG.warning("Exhausted candidate attempts. Falling back to highest confidence candidate (%s) with confidence %s", best.get("topic_hash", best.get("content_hash", "")), conf_val)
+            else:
+                result.update({"ok": True, "reason": f"Failed to find a candidate that passes concept and fact checks after {max_candidate_attempts} attempts."})
+                write_json(out / "result.json", result)
+                return result
 
         lane = cfg.get_path("lane", {}) or {}
         sc = None
