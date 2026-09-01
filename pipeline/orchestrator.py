@@ -162,9 +162,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / "5_premium_qc.json", qc_result)
             
             if not qc_result.get("passed"):
-                result.update({"ok": True, "reason": "Failed script QC (even after premium rewrite)."})
-                write_json(out / "result.json", result)
-                return result
+                LOG.warning("Failed script QC (even after premium rewrite), but proceeding anyway to guarantee output.")
         else:
             # Script passed QC, but might still qualify for premium enhancement
             from .stages.premium_rewrite import evaluate_and_rewrite
@@ -207,9 +205,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         v_qc = visual_qc.evaluate_visuals(vis)
         write_json(out / "7_visual_qc.json", v_qc)
         if not v_qc.get("passed"):
-            result.update({"ok": True, "reason": "Failed visual QC."})
-            write_json(out / "result.json", result)
-            return result
+            LOG.warning("Failed visual QC, but proceeding anyway to guarantee output.")
 
         video_out = out / f"{slugify(sc['title'])}.mp4"
         assemble.assemble_video(visuals=vis, audio_summary=audio_summary, srt_path=captions_file, out_dir=out, output_path=video_out, music_path=_pick_music(sc.get("music_mood", "suspense")))
