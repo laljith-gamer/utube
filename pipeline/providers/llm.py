@@ -401,7 +401,7 @@ class LLMRouter:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         reasoning_effort: str | None = None,
-        max_retries: int = 2,
+        max_retries: int = 5,
     ) -> dict[str, Any]:
         last_err = None
         for attempt in range(max_retries + 1):
