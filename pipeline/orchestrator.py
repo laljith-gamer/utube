@@ -47,37 +47,53 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         recent_hashes = ledger.recent_hashes("global", days=memory_days)
         scored = topic_scoring.score_candidates(candidates, content_memory=mem_ctx, recent_hashes=recent_hashes)
         write_json(out / "2_scored_candidates.json", scored)
-        best = topic_scoring.select_best(scored, exploration_ratio=float(qual_cfg.get("exploration_ratio", 0.25)))
-        if not best:
-            result.update({"ok": True, "reason": "No candidate passed minimum quality threshold."})
-            write_json(out / "result.json", result)
-            return result
-        topic_hash = best.get("topic_hash", best.get("content_hash"))
-        if topic_hash:
-            ledger.record_topic("global", topic_hash)
-        family = best.get("topic_family", best.get("family", ""))
-        if family:
-            ledger.record_family(family)
-        write_json(out / "2_best_topic.json", best)
+        
+        max_candidate_attempts = 3
+        blacklisted_hashes = set()
+        best = None
+        top_concept = None
+        brief = None
+        
+        for candidate_attempt in range(max_candidate_attempts):
+            available_scored = [c for c in scored if c.get("content_hash") not in blacklisted_hashes]
+            best = topic_scoring.select_best(available_scored, exploration_ratio=float(qual_cfg.get("exploration_ratio", 0.25)))
+            if not best:
+                result.update({"ok": True, "reason": "No candidate passed minimum quality threshold."})
+                write_json(out / "result.json", result)
+                return result
+                
+            topic_hash = best.get("topic_hash", best.get("content_hash"))
+            if topic_hash:
+                ledger.record_topic("global", topic_hash)
+            family = best.get("topic_family", best.get("family", ""))
+            if family:
+                ledger.record_family(family)
+            write_json(out / f"2_best_topic_v{candidate_attempt+1}.json", best)
 
-        top_concept = concept.generate_concept(best, content_memory=mem_ctx, out_dir=out)
-        if not top_concept:
-            result["reason"] = "Concept generation rejected due to low score."
-            write_json(out / "result.json", result)
-            return result
-        write_json(out / "3_concept.json", top_concept)
+            top_concept = concept.generate_concept(best, content_memory=mem_ctx, out_dir=out)
+            if not top_concept:
+                LOG.warning("Concept generation rejected due to low score. Blacklisting candidate %s and retrying.", topic_hash)
+                blacklisted_hashes.add(topic_hash)
+                continue
+            write_json(out / f"3_concept_v{candidate_attempt+1}.json", top_concept)
 
-        brief = research.build_research_brief(llm_research, best, concept=top_concept)
-        write_json(out / "4_research.json", brief)
-        conf_val = brief.get("confidence", 0)
-        try:
-            conf_val = float(conf_val)
-        except (ValueError, TypeError):
-            conf_val = 0.0
+            brief = research.build_research_brief(llm_research, best, concept=top_concept)
+            write_json(out / f"4_research_v{candidate_attempt+1}.json", brief)
+            conf_val = brief.get("confidence", 0)
+            try:
+                conf_val = float(conf_val)
+            except (ValueError, TypeError):
+                conf_val = 0.0
 
-        if conf_val < float(qual_cfg.get("min_fact_confidence", 70)):
-            LOG.warning("Fact confidence too low (%s). Aborting.", conf_val)
-            result["reason"] = f"Fact check failed (confidence {conf_val})."
+            if conf_val < float(qual_cfg.get("min_fact_confidence", 70)):
+                LOG.warning("Fact confidence too low (%s) for candidate %s. Blacklisting and retrying.", conf_val, topic_hash)
+                blacklisted_hashes.add(topic_hash)
+                continue
+                
+            # If we reach here, we have a valid concept and research brief
+            break
+        else:
+            result["reason"] = f"Failed to find a candidate that passes concept and fact checks after {max_candidate_attempts} attempts."
             write_json(out / "result.json", result)
             return result
 
