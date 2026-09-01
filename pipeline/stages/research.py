@@ -133,12 +133,14 @@ def build_research_brief(
     if not angle:
         angle = topic.get("angle", "")
 
+    evidence_text = "\n\nEVENT EVIDENCE PACKET:\n" + str(topic.get("evidence_packet", {})) if topic.get("evidence_packet") else ""
+    
     prompt = template.format(
         goal=goal_summary(),
         topic_title=topic.get("title", ""),
         angle=angle,
         source_url=source_url,
-        source_text=source_text or "(no source text available)",
+        source_text=(source_text or "(no source text available)") + evidence_text,
         target_duration=cfg.get_path("video.target_duration_sec", 35),
         format_label=cfg.get_path("channel.format", "shorts"),
     )

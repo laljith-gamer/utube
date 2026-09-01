@@ -92,14 +92,22 @@ def score_candidates(candidates: list[dict[str, Any]], *, content_memory: dict |
         if len(title.split()) >= 5: spec += 10
         if any(w in title.lower() for w in ("why", "how", "secret", "hidden", "real reason", "truth", "myth")): spec += 15
         c["scores"]["specificity"] = min(100, spec)
-        content_hash = c.get("content_hash", ""); c["scores"]["novelty"] = 0 if any(content_hash.startswith(rh[:20]) for rh in recent_hashes if rh) else 75
+        
+        # Pull features from evidence packet
+        ev = c.get("evidence_packet", {})
+        c["scores"]["velocity"] = max(0, min(100, int(ev.get("velocity", 0) * 10)))
+        c["scores"]["acceleration"] = max(0, min(100, int(ev.get("acceleration", 0) * 20)))
+        c["scores"]["corroboration"] = min(100, int(ev.get("independent_source_count", 1) * 25))
+        novelty_mem = int(ev.get("novelty", 1.0) * 100)
+        
+        content_hash = c.get("content_hash", ""); c["scores"]["novelty"] = 0 if any(content_hash.startswith(rh[:20]) for rh in recent_hashes if rh) else novelty_mem
         c["scores"]["evergreen_value"] = 80 if any(s in title.lower() for s in ("history", "invented", "origin", "discovered", "first", "oldest", "science")) else 50
         strat = 50 + 20 * sum(1 for theme in focused if theme and theme in text) - 30 * sum(1 for theme in avoided if theme and theme in text)
         c["scores"]["strategy_alignment"] = max(0, min(100, strat))
         c["hard_rejection"] = _obvious_hard_rejection(c, recent_hashes, content_memory)
         if c["hard_rejection"]: c["scores"]["hard_rejection"] = 0
         memory_bonus, memory_evidence = _memory_adjustment(c, content_memory); c["memory_adjustment"] = round(memory_bonus, 2); c["memory_evidence"] = memory_evidence
-    batch_size = max(1, int(scoring_cfg.get("llm_batch_size", 10)))
+    batch_size = max(1, int(scoring_cfg.get("llm_batch_size", 12)))
     for c in candidates: c["_heuristic_avg"] = sum(c["scores"].values()) / max(1, len(c["scores"]))
     candidates.sort(key=lambda c: c["_heuristic_avg"], reverse=True); top_batch = candidates[:batch_size]
     try:
@@ -109,7 +117,7 @@ def score_candidates(candidates: list[dict[str, Any]], *, content_memory: dict |
         LOG.warning("LLM batch scoring failed (%s), using heuristics only", exc)
         for c in top_batch: c["scores"].update({"audience_fit": 50, "curiosity_gap": 50, "story_potential": 50, "visual_potential": 50, "shareability": 50})
     for c in candidates[batch_size:]: c["scores"].update({"audience_fit": 40, "curiosity_gap": 40, "story_potential": 40, "visual_potential": 40, "shareability": 40})
-    default_weights = {"audience_fit": .18, "curiosity_gap": .16, "story_potential": .13, "visual_potential": .10, "strategy_alignment": .12, "freshness": .08, "specificity": .07, "shareability": .07, "novelty": .05, "source_quality": .02, "evergreen_value": .02}; w = {**default_weights, **weights}; total_w = sum(w.values())
+    default_weights = {"audience_fit": .15, "curiosity_gap": .12, "story_potential": .12, "visual_potential": .08, "strategy_alignment": .10, "freshness": .05, "specificity": .05, "shareability": .05, "novelty": .05, "source_quality": .02, "evergreen_value": .01, "velocity": .08, "acceleration": .07, "corroboration": .05}; w = {**default_weights, **weights}; total_w = sum(w.values())
     if total_w > 0: w = {k: v / total_w for k, v in w.items()}
     for c in candidates:
         if c.get("hard_rejection"): c["total_score"] = 0.0
@@ -143,7 +151,11 @@ def select_best(scored: list[dict[str, Any]], *, min_score: float | None = None,
 
 def _llm_batch_score(candidates: list[dict], scoring_cfg: dict) -> list[dict]:
     llm = LLMRouter("llm_research"); llm_cfg = scoring_cfg.get("llm", {}) or {}; goal = goal_summary(); candidate_lines = []
-    for i, c in enumerate(candidates): candidate_lines.append(f"[{i}] {c.get('title', '')} (source: {c.get('source', '')}, hotness: {c.get('normalized_hotness', 0)})\n    Summary: {str(c.get('summary', ''))[:250]}")
+    for i, c in enumerate(candidates):
+        ev = c.get('evidence_packet', {})
+        corrob = ev.get('independent_source_count', 1)
+        sources = ", ".join(ev.get('canonical_sources', [c.get('source', '')]))
+        candidate_lines.append(f"[{i}] {c.get('title', '')} (sources: {sources}, independent count: {corrob})\n    Summary: {str(c.get('summary', ''))[:250]}")
     prompt_path = repo_root() / "prompts" / "topic_scoring.txt"; template = prompt_path.read_text(encoding="utf-8") if prompt_path.exists() else _DEFAULT_SCORING_PROMPT
     prompt = template.format(goal=goal, target_duration=int(get_config().get_path("video.target_duration_sec", 35)), n_candidates=len(candidates), candidates="\n".join(candidate_lines))
     result = llm.chat_json([{"role": "user", "content": prompt}], max_tokens=int(llm_cfg.get("max_tokens", 3000)), temperature=float(llm_cfg.get("temperature", .3)), reasoning_effort=llm_cfg.get("reasoning_effort")); raw_scores = result.get("scores", []) if isinstance(result, dict) else []; raw_scores = raw_scores if isinstance(raw_scores, list) else []

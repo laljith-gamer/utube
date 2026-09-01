@@ -98,6 +98,39 @@ class Ledger:
             for k in list(themes.keys())[:-2000]:
                 themes.pop(k, None)
 
+    # ----- source health -----
+
+    def record_source_health(self, source: str, success: bool, failure_type: str = "") -> None:
+        health = self.data.setdefault("source_health", {}).setdefault(source, {"successes": 0, "failures": 0, "history": []})
+        event = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "success": success,
+            "failure_type": failure_type
+        }
+        health["history"].append(event)
+        if success:
+            health["successes"] += 1
+        else:
+            health["failures"] += 1
+        
+        # Keep rolling window of 50
+        if len(health["history"]) > 50:
+            oldest = health["history"].pop(0)
+            if oldest["success"]:
+                health["successes"] -= 1
+            else:
+                health["failures"] -= 1
+
+    def get_source_health(self, source: str) -> float:
+        """Returns a score between 0.0 and 1.0. 1.0 means perfect health."""
+        health = self.data.get("source_health", {}).get(source)
+        if not health or not health["history"]:
+            return 1.0
+        total = health["successes"] + health["failures"]
+        if total == 0:
+            return 1.0
+        return health["successes"] / total
+
     # ----- usage -----
 
     def bump(self, provider: str, count: int = 1) -> None:

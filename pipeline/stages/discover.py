@@ -11,11 +11,15 @@ import re
 from datetime import datetime, timezone, timedelta
 import time
 from typing import Any
+import math
 
 import feedparser
 import requests
 
 from ..config import get_config
+from ..ledger import Ledger
+from ..utils import repo_root
+from .discovery_memory import DiscoveryMemory
 
 LOG = logging.getLogger("utube.discover")
 
@@ -102,8 +106,11 @@ def discover_candidates(*, limit: int | None = None) -> list[dict[str, Any]]:
         # Extract keywords from title
         c["keywords"] = _extract_keywords(c.get("title", ""))
 
-    LOG.info("Discovered %d unique candidates from %d sources", len(unique), len(source_specs))
-    return unique
+    # Cluster candidates into events
+    clusters = _cluster_candidates(unique)
+
+    LOG.info("Discovered %d unique candidates, clustered into %d events from %d sources", len(unique), len(clusters), len(source_specs))
+    return clusters
 
 
 # Backward compatibility alias
@@ -177,6 +184,82 @@ def _source_key(src: dict) -> str:
     return t
 
 
+def _cluster_candidates(candidates: list[dict]) -> list[dict]:
+    """Group candidates into event clusters based on semantic keyword overlap."""
+    clusters = []
+    
+    # Helper to calculate Jaccard similarity of keywords
+    def sim(k1: list[str], k2: list[str]) -> float:
+        s1, s2 = set(k1), set(k2)
+        if not s1 or not s2: return 0.0
+        return len(s1 & s2) / len(s1 | s2)
+        
+    for c in candidates:
+        matched = False
+        for cluster in clusters:
+            # If high keyword overlap (>= 0.4 Jaccard), merge into cluster
+            if sim(c.get("keywords", []), cluster["keywords"]) >= 0.4:
+                cluster["candidates"].append(c)
+                # Expand keywords
+                cluster["keywords"] = list(set(cluster["keywords"] + c.get("keywords", [])))
+                matched = True
+                break
+        if not matched:
+            clusters.append({
+                "title": c["title"], # Representative title
+                "url": c["url"],     # Representative URL
+                "summary": c.get("summary", ""),
+                "keywords": c.get("keywords", []),
+                "candidates": [c]
+            })
+            
+    # Build Evidence Packets
+    memory = DiscoveryMemory()
+    out = []
+    for cl in clusters:
+        ev_id = _content_hash(cl["title"])
+        cands = cl["candidates"]
+        sources = [c["source"] for c in cands]
+        urls = [c.get("url") for c in cands if c.get("url")]
+        classes = {c.get("source_class") for c in cands if c.get("source_class")}
+        
+        # Calculate independent sources (unique base sources)
+        base_sources = {s.split(":")[0] for s in sources}
+        indep_count = len(base_sources)
+        
+        # Calculate best source score
+        best_cand = max(cands, key=lambda x: x.get("normalized_hotness", 0))
+        
+        mem_stats = memory.record_event(ev_id, len(cands))
+        
+        packet = {
+            "event_id": ev_id,
+            "representative_title": cl["title"],
+            "canonical_sources": list(set(sources)),
+            "all_relevant_urls": list(set(urls)),
+            "source_classes": list(classes),
+            "independent_source_count": indep_count,
+            "mention_count": len(cands),
+            "velocity": mem_stats["velocity"],
+            "acceleration": mem_stats["acceleration"],
+            "novelty": mem_stats["novelty"]
+        }
+        
+        out.append({
+            "title": cl["title"],
+            "url": cl["url"],
+            "summary": cl["summary"],
+            "source": best_cand.get("source", "unknown"),
+            "normalized_hotness": best_cand.get("normalized_hotness", 0),
+            "content_hash": ev_id,
+            "keywords": cl["keywords"],
+            "evidence_packet": packet
+        })
+        
+    memory.save()
+    return out
+
+
 def _content_hash(title: str) -> str:
     """Short stable hash for dedup — slug-like."""
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:60]
@@ -211,28 +294,47 @@ def _timeout() -> int:
 
 
 def _hackernews(limit: int) -> list[dict]:
-    r = requests.get(
-        "https://hn.algolia.com/api/v1/search",
-        params={"tags": "front_page", "hitsPerPage": limit},
-        headers={"User-Agent": _ua()},
-        timeout=_timeout(),
-    )
-    r.raise_for_status()
-    out = []
-    for h in r.json().get("hits", []):
-        out.append({
-            "title": h.get("title") or "",
-            "url": h.get("url") or f"https://news.ycombinator.com/item?id={h.get('objectID')}",
-            "score": h.get("points") or 0,
-            "summary": "",
-            "source": "hackernews",
-            "num_comments": h.get("num_comments", 0),
-        })
-    return out
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    health_score = ledger.get_source_health("hackernews")
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
+    try:
+        r = requests.get(
+            "https://hn.algolia.com/api/v1/search",
+            params={"tags": "front_page", "hitsPerPage": limit},
+            headers={"User-Agent": _ua()},
+            timeout=_timeout(),
+        )
+        r.raise_for_status()
+        out = []
+        for h in r.json().get("hits", []):
+            out.append({
+                "title": h.get("title") or "",
+                "url": h.get("url") or f"https://news.ycombinator.com/item?id={h.get('objectID')}",
+                "score": h.get("points") or 0,
+                "summary": "",
+                "source": "hackernews",
+                "source_class": "tier2",
+                "credibility_tier": 2,
+                "num_comments": h.get("num_comments", 0),
+            })
+        ledger.record_source_health("hackernews", True)
+        return out
+    except Exception as exc:
+        ledger.record_source_health("hackernews", False, str(exc))
+        LOG.warning("HackerNews failed: %s", exc)
+        return []
 
 
 def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
     """Fetch Reddit JSON, with an RSS fallback for hosted CI runners."""
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    src_key = f"reddit:{subreddit}"
+    health_score = ledger.get_source_health(src_key)
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
     params = {"t": time_filter, "limit": limit}
     headers = {"User-Agent": _ua()}
     url = f"https://www.reddit.com/r/{subreddit}/top.json"
@@ -255,89 +357,125 @@ def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
                     "external_url": d.get("url"),
                     "score": d.get("score", 0),
                     "summary": (d.get("selftext") or "")[:500],
-                    "source": f"reddit:{subreddit}",
+                    "source": src_key,
+                    "source_class": "tier2",
+                    "credibility_tier": 2,
                     "num_comments": d.get("num_comments", 0),
                 })
+            ledger.record_source_health(src_key, True)
             return out
     except requests.RequestException as exc:
         LOG.warning("Reddit JSON failed for r/%s: %s; trying RSS fallback", subreddit, exc)
 
     # Reddit's RSS endpoint is often available when JSON is blocked by CI IPs.
-    rss = requests.get(
-        f"https://www.reddit.com/r/{subreddit}/top/.rss",
-        params={"t": time_filter, "limit": limit},
-        headers=headers,
-        timeout=_timeout(),
-    )
-    rss.raise_for_status()
-    feed = feedparser.parse(rss.content)
-    out = []
-    for entry in feed.entries[:limit]:
-        link = entry.get("link", "")
-        title = entry.get("title", "")
-        summary = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))[:500]
-        out.append({
-            "title": title,
-            "url": link,
-            "external_url": link,
-            "score": 0,
-            "summary": summary,
-            "source": f"reddit:{subreddit}",
-            "num_comments": 0,
-        })
-    return out
+    try:
+        rss = requests.get(
+            f"https://www.reddit.com/r/{subreddit}/top/.rss",
+            params={"t": time_filter, "limit": limit},
+            headers=headers,
+            timeout=_timeout(),
+        )
+        rss.raise_for_status()
+        feed = feedparser.parse(rss.content)
+        out = []
+        for entry in feed.entries[:limit]:
+            link = entry.get("link", "")
+            title = entry.get("title", "")
+            summary = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))[:500]
+            out.append({
+                "title": title,
+                "url": link,
+                "external_url": link,
+                "score": 0,
+                "summary": summary,
+                "source": src_key,
+                "source_class": "tier2",
+                "credibility_tier": 2,
+                "num_comments": 0,
+            })
+        ledger.record_source_health(src_key, True)
+        return out
+    except Exception as exc:
+        ledger.record_source_health(src_key, False, str(exc))
+        LOG.warning("Reddit RSS fallback failed for r/%s: %s", subreddit, exc)
+        return []
 
 
 def _rss(url: str, limit: int) -> list[dict]:
-    feed = feedparser.parse(url)
-    out = []
-    now = time.time()
-    for e in feed.entries[:limit]:
-        score = 0
-        if e.get("published_parsed"):
-            pub_ts = time.mktime(e.published_parsed)
-            age_hours = (now - pub_ts) / 3600
-            score = max(0, int(100 * (1 - age_hours / 168)))
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    health_score = ledger.get_source_health(url)
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
+    try:
+        feed = feedparser.parse(url)
+        out = []
+        now = time.time()
+        for e in feed.entries[:limit]:
+            score = 0
+            if e.get("published_parsed"):
+                pub_ts = time.mktime(e.published_parsed)
+                age_hours = (now - pub_ts) / 3600
+                score = max(0, int(100 * (1 - age_hours / 168)))
 
-        out.append({
-            "title": e.get("title", ""),
-            "url": e.get("link", ""),
-            "score": score,
-            "summary": (e.get("summary") or "")[:500],
-            "source": f"rss:{feed.feed.get('title', 'rss')}",
-        })
-    return out
+            out.append({
+                "title": e.get("title", ""),
+                "url": e.get("link", ""),
+                "score": score,
+                "summary": (e.get("summary") or "")[:500],
+                "source": f"rss:{feed.feed.get('title', 'rss')}",
+                "source_class": "tier1",
+                "credibility_tier": 1,
+            })
+        ledger.record_source_health(url, True)
+        return out
+    except Exception as exc:
+        ledger.record_source_health(url, False, str(exc))
+        LOG.warning("RSS failed for %s: %s", url, exc)
+        return []
 
 
 def _wikipedia_otd(limit: int) -> list[dict]:
-    today = datetime.now(timezone.utc)
-    url = (
-        f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/"
-        f"{today.month:02d}/{today.day:02d}"
-    )
-    r = requests.get(url, headers={"User-Agent": _ua()}, timeout=_timeout())
-    r.raise_for_status()
-    out = []
-    for ev in r.json().get("events", [])[:limit]:
-        pages = ev.get("pages", [])
-        link = pages[0].get("content_urls", {}).get("desktop", {}).get("page", "") if pages else ""
-        out.append({
-            "title": f"On {today.strftime('%B %d')}, {ev.get('year')}: {ev.get('text','')}",
-            "url": link or "https://en.wikipedia.org/wiki/Main_Page",
-            "score": 0,
-            "summary": ev.get("text", ""),
-            "source": "wikipedia_otd",
-        })
-    return out
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    health_score = ledger.get_source_health("wikipedia_otd")
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
+    try:
+        today = datetime.now(timezone.utc)
+        url = (
+            f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/"
+            f"{today.month:02d}/{today.day:02d}"
+        )
+        r = requests.get(url, headers={"User-Agent": _ua()}, timeout=_timeout())
+        r.raise_for_status()
+        out = []
+        for ev in r.json().get("events", [])[:limit]:
+            pages = ev.get("pages", [])
+            link = pages[0].get("content_urls", {}).get("desktop", {}).get("page", "") if pages else ""
+            out.append({
+                "title": f"On {today.strftime('%B %d')}, {ev.get('year')}: {ev.get('text','')}",
+                "url": link or "https://en.wikipedia.org/wiki/Main_Page",
+                "score": 0,
+                "summary": ev.get("text", ""),
+                "source": "wikipedia_otd",
+                "source_class": "tier1",
+                "credibility_tier": 1,
+            })
+        ledger.record_source_health("wikipedia_otd", True)
+        return out
+    except Exception as exc:
+        ledger.record_source_health("wikipedia_otd", False, str(exc))
+        LOG.warning("Wikipedia failed: %s", exc)
+        return []
 
 
 def _github_trending(limit: int) -> list[dict]:
-    """Approximate GitHub daily trending with recently-pushed, popular repos.
-
-    The previous third-party gitterapp endpoint now returns 404. GitHub's
-    authenticated search API is more stable and gives us a first-party,
-    current signal without scraping HTML.
-    """
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    health_score = ledger.get_source_health("github_trending")
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
     try:
         token = __import__("os").getenv("GITHUB_TOKEN", "")
         since = (datetime.now(timezone.utc) - timedelta(days=2)).date().isoformat()
@@ -364,23 +502,40 @@ def _github_trending(limit: int) -> list[dict]:
                 "score": repo.get("stargazers_count", 0),
                 "summary": repo.get("description", "") or "",
                 "source": "github_trending",
+                "source_class": "tier4",
+                "credibility_tier": 4,
             })
+        ledger.record_source_health("github_trending", True)
         return out
     except Exception as e:  # noqa: BLE001
+        ledger.record_source_health("github_trending", False, str(e))
         LOG.warning("github_trending unavailable: %s", e)
         return []
 
 
 def _devto(limit: int) -> list[dict]:
-    r = requests.get("https://dev.to/api/articles", params={"top": "1"}, timeout=_timeout())
-    r.raise_for_status()
-    out = []
-    for a in r.json()[:limit]:
-        out.append({
-            "title": a.get("title", ""),
-            "url": a.get("url", ""),
-            "score": a.get("public_reactions_count", 0),
-            "summary": a.get("description", "") or "",
-            "source": "devto",
-        })
-    return out
+    ledger = Ledger.load(repo_root() / "ledger.json")
+    health_score = ledger.get_source_health("devto")
+    if health_score < 0.5:
+        limit = max(1, int(limit * health_score))
+        
+    try:
+        r = requests.get("https://dev.to/api/articles", params={"top": "1"}, timeout=_timeout())
+        r.raise_for_status()
+        out = []
+        for a in r.json()[:limit]:
+            out.append({
+                "title": a.get("title", ""),
+                "url": a.get("url", ""),
+                "score": a.get("public_reactions_count", 0),
+                "summary": a.get("description", "") or "",
+                "source": "devto",
+                "source_class": "tier4",
+                "credibility_tier": 4,
+            })
+        ledger.record_source_health("devto", True)
+        return out
+    except Exception as exc:
+        ledger.record_source_health("devto", False, str(exc))
+        LOG.warning("devto failed: %s", exc)
+        return []
