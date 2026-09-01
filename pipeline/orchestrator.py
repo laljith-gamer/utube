@@ -156,10 +156,15 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         if not qc_result or not qc_result.get("passed"):
             # Before failing outright, give the premium rewrite a chance
             from .stages.premium_rewrite import evaluate_and_rewrite
-            sc = evaluate_and_rewrite(sc, qc_result, topic=best, concept=top_concept)
-            # Re-run QC on the rewritten script
-            qc_result = script_qc.evaluate_script(sc, topic=best, concept=top_concept)
-            write_json(out / "5_premium_qc.json", qc_result)
+            
+            for premium_attempt in range(3):
+                sc = evaluate_and_rewrite(sc, qc_result, topic=best, concept=top_concept)
+                # Re-run QC on the rewritten script
+                qc_result = script_qc.evaluate_script(sc, topic=best, concept=top_concept)
+                write_json(out / f"5_premium_qc_v{premium_attempt+1}.json", qc_result)
+                
+                if qc_result.get("passed"):
+                    break
             
             if not qc_result.get("passed"):
                 LOG.warning("Failed script QC (even after premium rewrite), but proceeding anyway to guarantee output.")
