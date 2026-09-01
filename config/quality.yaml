@@ -46,11 +46,12 @@ script_qc:
   # Per-dimension scores (0-100). Script fails if ANY dimension is below its min.
   min_scores:
     hook_strength:      75
-    clarity:            72
-    specificity:        70
-    story_progression:  68
+    content_density:    72
+    factual_grounding:  70
+    novel_information:  68
+    non_redundancy:     72
+    spoken_naturalness: 65
     payoff_strength:    72
-    natural_voice:      65
     channel_fit:        70
 
   # Weighted overall score
