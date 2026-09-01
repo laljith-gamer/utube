@@ -401,22 +401,34 @@ class LLMRouter:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         reasoning_effort: str | None = None,
+        max_retries: int = 2,
     ) -> dict[str, Any]:
-        res = self.chat_json_structured(
-            messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            reasoning_effort=reasoning_effort,
-        )
-        if res.status != ProviderStatus.SUCCESS:
+        last_err = None
+        for attempt in range(max_retries + 1):
+            res = self.chat_json_structured(
+                messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                reasoning_effort=reasoning_effort,
+                attempt=attempt
+            )
+            if res.status == ProviderStatus.SUCCESS:
+                parsed = res.parsed or {}
+                parsed["_llm_usage"] = res.usage
+                parsed["_llm_provider"] = res.provider
+                if res.account_index is not None:
+                    parsed["_llm_account_index"] = res.account_index
+                return parsed
+                
+            if res.status == ProviderStatus.OUTPUT:
+                LOG.warning("LLM returned malformed JSON on attempt %d: %s. Retrying...", attempt + 1, res.error_summary)
+                last_err = res.error_summary
+                time.sleep(2)
+                continue
+                
             raise RuntimeError(f"Chat failed: {res.error_summary}")
             
-        parsed = res.parsed or {}
-        parsed["_llm_usage"] = res.usage
-        parsed["_llm_provider"] = res.provider
-        if res.account_index is not None:
-            parsed["_llm_account_index"] = res.account_index
-        return parsed
+        raise RuntimeError(f"Chat failed after {max_retries} JSON output retries. Last error: {last_err}")
 
 
 # ---------- robust JSON extraction ----------
