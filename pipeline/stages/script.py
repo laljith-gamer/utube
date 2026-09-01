@@ -63,7 +63,7 @@ def _repetition_issues(script: dict[str, Any]) -> list[str]:
             if a_norm and a_norm == b_norm:
                 issues.append(f"Exact repetition: {a_name} == {b_name}")
 
-    # Distinctive 5-word phrase reuse. This catches paraphrased/reused fragments
+    # Distinctive 5-word phrase reuse. This catches meaningful reused fragments
     # while avoiding false positives from normal 1-4 word overlaps.
     for i in range(len(normalized)):
         for j in range(i + 1, len(normalized)):
@@ -78,14 +78,9 @@ def _repetition_issues(script: dict[str, Any]) -> list[str]:
                 phrase = " ".join(next(iter(overlap)))
                 issues.append(f"Repeated 5-word phrase between {a_name} and {b_name}: '{phrase}'")
 
-    # Scene-opening repetition is a separate stylistic problem.
-    openings: list[tuple[str, str]] = []
-    for name, _, words in normalized:
-        if name.startswith("scene_") and words:
-            openings.append((name, words[0]))
-    for i in range(1, len(openings)):
-        if openings[i][1] == openings[i - 1][1]:
-            issues.append(f"Consecutive scene openings repeat '{openings[i][1]}'")
+    # Do not reject repeated single-word openings. Topic-specific words such as
+    # names, products, companies, and places can legitimately start consecutive
+    # scenes. Meaningful repeated phrases are already caught by the 5-gram check.
 
     return issues
 
