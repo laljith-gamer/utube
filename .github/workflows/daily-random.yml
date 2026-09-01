@@ -79,6 +79,8 @@ jobs:
           PUTER_AUTH_TOKEN_3: ${{ secrets.PUTER_AUTH_TOKEN_3 }}
           PUTER_AUTH_TOKEN_4: ${{ secrets.PUTER_AUTH_TOKEN_4 }}
           PUTER_AUTH_TOKEN_5: ${{ secrets.PUTER_AUTH_TOKEN_5 }}
+          PUTER_AUTH_TOKEN_6: ${{ secrets.PUTER_AUTH_TOKEN_6 }}
+          PUTER_AUTH_TOKEN_7: ${{ secrets.PUTER_AUTH_TOKEN_7 }}
           F5_REF_AUDIO: assets/voice_ref.wav
           F5_REF_TEXT: ${{ secrets.F5_REF_TEXT }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}

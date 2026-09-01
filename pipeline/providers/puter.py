@@ -25,7 +25,7 @@ class PuterProvider:
         
         import os
         tokens = [auth_token] if auth_token else []
-        for i in range(2, 6):
+        for i in range(2, 8):
             t = os.environ.get(f"PUTER_AUTH_TOKEN_{i}")
             if t and t not in tokens:
                 tokens.append(t)
@@ -141,7 +141,7 @@ class PuterProvider:
         
         import os
         tokens = [auth_token] if auth_token else []
-        for i in range(2, 6):
+        for i in range(2, 8):
             t = os.environ.get(f"PUTER_AUTH_TOKEN_{i}")
             if t and t not in tokens:
                 tokens.append(t)
