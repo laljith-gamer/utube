@@ -19,7 +19,7 @@ from .providers.tts import TTSRouter
 from .providers.video import VideoRouter
 from .providers.youtube import upload_video
 from .stages import assemble, audio, captions, concept, content_memory, discover, research, script, script_qc, thumbnail, topic_scoring, visual_qc, visuals
-from .utils import env_bool, repo_root, run_date, run_dir, setup_logging, slugify, write_json
+from .utils import env, env_bool, repo_root, run_date, run_dir, setup_logging, slugify, write_json
 
 LOG = logging.getLogger("utube.orchestrator")
 
