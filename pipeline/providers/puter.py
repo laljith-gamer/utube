@@ -21,7 +21,7 @@ class PuterProvider:
         max_tokens: int,
         temperature: float,
         json_mode: bool = False,
-    ) -> str:
+    ) -> dict[str, Any]:
         cli_script = repo_root() / "pipeline" / "providers" / "puter_cli.js"
         
         # Prepare payload
@@ -37,28 +37,34 @@ class PuterProvider:
             result = subprocess.run(
                 ["node", str(cli_script), "chat", json.dumps(payload)],
                 capture_output=True,
-                text=True,
-                check=True
+                text=True
             )
-            out = json.loads(result.stdout)
-            if "error" in out:
-                raise RuntimeError(f"Puter API Error: {out['error']}")
             
-            # Puter JS chat returns OpenAI-compatible format
-            # e.g. { message: { content: "..." } } or { choices: [ { message: { content: "..." } } ] }
-            if "message" in out and "content" in out["message"]:
-                content = out["message"]["content"]
-                if isinstance(content, list):
-                    # Handle Anthropic-style blocks: [{'type': 'text', 'text': '...'}]
-                    content = "".join(b.get("text", "") for b in content if b.get("type") == "text")
-                return content
-            elif "choices" in out and len(out["choices"]) > 0:
-                content = out["choices"][0]["message"]["content"]
-                if isinstance(content, list):
-                    content = "".join(b.get("text", "") for b in content if b.get("type") == "text")
-                return content
-            else:
-                return json.dumps(out)
+            # Use a regex to extract the first JSON block from stdout or stderr
+            # to avoid node.js assertions and other junk printed
+            import re
+            combined_output = result.stdout + "\n" + result.stderr
+            m = re.search(r"(\{.*\})", combined_output, re.DOTALL)
+            if not m:
+                if result.returncode != 0:
+                    err_msg = result.stderr.strip() or result.stdout.strip()
+                    raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
+                raise RuntimeError(f"Puter CLI returned empty/invalid output: {combined_output}")
+                
+            json_str = m.group(1)
+            try:
+                out = json.loads(json_str)
+            except json.JSONDecodeError:
+                if result.returncode != 0:
+                    err_msg = result.stderr.strip() or result.stdout.strip()
+                    raise RuntimeError(f"Puter CLI failed (code {result.returncode}): {err_msg}")
+                raise RuntimeError(f"Puter CLI returned invalid JSON: {json_str}")
+            
+            # If the script returned a JSON error block or exited with error
+            if "error" in out or result.returncode != 0:
+                return out
+                
+            return out
                 
         except subprocess.CalledProcessError as e:
             err_msg = e.stderr.strip() or e.stdout.strip()

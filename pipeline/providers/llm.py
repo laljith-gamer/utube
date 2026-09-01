@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import time
+import random
 from enum import Enum, auto
 from typing import Any
 
@@ -103,203 +104,218 @@ class LLMRouter:
                 retryable=True
             )
             
-            try:
-                fault = os.environ.get("CONCEPT_FAULT_INJECTION")
-                if fault:
-                    if fault == "gemini_503" and "gemini" in provider_name.lower():
-                        raise RuntimeError("503 Service Unavailable")
-                    if fault == "openrouter_length" and "openrouter" in provider_name.lower():
-                        result.content = "{\n  \"angles\": [\n    {\n      \"angle\": \"Some angle"
-                        result.finish_reason = "length"
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "truncated_output"
-                        result.latency_ms = (time.time() - start_time) * 1000
-                        return result
-                    if fault == "nvidia_truncated" and "nvidia" in provider_name.lower():
-                        result.content = "{\n  \"angles\": ["
-                        result.finish_reason = "stop"
-                        result.status = ProviderStatus.SUCCESS # Parsing will fail later
-                        result.latency_ms = (time.time() - start_time) * 1000
-                        return result
+            provider_params = p.get("params", {})
+            provider_timeout = p.get("request_timeout_sec", self.timeout)
+            max_provider_retries = p.get("max_retries", 4)
+            
+            current_messages = list(messages)
+            accumulated_content = ""
+            continuation_count = 0
+            MAX_CONTINUATIONS = 5
 
-                provider_params = p.get("params", {})
-                provider_timeout = p.get("request_timeout_sec", self.timeout)
-                provider_retries = p.get("max_retries", 0 if "request_timeout_sec" in p else 2)
-                
-                LOG.info(
-                    "LLM call → %s (%s) timeout=%ss retries=%s",
-                    provider_name, model_name, provider_timeout, provider_retries
-                )
-                
-                is_gemini = "gemini" in model_name.lower() or p.get("api_key_env") == "GEMINI_API_KEY"
-                is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or provider_name == "puter_rewrite"
+            provider_success = False
 
-                if is_puter:
-                    from .puter import PuterProvider
-                    content = PuterProvider.chat(
-                        model=model_name,
-                        messages=messages,
-                        max_tokens=provider_params.get("max_tokens", max_tokens),
-                        temperature=provider_params.get("temperature", temperature),
-                        json_mode=json_mode
-                    )
-                    if not content:
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "empty_response"
-                        result.error_summary = "Empty response from Puter."
-                        result.latency_ms = (time.time() - start_time) * 1000
-                        return result
-                    result.content = content
+            while continuation_count <= MAX_CONTINUATIONS:
+                chunk_content = ""
+                finish = "stop"
+                retry_success = False
+
+                for retry_attempt in range(max_provider_retries + 1):
+                    try:
+                        fault = os.environ.get("CONCEPT_FAULT_INJECTION")
+                        if fault:
+                            if fault == "gemini_503" and "gemini" in provider_name.lower():
+                                raise RuntimeError("503 Service Unavailable")
+                            if fault == "openrouter_length" and "openrouter" in provider_name.lower():
+                                result.content = accumulated_content + "{\n  \"angles\": [\n    {\n      \"angle\": \"Some angle"
+                                result.finish_reason = "length"
+                                result.status = ProviderStatus.OUTPUT
+                                result.failure_type = "truncated_output"
+                                result.latency_ms = (time.time() - start_time) * 1000
+                                return result
+                            if fault == "nvidia_truncated" and "nvidia" in provider_name.lower():
+                                result.content = accumulated_content + "{\n  \"angles\": ["
+                                result.finish_reason = "stop"
+                                result.status = ProviderStatus.SUCCESS
+                                result.latency_ms = (time.time() - start_time) * 1000
+                                return result
+
+                        LOG.info(
+                            "LLM call → %s (%s) timeout=%ss retries=%s attempt=%s (cont: %s)",
+                            provider_name, model_name, provider_timeout, max_provider_retries, retry_attempt + 1, continuation_count
+                        )
+                        
+                        is_gemini = "gemini" in model_name.lower() or p.get("api_key_env") == "GEMINI_API_KEY"
+                        is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or "puter" in provider_name.lower()
+
+                        if is_puter:
+                            from .puter import PuterProvider
+                            resp_dict = PuterProvider.chat(
+                                model=model_name,
+                                messages=current_messages,
+                                max_tokens=provider_params.get("max_tokens", max_tokens),
+                                temperature=provider_params.get("temperature", temperature),
+                                json_mode=json_mode
+                            )
+                            if resp_dict.get("error"):
+                                if resp_dict.get("is_rate_limit"):
+                                    raise RuntimeError(f"Rate Limit 429: {resp_dict['error']}")
+                                raise RuntimeError(f"Puter Error: {resp_dict['error']}")
+                                
+                            chunk_content = resp_dict.get("text", "")
+                            finish = resp_dict.get("finishReason", "stop")
+
+                        elif is_gemini:
+                            from google import genai
+                            from google.genai import types
+                            
+                            client = genai.Client(api_key=p["api_key"])
+                            
+                            sys_inst = None
+                            gemini_msgs = []
+                            for m in current_messages:
+                                if m["role"] == "system":
+                                    sys_inst = m["content"]
+                                else:
+                                    role = "user" if m["role"] == "user" else "model"
+                                    gemini_msgs.append(types.Content(role=role, parts=[types.Part.from_text(text=m["content"])]))
+                            
+                            config_kwargs = {
+                                "max_output_tokens": provider_params.get("max_tokens", max_tokens),
+                            }
+                            if json_mode:
+                                config_kwargs["response_mime_type"] = "application/json"
+                                
+                            if reasoning_effort and p.get("supports_reasoning_effort"):
+                                if reasoning_effort == "low":
+                                    tl = types.ThinkingLevel.LOW
+                                elif reasoning_effort == "high":
+                                    tl = types.ThinkingLevel.HIGH
+                                else:
+                                    tl = types.ThinkingLevel.MEDIUM
+                                config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=tl)
+                                
+                            if sys_inst:
+                                config_kwargs["system_instruction"] = sys_inst
+                                
+                            config = types.GenerateContentConfig(**config_kwargs)
+                            resp = client.models.generate_content(model=model_name, contents=gemini_msgs, config=config)
+                            chunk_content = (resp.text or "").strip()
+                            raw_finish = getattr(resp.candidates[0] if resp.candidates else None, "finish_reason", None)
+                            finish = str(raw_finish.name if hasattr(raw_finish, "name") else raw_finish).lower()
+
+                        else:
+                            client = OpenAI(
+                                api_key=p["api_key"], 
+                                base_url=p["base_url"], 
+                                timeout=provider_timeout,
+                                max_retries=provider_retries
+                            )
+                            kwargs: dict[str, Any] = {
+                                "model": model_name,
+                                "messages": current_messages,
+                                "max_tokens": provider_params.get("max_tokens", max_tokens),
+                                "temperature": provider_params.get("temperature", temperature),
+                            }
+                            if "top_p" in provider_params:
+                                kwargs["top_p"] = provider_params["top_p"]
+                            if json_mode:
+                                kwargs["response_format"] = {"type": "json_object"}
+                            if reasoning_effort and p.get("supports_reasoning_effort"):
+                                kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
+                                
+                            resp = client.chat.completions.create(**kwargs)
+                            choice = resp.choices[0]
+                            msg = choice.message
+                            chunk_content = (msg.content or "").strip()
+                            finish = str(getattr(choice, "finish_reason", None)).lower()
+            
+                            if not chunk_content:
+                                extra = getattr(msg, "model_extra", None) or {}
+                                for key in ("reasoning_content", "reasoning", "thinking"):
+                                    cand = extra.get(key)
+                                    if not (isinstance(cand, str) and cand.strip()):
+                                        continue
+                                    cand = cand.strip()
+                                    if json_mode and not _looks_like_json(cand):
+                                        LOG.warning(
+                                            "  %s present but does not look like JSON "
+                                            "(finish_reason=%s, %d chars)",
+                                            key, finish, len(cand),
+                                        )
+                                        continue
+                                    chunk_content = cand
+                                    LOG.info("  (used %s field as content)", key)
+                                    break
+
+                        if not chunk_content:
+                            result.status = ProviderStatus.OUTPUT
+                            result.failure_type = "empty_response"
+                            result.error_summary = f"Empty response (finish_reason={finish})."
+                            retry_success = False
+                            break # Empty response isn't retryable
+                        
+                        retry_success = True
+                        break # Exited retry loop successfully
+
+                    except Exception as e:
+                        err_str = str(e).lower()
+                        result.error_summary = str(e)
+                        last_err = e
+                        LOG.warning("LLM provider %s failed (attempt %d): %s", provider_name, retry_attempt + 1, e)
+                        
+                        is_rate_limit = "429" in err_str or "rate" in err_str or "quota" in err_str
+                        is_transient = "503" in err_str or "502" in err_str or "500" in err_str or "timeout" in err_str or "network" in err_str or "fetch" in err_str
+                        
+                        if is_rate_limit or is_transient:
+                            if retry_attempt < max_provider_retries:
+                                base_delay = p.get("retry_on_rate_limit_seconds", 5)
+                                backoff = base_delay * (2 ** retry_attempt)
+                                jitter = random.uniform(0, 0.2 * backoff)
+                                wait_time = backoff + jitter
+                                LOG.info("Sleeping %.2fs before retrying...", wait_time)
+                                time.sleep(wait_time)
+                                continue
+                            else:
+                                result.status = ProviderStatus.TRANSIENT
+                                result.failure_type = "rate_limit" if is_rate_limit else "network_error"
+                                break # Out of retries
+                        else:
+                            result.status = ProviderStatus.PERMANENT
+                            result.failure_type = "authentication_failed" if ("auth" in err_str or "key" in err_str or "401" in err_str or "403" in err_str) else "unknown_error"
+                            result.retryable = False
+                            break # Permanent error
+
+                if not retry_success:
+                    break # The provider completely failed, skip to next provider in chain
+                
+                accumulated_content += chunk_content
+                result.content = accumulated_content
+                result.finish_reason = finish
+                provider_success = True
+                
+                # Check for continuation
+                if finish in ("length", "max_tokens", "truncated"):
+                    LOG.info("LLM output truncated (finish_reason=%s), continuing generation (continuation %d/%d)...", finish, continuation_count + 1, MAX_CONTINUATIONS)
+                    current_messages.append({"role": "assistant", "content": chunk_content})
+                    current_messages.append({"role": "user", "content": "Continue from exactly where you stopped. Do not repeat previous content. Return the remaining content only. Finish the requested task completely."})
+                    continuation_count += 1
+                else:
                     result.status = ProviderStatus.SUCCESS
-                    
-                elif is_gemini:
-                    from google import genai
-                    from google.genai import types
-                    
-                    client = genai.Client(api_key=p["api_key"])
-                    
-                    sys_inst = None
-                    gemini_msgs = []
-                    for m in messages:
-                        if m["role"] == "system":
-                            sys_inst = m["content"]
-                        else:
-                            role = "user" if m["role"] == "user" else "model"
-                            gemini_msgs.append(types.Content(role=role, parts=[types.Part.from_text(text=m["content"])]))
-                    
-                    config_kwargs = {
-                        "max_output_tokens": provider_params.get("max_tokens", max_tokens),
-                    }
-                    if json_mode:
-                        config_kwargs["response_mime_type"] = "application/json"
-                        
-                    if reasoning_effort and p.get("supports_reasoning_effort"):
-                        if reasoning_effort == "low":
-                            tl = types.ThinkingLevel.LOW
-                        elif reasoning_effort == "high":
-                            tl = types.ThinkingLevel.HIGH
-                        else:
-                            tl = types.ThinkingLevel.MEDIUM
-                        config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=tl)
-                        
-                    if sys_inst:
-                        config_kwargs["system_instruction"] = sys_inst
-                        
-                    config = types.GenerateContentConfig(**config_kwargs)
-                    resp = client.models.generate_content(model=model_name, contents=gemini_msgs, config=config)
-                    content = (resp.text or "").strip()
-                    finish = getattr(resp.candidates[0] if resp.candidates else None, "finish_reason", None)
-                    result.finish_reason = str(finish.name if hasattr(finish, "name") else finish)
-                    
-                    if not content:
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "empty_response"
-                        result.error_summary = f"Empty response from Gemini (finish_reason={result.finish_reason})."
-                        result.latency_ms = (time.time() - start_time) * 1000
-                        return result
-                    
-                    result.content = content
-                    if result.finish_reason.lower() in ("max_tokens", "length"):
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "truncated_output"
-                    else:
-                        result.status = ProviderStatus.SUCCESS
-                        
-                else:
-                    client = OpenAI(
-                        api_key=p["api_key"], 
-                        base_url=p["base_url"], 
-                        timeout=provider_timeout,
-                        max_retries=provider_retries
-                    )
-                    kwargs: dict[str, Any] = {
-                        "model": model_name,
-                        "messages": messages,
-                        "max_tokens": provider_params.get("max_tokens", max_tokens),
-                        "temperature": provider_params.get("temperature", temperature),
-                    }
-                    if "top_p" in provider_params:
-                        kwargs["top_p"] = provider_params["top_p"]
-                    if json_mode:
-                        kwargs["response_format"] = {"type": "json_object"}
-                    if reasoning_effort and p.get("supports_reasoning_effort"):
-                        kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
-                        
-                    resp = client.chat.completions.create(**kwargs)
-                    choice = resp.choices[0]
-                    msg = choice.message
-                    content = (msg.content or "").strip()
-                    finish = getattr(choice, "finish_reason", None)
-                    result.finish_reason = str(finish)
-    
-                    if not content:
-                        extra = getattr(msg, "model_extra", None) or {}
-                        for key in ("reasoning_content", "reasoning", "thinking"):
-                            cand = extra.get(key)
-                            if not (isinstance(cand, str) and cand.strip()):
-                                continue
-                            cand = cand.strip()
-                            if json_mode and not _looks_like_json(cand):
-                                LOG.warning(
-                                    "  %s present but does not look like JSON "
-                                    "(finish_reason=%s, %d chars)",
-                                    key, finish, len(cand),
-                                )
-                                continue
-                            content = cand
-                            LOG.info("  (used %s field as content)", key)
-                            break
-    
-                    if not content:
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "empty_response"
-                        result.error_summary = f"Empty response (finish_reason={finish})."
-                        result.latency_ms = (time.time() - start_time) * 1000
-                        return result
-                        
-                    result.content = content
-                    if result.finish_reason.lower() == "length":
-                        result.status = ProviderStatus.OUTPUT
-                        result.failure_type = "truncated_output"
-                    else:
-                        result.status = ProviderStatus.SUCCESS
-                        
-                result.latency_ms = (time.time() - start_time) * 1000
+                    break # Done with generation!
+
+            result.latency_ms = (time.time() - start_time) * 1000
+            
+            if provider_success and result.finish_reason not in ("length", "max_tokens"):
+                result.status = ProviderStatus.SUCCESS
+                return result
                 
-                # If we were called for a specific provider, or we succeeded, return immediately
-                if result.status == ProviderStatus.SUCCESS or provider_idx is not None:
-                    return result
-                    
-            except Exception as e:
-                err_str = str(e).lower()
-                result.error_summary = str(e)
-                result.latency_ms = (time.time() - start_time) * 1000
-                LOG.warning("LLM provider %s failed: %s", provider_name, e)
-                last_err = e
+            if result.status == ProviderStatus.PERMANENT:
+                continue # Try next provider
                 
-                if "429" in err_str or "rate" in err_str or "quota" in err_str:
-                    result.status = ProviderStatus.TRANSIENT
-                    result.failure_type = "rate_limit"
-                    time.sleep(self.retry_pause)
-                elif "503" in err_str or "502" in err_str or "500" in err_str:
-                    result.status = ProviderStatus.TRANSIENT
-                    result.failure_type = "service_unavailable"
-                elif "timeout" in err_str:
-                    result.status = ProviderStatus.TRANSIENT
-                    result.failure_type = "timeout"
-                elif "auth" in err_str or "key" in err_str or "401" in err_str or "403" in err_str:
-                    result.status = ProviderStatus.PERMANENT
-                    result.failure_type = "authentication_failed"
-                    result.retryable = False
-                else:
-                    result.status = ProviderStatus.TRANSIENT
-                    result.failure_type = "network_error"
-                
-                if provider_idx is not None:
-                    return result
-                    
-                continue
-                
+            if provider_idx is not None:
+                return result
+
         # If we exhausted the chain without a specific provider targeting, return a generic failure
         return ProviderResult(
             status=ProviderStatus.PERMANENT,

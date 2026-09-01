@@ -5,7 +5,7 @@
 llm_research:
   # Prefer a current general-purpose text model. The previous Ising Calibration
   # model is a quantum-calibration VLM and is not an appropriate research model.
-  chain: [gemini_flash, nvidia_nim_research, openrouter_research]
+  chain: [puter_opus, gemini_flash, nvidia_nim_research, openrouter_research]
   request_timeout_sec: 120
   reasoning_token_floor:
     low: 3000
@@ -13,6 +13,12 @@ llm_research:
     high: 16000
   retry_on_rate_limit_seconds: 10
   providers:
+    puter_opus:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-opus-4-8
+      supports_reasoning_effort: false
+      params:
+        max_tokens: 6000
     gemini_flash:
       api_key_env: GEMINI_API_KEY
       model: gemini-3.7-flash
@@ -41,10 +47,16 @@ llm_research:
 
 llm_script:
   # OpenRouter is first — NIM llama models (3.3 and 3.1) both hit EOL 2026-08-26
-  chain: [gemini_flash, openrouter_script, nvidia_nim_script]
+  chain: [puter_opus, gemini_flash, openrouter_script, nvidia_nim_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
+    puter_opus:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-opus-4-8
+      supports_reasoning_effort: false
+      params:
+        max_tokens: 8000
     gemini_flash:
       api_key_env: GEMINI_API_KEY
       model: gemini-3.7-flash
@@ -64,10 +76,16 @@ llm_script:
       supports_reasoning_effort: false
 
 llm_concept:
-  chain: [gemini_flash, openrouter_research, nvidia_nim_research]
+  chain: [puter_opus, gemini_flash, openrouter_research, nvidia_nim_research]
   request_timeout_sec: 120
   retry_on_rate_limit_seconds: 10
   providers:
+    puter_opus:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-opus-4-8
+      supports_reasoning_effort: false
+      params:
+        max_tokens: 4000
     gemini_flash:
       api_key_env: GEMINI_API_KEY
       model: gemini-3.7-flash
@@ -95,10 +113,16 @@ llm_concept:
         max_tokens: 4000
 
 llm_qc:
-  chain: [gemini_flash, openrouter_research, nvidia_nim_research]
+  chain: [puter_opus, gemini_flash, openrouter_research, nvidia_nim_research]
   request_timeout_sec: 120
   retry_on_rate_limit_seconds: 10
   providers:
+    puter_opus:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-opus-4-8
+      supports_reasoning_effort: false
+      params:
+        max_tokens: 4000
     gemini_flash:
       api_key_env: GEMINI_API_KEY
       model: gemini-3.7-flash
@@ -126,13 +150,13 @@ llm_qc:
         max_tokens: 3000
 
 llm_premium_rewrite:
-  chain: [puter_rewrite]
+  chain: [puter_opus]
   request_timeout_sec: 180
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_rewrite:
+    puter_opus:
       api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-6
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         temperature: 0.2

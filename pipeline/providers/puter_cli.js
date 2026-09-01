@@ -35,14 +35,55 @@ async function main() {
                 model: model,
                 stream: !!stream
             });
-            console.log(JSON.stringify(response));
+
+            let text = "";
+            let finishReason = "unknown";
+            let usage = {};
+
+            if (response.message && response.message.content) {
+                let content = response.message.content;
+                if (Array.isArray(content)) {
+                    text = content.filter(b => b.type === 'text').map(b => b.text).join('');
+                } else {
+                    text = content;
+                }
+                finishReason = response.finish_reason || "stop";
+            } else if (response.choices && response.choices.length > 0) {
+                let content = response.choices[0].message.content;
+                if (Array.isArray(content)) {
+                    text = content.filter(b => b.type === 'text').map(b => b.text).join('');
+                } else {
+                    text = content;
+                }
+                finishReason = response.choices[0].finish_reason || "stop";
+            } else {
+                text = JSON.stringify(response);
+            }
+
+            if (response.usage) {
+                usage = response.usage;
+            }
+
+            console.log(JSON.stringify({
+                text: text,
+                finishReason: finishReason,
+                usage: usage,
+                model: model,
+                provider: "puter",
+                raw: response
+            }));
         } else {
-            console.error("Unknown command: " + command);
+            console.error(JSON.stringify({ error: "Unknown command: " + command }));
             process.exit(1);
         }
     } catch (e) {
         // Output error as JSON so python can parse it
-        console.error(JSON.stringify({ error: e.message || String(e) }));
+        const errorMsg = e.message || String(e);
+        const isRateLimit = errorMsg.includes("429") || 
+                            errorMsg.toLowerCase().includes("rate limit") || 
+                            e.status === 429 || 
+                            (e.response && e.response.status === 429);
+        console.error(JSON.stringify({ error: errorMsg, is_rate_limit: isRateLimit, raw_error: e }));
         process.exit(1);
     }
 }

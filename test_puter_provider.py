@@ -20,15 +20,13 @@ def test_puter():
         print(response)
         
         # Verify JSON
-        try:
-            data = json.loads(response)
-            if data.get("status") == "ok":
-                print("JSON parsing successful.")
+        if "error" in response:
+            print("Puter returned an error (expected if no API key):", response["error"])
+        else:
+            if response.get("status") == "ok" or "text" in response:
+                print("JSON response successful.")
             else:
-                print("JSON parsing failed, unexpected response:", data)
-        except json.JSONDecodeError as e:
-            print("Failed to parse JSON:", e)
-            print("Raw response:", response)
+                print("JSON parsing failed, unexpected response:", response)
             
     except Exception as e:
         print("Puter API call failed:", e)
