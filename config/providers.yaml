@@ -6,7 +6,7 @@ llm_research:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, nvidia_nim_primary, nvidia_nim_fallback, openrouter_research]
+  chain: [puter_opus, openrouter_research]
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -43,7 +43,7 @@ llm_research:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: deepseek/deepseek-v4-flash-0731
+      model: deepseek/deepseek-chat:free
       supports_reasoning_effort: false
       params:
         temperature: 0.4
@@ -54,7 +54,7 @@ llm_script:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_script, nvidia_nim_primary, nvidia_nim_fallback]
+  chain: [puter_opus, openrouter_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -67,7 +67,7 @@ llm_script:
     openrouter_script:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.1-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
     nvidia_nim_primary:
       request_timeout_sec: 7200
@@ -86,7 +86,7 @@ llm_concept:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain: [puter_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -99,7 +99,7 @@ llm_concept:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: deepseek/deepseek-v4-flash-0731
+      model: deepseek/deepseek-chat:free
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -130,7 +130,7 @@ llm_qc:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain: [puter_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -143,7 +143,7 @@ llm_qc:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: deepseek/deepseek-v4-flash-0731
+      model: deepseek/deepseek-chat:free
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -174,7 +174,7 @@ llm_premium_rewrite:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain: [puter_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -189,7 +189,7 @@ llm_premium_rewrite:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: deepseek/deepseek-v4-flash-0731
+      model: deepseek/deepseek-chat:free
       supports_reasoning_effort: false
       params:
         temperature: 0.2
