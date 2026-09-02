@@ -204,7 +204,7 @@ video:
   providers: {}
 
 tts:
-  chain: [f5tts]
+  chain: [nim_magpie]
   default_rate: "+0%"
   default_pitch: "+0Hz"
   continuous_narration: true
