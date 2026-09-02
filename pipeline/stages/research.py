@@ -139,7 +139,7 @@ def build_research_brief(
 
     evidence_text = "\n\nEVENT EVIDENCE PACKET:\n" + str(topic.get("evidence_packet", {})) if topic.get("evidence_packet") else ""
     
-    # Do more research using Brave to fetch extra context
+    # Do more research using Brave to fetch extra context and grounded AI answers
     try:
         from ..providers.brave import BraveProvider
         extra_news = BraveProvider.search_news(topic.get("title", ""), count=3)
@@ -147,6 +147,12 @@ def build_research_brief(
             evidence_text += "\n\nADDITIONAL BRAVE SEARCH CONTEXT:\n"
             for n in extra_news:
                 evidence_text += f"- {n.get('title')}: {n.get('summary')}\n"
+        
+        # Use the newly available Answers plan for deep grounded context
+        grounded_answer = BraveProvider.get_answer(topic.get("title", ""))
+        if grounded_answer:
+            evidence_text += f"\n\nDEEP AI-GROUNDED RESEARCH ANSWER:\n{grounded_answer}\n"
+            
     except Exception as e:
         LOG.warning("Failed to fetch extra Brave context: %s", e)
     

@@ -98,3 +98,35 @@ class BraveProvider:
         except Exception as e:
             LOG.error("Brave Image search failed for query '%s': %s", query, e)
             return []
+
+    @classmethod
+    def get_answer(cls, query: str) -> str:
+        """Get an AI-generated answer from Brave Search Answers API."""
+        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave API limit reached (%d). Skipping Answers request.", cls.MAX_REQUESTS_PER_RUN)
+            return ""
+            
+        try:
+            cls._request_count += 1
+            r = requests.post(
+                f"{cls.BASE_URL}/chat/completions",
+                headers=cls._headers(),
+                json={
+                    "messages": [{"role": "user", "content": f"Give me a highly detailed summary and fascinating facts about: {query}"}],
+                    "model": "brave",
+                    "stream": False,
+                },
+                timeout=30
+            )
+            r.raise_for_status()
+            data = r.json()
+            
+            choices = data.get("choices", [])
+            if not choices:
+                return ""
+                
+            return choices[0].get("message", {}).get("content", "")
+        except Exception as e:
+            LOG.error("Brave Answers request failed for query '%s': %s", query, e)
+            return ""
+
