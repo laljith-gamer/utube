@@ -6,7 +6,7 @@ llm_research:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [llmsrelay_opus, openrouter_research]
+  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -14,13 +14,6 @@ llm_research:
     high: 16000
   retry_on_rate_limit_seconds: 10
   providers:
-    llmsrelay_opus:
-      base_url: https://api.llmsrelay.com/v1
-      api_key_env: LLMSRELAY_API_KEY
-      model: claude-opus-4-8
-      supports_reasoning_effort: false
-      params:
-        max_tokens: 6000
     nvidia_nim_primary:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
@@ -42,6 +35,7 @@ llm_research:
         top_p: 0.95
         max_tokens: 6000
     openrouter_research:
+      max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.3-70b-instruct
@@ -55,18 +49,12 @@ llm_script:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [llmsrelay_opus, openrouter_script]
+  chain: [openrouter_script, nvidia_nim_primary, nvidia_nim_fallback]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    llmsrelay_opus:
-      base_url: https://api.llmsrelay.com/v1
-      api_key_env: LLMSRELAY_API_KEY
-      model: claude-opus-4-8
-      supports_reasoning_effort: false
-      params:
-        max_tokens: 8000
     openrouter_script:
+      max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.3-70b-instruct
@@ -88,18 +76,12 @@ llm_concept:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [llmsrelay_opus, openrouter_research]
+  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    llmsrelay_opus:
-      base_url: https://api.llmsrelay.com/v1
-      api_key_env: LLMSRELAY_API_KEY
-      model: claude-opus-4-8
-      supports_reasoning_effort: false
-      params:
-        max_tokens: 4000
     openrouter_research:
+      max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.3-70b-instruct
@@ -133,18 +115,12 @@ llm_qc:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [llmsrelay_opus, openrouter_research]
+  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    llmsrelay_opus:
-      base_url: https://api.llmsrelay.com/v1
-      api_key_env: LLMSRELAY_API_KEY
-      model: claude-opus-4-8
-      supports_reasoning_effort: false
-      params:
-        max_tokens: 4000
     openrouter_research:
+      max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.3-70b-instruct
@@ -178,19 +154,12 @@ llm_premium_rewrite:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [llmsrelay_opus, openrouter_research]
+  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    llmsrelay_opus:
-      base_url: https://api.llmsrelay.com/v1
-      api_key_env: LLMSRELAY_API_KEY
-      model: claude-opus-4-8
-      supports_reasoning_effort: false
-      params:
-        temperature: 0.2
-        max_tokens: 4000
     openrouter_research:
+      max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
       model: meta-llama/llama-3.3-70b-instruct
