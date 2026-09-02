@@ -13,6 +13,8 @@ class BraveProvider:
     BASE_URL = "https://api.search.brave.com/res/v1"
     MAX_REQUESTS_PER_RUN = 25
     _request_count = 0
+    _web_exhausted = False
+    _answers_exhausted = False
     
     @classmethod
     def _key(cls) -> str:
@@ -34,8 +36,8 @@ class BraveProvider:
         Search Brave News API.
         freshness: 'pd' (past day), 'pw' (past week), 'pm' (past month)
         """
-        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
-            LOG.warning("Brave API limit reached (%d). Skipping News request.", cls.MAX_REQUESTS_PER_RUN)
+        if cls._web_exhausted or cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave Web API exhausted or limit reached. Skipping News request.")
             return []
             
         try:
@@ -46,6 +48,10 @@ class BraveProvider:
                 headers=cls._headers(),
                 timeout=10
             )
+            if r.status_code in (402, 403, 429):
+                LOG.warning("Brave Web API quota exceeded (HTTP %d). Disabling for this run.", r.status_code)
+                cls._web_exhausted = True
+                return []
             r.raise_for_status()
             data = r.json()
             
@@ -70,8 +76,8 @@ class BraveProvider:
     @classmethod
     def search_images(cls, query: str, count: int = 5) -> list[dict]:
         """Search Brave Images API."""
-        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
-            LOG.warning("Brave API limit reached (%d). Skipping Image request.", cls.MAX_REQUESTS_PER_RUN)
+        if cls._web_exhausted or cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave Web API exhausted or limit reached. Skipping Image request.")
             return []
             
         try:
@@ -82,6 +88,10 @@ class BraveProvider:
                 headers=cls._headers(),
                 timeout=10
             )
+            if r.status_code in (402, 403, 429):
+                LOG.warning("Brave Web API quota exceeded (HTTP %d). Disabling for this run.", r.status_code)
+                cls._web_exhausted = True
+                return []
             r.raise_for_status()
             data = r.json()
             
@@ -100,10 +110,46 @@ class BraveProvider:
             return []
 
     @classmethod
+    def search_web(cls, query: str, count: int = 5) -> list[dict]:
+        """Search Brave Web API for snippets and context."""
+        if cls._web_exhausted or cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave Web API exhausted or limit reached. Skipping Web request.")
+            return []
+            
+        try:
+            cls._request_count += 1
+            r = requests.get(
+                f"{cls.BASE_URL}/web/search",
+                params={"q": query, "count": min(count, 10), "safesearch": "moderate"},
+                headers=cls._headers(),
+                timeout=10
+            )
+            if r.status_code in (402, 403, 429):
+                LOG.warning("Brave Web API quota exceeded (HTTP %d). Disabling for this run.", r.status_code)
+                cls._web_exhausted = True
+                return []
+            r.raise_for_status()
+            data = r.json()
+            
+            results = data.get("web", {}).get("results", [])
+            out = []
+            for item in results:
+                out.append({
+                    "title": item.get("title", ""),
+                    "url": item.get("url", ""),
+                    "description": item.get("description", ""),
+                    "extra_snippets": item.get("extra_snippets", [])
+                })
+            return out
+        except Exception as e:
+            LOG.error("Brave Web search failed for query '%s': %s", query, e)
+            return []
+
+    @classmethod
     def get_answer(cls, query: str) -> str:
         """Get an AI-generated answer from Brave Search Answers API."""
-        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
-            LOG.warning("Brave API limit reached (%d). Skipping Answers request.", cls.MAX_REQUESTS_PER_RUN)
+        if cls._answers_exhausted or cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave Answers API exhausted or limit reached. Skipping request.")
             return ""
             
         try:
@@ -118,6 +164,10 @@ class BraveProvider:
                 },
                 timeout=30
             )
+            if r.status_code in (402, 403, 429):
+                LOG.warning("Brave Answers API quota exceeded (HTTP %d). Disabling for this run.", r.status_code)
+                cls._answers_exhausted = True
+                return ""
             r.raise_for_status()
             data = r.json()
             
