@@ -142,20 +142,24 @@ def build_research_brief(
     # Do more research using Brave to fetch extra context and grounded AI answers
     try:
         from ..providers.brave import BraveProvider
-        extra_news = BraveProvider.search_news(topic.get("title", ""), count=3)
+        
+        # Spellcheck the topic title first
+        search_q = BraveProvider.spellcheck(topic.get("title", "")) or topic.get("title", "")
+        
+        extra_news = BraveProvider.search_news(search_q, count=3)
         if extra_news:
             evidence_text += "\n\nADDITIONAL BRAVE SEARCH CONTEXT (NEWS):\n"
             for n in extra_news:
                 evidence_text += f"- {n.get('title')}: {n.get('summary')}\n"
                 
-        extra_web = BraveProvider.search_web(topic.get("title", ""), count=3)
+        extra_web = BraveProvider.search_web(search_q, count=3)
         if extra_web:
             evidence_text += "\n\nADDITIONAL BRAVE SEARCH CONTEXT (WEB):\n"
             for w in extra_web:
                 evidence_text += f"- {w.get('title')}: {w.get('description')}\n"
         
         # Use the newly available Answers plan for deep grounded context
-        grounded_answer = BraveProvider.get_answer(topic.get("title", ""))
+        grounded_answer = BraveProvider.get_answer(search_q)
         if grounded_answer:
             evidence_text += f"\n\nDEEP AI-GROUNDED RESEARCH ANSWER:\n{grounded_answer}\n"
             

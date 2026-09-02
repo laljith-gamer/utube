@@ -304,12 +304,31 @@ def _timeout() -> int:
 def _brave_search(query: str, limit: int) -> list[dict]:
     from ..providers.brave import BraveProvider
     ledger = Ledger.load(repo_root() / "ledger.json")
-    src_key = f"brave_search:{query}"
+    
+    # Spellcheck the query to fix typos before searching
+    cleaned_query = BraveProvider.spellcheck(query)
+    if not cleaned_query:
+        cleaned_query = query
+        
+    src_key = f"brave_search:{cleaned_query}"
     health_score = ledger.get_source_health(src_key)
     if health_score < 0.5:
         limit = max(1, int(limit * health_score))
         
-    out = BraveProvider.search_news(query, count=limit)
+    # Get autosuggestions for expanded reach
+    suggestions = BraveProvider.autosuggest(cleaned_query, count=2)
+    search_queries = [cleaned_query]
+    if suggestions:
+        search_queries.extend(suggestions)
+        
+    out = []
+    # Divide the limit among the queries to get a diverse spread
+    per_query_limit = max(1, limit // len(search_queries))
+    
+    for sq in set(search_queries):
+        res = BraveProvider.search_news(sq, count=per_query_limit)
+        out.extend(res)
+        
     if out:
         ledger.record_source_health(src_key, True)
     else:

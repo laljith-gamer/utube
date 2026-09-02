@@ -55,6 +55,10 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                 import base64
                 
                 search_q = " ".join(broll) if broll else prompt
+                
+                # Fix any AI-hallucinated typos in the prompt before searching
+                search_q = BraveProvider.spellcheck(search_q) or search_q
+                
                 img_cands = BraveProvider.search_images(search_q, count=3)
                 
                 real_img_path = scene_dir / "real.jpg"

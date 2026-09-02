@@ -31,6 +31,41 @@ class BraveProvider:
         }
 
     @classmethod
+    def spellcheck(cls, query: str) -> str:
+        """Check query spelling. Returns the corrected query or the original."""
+        try:
+            r = requests.get(
+                f"{cls.BASE_URL}/spellcheck/search",
+                params={"q": query},
+                headers=cls._headers(),
+                timeout=5
+            )
+            r.raise_for_status()
+            data = r.json()
+            return data.get("query", {}).get("altered", query)
+        except Exception as e:
+            LOG.error("Brave Spellcheck failed for query '%s': %s", query, e)
+            return query
+
+    @classmethod
+    def autosuggest(cls, query: str, count: int = 5) -> list[str]:
+        """Get autosuggestions for a query."""
+        try:
+            r = requests.get(
+                f"{cls.BASE_URL}/suggest/search",
+                params={"q": query, "count": count},
+                headers=cls._headers(),
+                timeout=5
+            )
+            r.raise_for_status()
+            data = r.json()
+            results = data.get("results", [])
+            return [item.get("query") for item in results if item.get("query")]
+        except Exception as e:
+            LOG.error("Brave Autosuggest failed for query '%s': %s", query, e)
+            return []
+
+    @classmethod
     def search_news(cls, query: str, count: int = 10, freshness: str = "pd") -> list[dict]:
         """
         Search Brave News API.
