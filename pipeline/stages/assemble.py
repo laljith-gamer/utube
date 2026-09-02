@@ -112,15 +112,41 @@ def _render_from_image(src: Path, out: Path, dur: float, w: int, h: int, fps: in
     f = acfg.get("ffmpeg", {}) or {}
     image_cfg = acfg.get("image_motion", {}) or {}
     
-    # We'll use zoompan filter. We want a slight zoom in.
-    # zoom in from 1.0 to 1.15 over the duration.
-    # z='min(zoom+0.0015,1.15)':d={dur*fps}
+    # We'll use zoompan filter with random cinematic motion.
+    import random
     zoom_rate = float(image_cfg.get("zoom_rate", 0.0015))
-    
+    frames = int(dur * fps)
+    motion_type = random.choice(["zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down"])
+
+    if motion_type == "zoom_in":
+        z = f"min(zoom+{zoom_rate},1.5)"
+        x = "iw/2-(iw/zoom/2)"
+        y = "ih/2-(ih/zoom/2)"
+    elif motion_type == "zoom_out":
+        z = f"max(1.3-{zoom_rate}*on,1.0)"
+        x = "iw/2-(iw/zoom/2)"
+        y = "ih/2-(ih/zoom/2)"
+    elif motion_type == "pan_left":
+        z = "1.3"
+        x = "max((iw-iw/zoom)-on*2,0)"
+        y = "ih/2-(ih/zoom/2)"
+    elif motion_type == "pan_right":
+        z = "1.3"
+        x = "min(on*2,iw-iw/zoom)"
+        y = "ih/2-(ih/zoom/2)"
+    elif motion_type == "pan_up":
+        z = "1.3"
+        x = "iw/2-(iw/zoom/2)"
+        y = "max((ih-ih/zoom)-on*2,0)"
+    else:  # pan_down
+        z = "1.3"
+        x = "iw/2-(iw/zoom/2)"
+        y = "min(on*2,ih-ih/zoom)"
+
     vf = (
         f"scale={w}:{h}:force_original_aspect_ratio=increase,"
         f"crop={w}:{h},setsar=1,"
-        f"zoompan=z='min(zoom+{zoom_rate},1.15)':d={int(dur * fps)}:s={w}x{h}:fps={fps}"
+        f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={w}x{h}:fps={fps}"
     )
     cmd = [
         "ffmpeg", "-y", "-loop", "1", "-i", str(src),

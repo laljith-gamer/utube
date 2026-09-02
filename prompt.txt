@@ -1,0 +1,1031 @@
+<USER_REQUEST>
+============================================================
+UTUBE — DISCOVERY / DATA RETRIEVAL ENGINE UPGRADE
+============================================================
+
+IMPORTANT:
+We are NOT changing the AI provider architecture in this task.
+
+Puter.js is already the active and intended AI gateway.
+
+DO NOT:
+- switch AI providers
+- add Gemini
+- add NVIDIA NIM
+- add OpenRouter
+- add direct OpenAI
+- add direct Anthropic
+- replace Claude Opus
+- redesign the Puter AI integration
+
+The task in this prompt is specifically:
+
+    IMPROVE DATA RETRIEVAL + DISCOVERY QUALITY
+
+before data reaches Claude Opus.
+
+============================================================
+CONTEXT
+============================================================
+
+Repository:
+
+    https://github.com/laljith-gamer/utube
+
+Runtime:
+
+    GitHub Actions
+    Ubuntu hosted VM
+    Python
+    Node.js
+    Puter.js
+    Claude Opus through Puter
+
+The current pipeline already discovers candidates from multiple sources.
+
+However, the main weakness is upstream information quality.
+
+Recent runs showed:
+
+- Reddit JSON retrieval being blocked
+- Reddit RSS fallback receiving 429 responses
+- source failures reducing coverage
+- candidates being discovered, but without a sufficiently intelligent
+  evidence/trend layer
+- raw candidate volume being more important than event-level intelligence
+- insufficient cross-run trend memory
+- insufficient source-health adaptation
+- insufficient distinction between:
+    mention count
+    independent corroboration
+    source quality
+    novelty
+    velocity
+- Opus should receive better evidence, not more noisy URLs
+
+DO NOT start by adding dozens of sources.
+
+First build the discovery foundation.
+
+============================================================
+PHASE 1 — FULL DISCOVERY AUDIT
+============================================================
+
+Inspect the entire repository before making changes.
+
+Read and understand:
+
+- discovery modules
+- source configuration
+- RSS handling
+- Reddit handling
+- candidate representation
+- URL normalization
+- duplicate detection
+- topic scoring
+- topic history
+- ledger
+- artifacts
+- content memory
+- performance data
+- orchestration
+- GitHub Actions
+- all tests related to discovery/topic scoring
+
+Identify:
+
+1. Every current source
+2. How each source is retrieved
+3. Timeout behavior
+4. Retry behavior
+5. Rate-limit behavior
+6. Candidate schema
+7. Deduplication behavior
+8. Topic scoring behavior
+9. Existing persistence
+10. Existing cross-run memory
+11. Existing source failure tracking
+
+Do not assume the current implementation is as simple as the logs suggest.
+
+Understand the actual code first.
+
+============================================================
+PHASE 2 — DO NOT MAKE REDDIT THE CORE
+============================================================
+
+Reddit must NOT be the backbone of discovery.
+
+Treat Reddit as:
+
+    SOCIAL / AUDIENCE SIGNAL
+
+rather than:
+
+    PRIMARY FACTUAL EVIDENCE
+
+A Reddit thread can indicate:
+
+    people are discussing X
+
+but it should not automatically establish:
+
+    X is factually true
+
+Do not implement scraping intended to bypass:
+
+- authentication
+- rate limits
+- access controls
+- CAPTCHAs
+- robots/access restrictions
+- platform technical protections
+
+Use supported/legitimate access methods where available.
+
+When Reddit is unavailable:
+
+    CONTINUE DISCOVERY
+
+Do not let Reddit failure terminate or cripple the pipeline.
+
+============================================================
+PHASE 3 — SOURCE PORTFOLIO
+============================================================
+
+Evaluate the current sources and improve their roles.
+
+Think in source classes:
+
+TIER 1 — DURABLE / FACTUAL
+
+- official company announcements
+- official press releases
+- government/agency sources
+- major publisher RSS/Atom
+- specialist publications
+- research/scientific feeds
+
+TIER 2 — STRUCTURED / SIGNAL
+
+- Hacker News
+- YouTube signals
+- Reddit
+- other legitimate community APIs/feeds
+
+TIER 3 — SEARCH-DERIVED DISCOVERY
+
+- Google News/search-derived feeds
+- other permitted search/news feeds
+- query families with recency
+- locale-specific queries
+- topic-specific queries
+
+TIER 4 — OPTIONAL EXPANSION
+
+- GitHub trend signals
+- product launches
+- startup trackers
+- specialist forums
+- additional vertical sources
+
+Do NOT add a new source simply because it exists.
+
+A source must provide a distinct useful signal.
+
+============================================================
+PHASE 4 — COMMON CANDIDATE SCHEMA
+============================================================
+
+All retrieval adapters must normalize into a common internal candidate representation.
+
+Conceptually each candidate should contain enough information for
+downstream processing to understand:
+
+- title
+- canonical URL
+- source
+- source class
+- publication timestamp
+- retrieval timestamp
+- author where appropriate
+- snippet/summary
+- source credibility tier
+- extracted entities
+- extracted numbers
+- content fingerprint
+- source-specific engagement signal if available
+
+Do not immediately send raw source-specific objects to Opus.
+
+Normalize first.
+
+============================================================
+PHASE 5 — EVENT-LEVEL CLUSTERING
+============================================================
+
+This is a major requirement.
+
+Do NOT treat:
+
+    20 articles
+
+as:
+
+    20 separate trends
+
+when they all describe the same event.
+
+Build event-level clustering.
+
+Use a layered strategy:
+
+1. URL canonicalization
+2. title normalization
+3. fuzzy title similarity
+4. shared entity detection
+5. shared numbers/dates
+6. semantic similarity
+7. cross-source corroboration
+
+Cluster examples such as:
+
+    "Company X raises $50M"
+    "Company X closes Series B"
+    "Startup X secures $50 million"
+    
+into one underlying event when evidence indicates they refer to
+the same occurrence.
+
+Do NOT merge unrelated stories just because they share a company name.
+
+Use confidence thresholds.
+
+Ambiguous clustering can later be resolved by Claude Opus.
+
+============================================================
+PHASE 6 — EVIDENCE PACKET
+============================================================
+
+After event clustering, create an evidence packet for each important event.
+
+The evidence packet should contain conceptually:
+
+    event_id
+
+    representative_title
+
+    representative_claim
+
+    canonical_sources
+
+    all_relevant_urls
+
+    source_classes
+
+    source_credibility
+
+    first_seen_at
+
+    latest_seen_at
+
+    independent_source_count
+
+    source_class_count
+
+    mention_count
+
+    velocity
+
+    velocity_change
+
+    novelty
+
+    prior_history
+
+    key_entities
+
+    key_numbers
+
+    factual_snippets
+
+    source-specific signals
+
+    confidence
+
+    prior_topic_usage
+
+The goal is:
+
+    raw internet
+        ↓
+    structured evidence
+        ↓
+    Claude Opus
+
+not:
+
+    raw internet
+        ↓
+    Claude Opus
+
+============================================================
+PHASE 7 — INDEPENDENT CORROBORATION
+============================================================
+
+Distinguish:
+
+    raw mention count
+
+from:
+
+    independent source count
+
+Example:
+
+    20 sites copying the same AP story
+
+must NOT count like:
+
+    official announcement
+    + specialist publication
+    + independent major publication
+    + community discussion
+
+The second case should receive materially stronger corroboration.
+
+Track:
+
+- source count
+- independent source count
+- source-class diversity
+- primary-source presence
+- credibility
+
+Do not double-count syndication.
+
+============================================================
+PHASE 8 — DETERMINISTIC TREND FEATURES
+============================================================
+
+Before Claude sees a candidate, calculate deterministic signals.
+
+At minimum evaluate:
+
+    freshness
+    recency
+    velocity
+    acceleration
+    novelty
+    source quality
+    corroboration
+    source diversity
+    prior-history overlap
+    prior usage
+    audience signal
+
+Use formulas/rules rather than asking Claude to do arithmetic.
+
+The system should be able to explain numerically why an event ranked highly.
+
+============================================================
+PHASE 9 — CROSS-RUN MEMORY
+============================================================
+
+Use the repository's existing persistent state intelligently.
+
+Inspect:
+
+    ledger.json
+    artifact/
+    data/
+    content memory
+    performance history
+
+Do not create unnecessary redundant storage if existing files can be
+extended safely.
+
+Create a compact persistent discovery memory capable of tracking:
+
+- story fingerprints
+- event IDs
+- first seen
+- last seen
+- historical mention counts
+- historical velocity
+- previous score
+- previous rank
+- whether already selected
+- whether already used in a video
+- source health
+
+Use a rolling retention policy.
+
+Do NOT let repository history grow without bound.
+
+Prefer a compact rolling window.
+
+============================================================
+PHASE 10 — TREND VELOCITY
+============================================================
+
+The system must understand change over time.
+
+Example:
+
+    Day 1 = 4 mentions
+    Day 2 = 11 mentions
+    Day 3 = 37 mentions
+
+This should become a strong acceleration signal.
+
+Also distinguish:
+
+    40 → 41
+
+from:
+
+    4 → 37
+
+The latter is a rapidly emerging story.
+
+Do NOT build sophisticated forecasting yet.
+
+Use reliable rolling-window deltas.
+
+============================================================
+PHASE 11 — SOURCE HEALTH
+============================================================
+
+Build an adaptive source-health mechanism.
+
+Track per source:
+
+- success rate
+- failure rate
+- timeout rate
+- 429 rate
+- empty-result rate
+- duplicate-result rate
+- useful-candidate rate
+- average latency
+
+Source health must influence:
+
+- retrieval priority
+- retry budget
+- weighting
+- future source selection
+
+Example:
+
+    Reddit repeatedly fails
+        ↓
+    health score decreases
+        ↓
+    less retrieval budget
+        ↓
+    other sources receive more budget
+
+Do NOT remove a source permanently because it fails once.
+
+Use recent rolling health.
+
+============================================================
+PHASE 12 — REDDIT FAILURE BEHAVIOR
+============================================================
+
+Reddit failures must be non-fatal.
+
+Examples:
+
+    HTTP 429
+    access denied
+    blocked JSON
+    timeout
+    unavailable endpoint
+
+should become:
+
+    source unavailable/degraded
+
+not:
+
+    discovery failure
+
+Never repeatedly hammer an unavailable source.
+
+Use bounded retries/backoff.
+
+If Reddit repeatedly fails, move on.
+
+The total discovery system must remain useful.
+
+============================================================
+PHASE 13 — SEARCH-DRIVEN DISCOVERY
+============================================================
+
+Evaluate adding search/news-derived discovery as a major signal source.
+
+Design multiple query families.
+
+Examples:
+
+    AI
+    AI startups
+    AI funding
+    AI regulation
+    cybersecurity
+    consumer technology
+    science
+    space
+    business
+    startups
+    India technology
+    India business
+    internet culture
+
+Use recency-sensitive queries.
+
+The objective is:
+
+    CURRENT EVENTS
+
+not:
+
+    evergreen articles
+
+Do not run an enormous number of queries every run.
+
+Use:
+
+    bounded query families
+    rotation
+    source health
+    freshness
+    diminishing returns
+
+to control runtime.
+
+============================================================
+PHASE 14 — HACKER NEWS / COMMUNITY SIGNALS
+============================================================
+
+Evaluate Hacker News and other legitimate community sources.
+
+Use community sources primarily for:
+
+- velocity
+- attention
+- emerging interest
+- discussion
+
+not as the sole factual authority.
+
+Community signals should enrich evidence packets.
+
+============================================================
+PHASE 15 — OPUS USAGE
+============================================================
+
+Claude Opus should NOT perform mechanical retrieval work.
+
+Do not ask Opus to:
+
+- count URLs
+- count sources
+- calculate timestamps
+- perform basic duplicate filtering
+- calculate simple scores
+
+Use deterministic code for those.
+
+Use Claude Opus for:
+
+- significance
+- narrative potential
+- novelty interpretation
+- audience relevance
+- ambiguity resolution
+- event synthesis
+- evidence sufficiency
+- selecting the strongest story
+- deciding whether multiple clusters are actually related
+- explaining why a story matters
+- selecting the strongest angle
+
+============================================================
+PHASE 16 — OPUS INPUT SIZE
+============================================================
+
+Do NOT dump 75+ raw candidates into Opus.
+
+Target:
+
+    8–12 strong event clusters
+
+after deterministic filtering/scoring.
+
+A reasonable architecture:
+
+    75 raw candidates
+        ↓
+    normalization
+        ↓
+    obvious duplicate removal
+        ↓
+    event clustering
+        ↓
+    evidence enrichment
+        ↓
+    deterministic scoring
+        ↓
+    top 8–12 events
+        ↓
+    Claude Opus
+        ↓
+    final topic
+
+Adjust the number based on actual retrieval volume.
+
+============================================================
+PHASE 17 — YOUTUBE-SPECIFIC RANKING
+============================================================
+
+This is not a generic news aggregator.
+
+The system exists to find good YouTube opportunities.
+
+The ranking should therefore consider:
+
+- novelty
+- immediate audience interest
+- narrative tension
+- surprise
+- human impact
+- business impact
+- technological significance
+- controversy where appropriate
+- future implications
+- visual storytelling potential
+- ability to explain simply
+- evidence quality
+- timeliness
+
+Do not optimize only for:
+
+    most mentions
+
+A highly mentioned boring story may be worse than a rapidly emerging,
+highly consequential story with fewer mentions.
+
+============================================================
+PHASE 18 — DISCOVERY QUALITY VS QUANTITY
+============================================================
+
+Measure:
+
+    useful candidates / retrieved candidates
+
+not only:
+
+    number of retrieved candidates
+
+A source producing 500 duplicates is worse than a source producing
+20 unique high-value events.
+
+Track this.
+
+============================================================
+PHASE 19 — DEDUP AGAINST PREVIOUS VIDEOS
+============================================================
+
+A story already used in a video should receive a strong reuse penalty
+unless there is meaningful new development.
+
+However:
+
+    old event + major new development
+
+should NOT automatically be rejected.
+
+Instead recognize:
+
+    resurfacing
+    escalation
+    new phase
+    new evidence
+
+This is why cross-run memory is important.
+
+============================================================
+PHASE 20 — STALE STORY DETECTION
+============================================================
+
+Do not let a popular old article win merely because it has many mentions.
+
+Use:
+
+- article age
+- event age
+- last meaningful update
+- historical presence
+- velocity
+
+Distinguish:
+
+    old story receiving recycled mentions
+
+from:
+
+    old story with genuinely new developments
+
+============================================================
+PHASE 21 — RUNTIME DESIGN FOR GITHUB ACTIONS
+============================================================
+
+We are running on an Ubuntu GitHub Actions hosted VM.
+
+Use bounded concurrency.
+
+Avoid unbounded parallel scraping.
+
+Give each source:
+
+- timeout
+- retry budget
+- backoff
+- maximum requests
+- maximum response size where appropriate
+
+Give the entire discovery stage:
+
+- total runtime budget
+- source prioritization
+- early stopping
+- graceful degradation
+
+Do not create a system that spends 30 minutes waiting for one broken
+source.
+
+============================================================
+PHASE 22 — OBSERVABILITY
+============================================================
+
+Add useful discovery logging.
+
+At the end of retrieval report something like:
+
+    Sources queried: X
+    Sources healthy: X
+    Sources degraded: X
+
+    Raw candidates: X
+    After normalization: X
+    After deduplication: X
+    Event clusters: X
+    Evidence-backed events: X
+
+    Top event:
+      title
+      score
+      independent sources
+      velocity
+      novelty
+
+For each failed source log:
+
+    source
+    failure type
+    retry count
+    final state
+
+Do not log secrets.
+
+============================================================
+PHASE 23 — DO NOT TRUST SOURCE COUNT
+============================================================
+
+Never implement:
+
+    more URLs = higher score
+
+Instead use something closer to:
+
+    event quality
+    × corroboration
+    × freshness
+    × velocity
+    × novelty
+    × audience relevance
+
+with sensible normalization.
+
+============================================================
+PHASE 24 — TESTING
+============================================================
+
+Before finishing, create tests for:
+
+1. Reddit unavailable
+2. Reddit 429
+3. source timeout
+4. duplicate URLs
+5. duplicate article titles
+6. semantically equivalent events
+7. independent corroboration
+8. syndicated articles
+9. old story vs. new story
+10. accelerating story
+11. repeated story from previous run
+12. story resurfacing with meaningful update
+13. source health degradation
+14. source recovery
+15. empty source
+16. malformed feed
+17. evidence packet construction
+18. ranking
+19. final shortlist
+20. no-source graceful degradation
+
+============================================================
+PHASE 25 — REGRESSION SAFETY
+============================================================
+
+Do not break:
+
+- topic selection
+- concept generation
+- research
+- script generation
+- QC
+- video rendering
+- upload
+- ledger persistence
+
+Only improve the discovery/data layer.
+
+Do not alter the Puter architecture.
+
+============================================================
+PHASE 26 — CURRENT REPOSITORY STATE
+============================================================
+
+Before modifying anything, inspect the newest commit and current files.
+
+Do not rely on historical assumptions.
+
+Specifically verify the current implementation of:
+
+- discover.py
+- topic_scoring.py
+- ledger.py
+- content memory
+- orchestrator.py
+- configuration files
+- all source adapters
+- current workflow files
+
+Adapt the architecture to the existing code rather than creating a parallel
+discovery system.
+
+============================================================
+PHASE 27 — IMPLEMENTATION ORDER
+============================================================
+
+Implement in this order:
+
+    1. audit existing discovery
+    2. normalize candidate schema
+    3. improve canonicalization
+    4. event clustering
+    5. evidence packet
+    6. cross-run memory
+    7. source health
+    8. deterministic trend features
+    9. improve source portfolio
+    10. search-derived discovery
+    11. community signal integration
+    12. Opus shortlist input
+    13. testing
+    14. end-to-end verification
+
+Do NOT start by adding 15 new websites.
+
+============================================================
+PHASE 28 — FINAL ACCEPTANCE CRITERIA
+============================================================
+
+The task is complete only when:
+
+[ ] Reddit failure is non-fatal
+[ ] source health is tracked
+[ ] candidates have a common schema
+[ ] duplicate URLs are normalized
+[ ] event-level clustering exists
+[ ] syndicated stories are not over-counted
+[ ] independent corroboration is measured
+[ ] freshness is measured
+[ ] velocity is measured
+[ ] acceleration is measurable
+[ ] novelty is measured
+[ ] previous-run history is used
+[ ] previously used topics are known
+[ ] stale stories are penalized
+[ ] evidence packets exist
+[ ] Opus receives a small high-quality shortlist
+[ ] source diversity affects ranking
+[ ] source quality affects ranking
+[ ] source failures redistribute discovery effort
+[ ] discovery remains useful with several source failures
+[ ] GitHub Actions runtime remains bounded
+[ ] deterministic work is kept outside Opus
+[ ] Puter.js architecture is unchanged
+[ ] no non-Puter AI provider is introduced
+
+============================================================
+PHASE 29 — VERIFY WITH A REAL RUN
+============================================================
+
+After implementation, run the discovery pipeline in the GitHub Actions
+environment or an equivalent production-like test.
+
+Inspect actual logs.
+
+Verify that the runtime behavior is:
+
+    source retrieval
+        ↓
+    normalization
+        ↓
+    event clustering
+        ↓
+    evidence packets
+        ↓
+    deterministic trend scoring
+        ↓
+    top events
+        ↓
+    Puter / Claude Opus
+
+Do not declare success based only on unit tests.
+
+============================================================
+PHASE 30 — FINAL REPORT
+============================================================
+
+At the end provide:
+
+1. Current discovery architecture
+2. Sources currently active
+3. Sources added
+4. Sources unchanged
+5. Reddit behavior
+6. Source-health mechanism
+7. Event-clustering mechanism
+8. Evidence-packet structure
+9. Cross-run memory
+10. Trend features
+11. Ranking changes
+12. Opus input strategy
+13. Runtime implications
+14. Tests executed
+15. End-to-end test result
+16. Exact files changed
+17. Remaining weaknesses
+
+IMPORTANT:
+
+Do not just give me a plan.
+
+Inspect the current repository.
+Implement the discovery improvements.
+Run tests.
+Run a real production-like discovery test.
+Inspect the output.
+Fix problems you find.
+
+But do NOT redesign the Puter AI layer.
+
+The focus is:
+
+    BETTER DATA IN
+        ↓
+    BETTER EVIDENCE
+        ↓
+    BETTER TREND DETECTION
+        ↓
+    BETTER CLAUDE OPUS DECISION
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-01T13:24:06+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\ASUS\Documents\GitHub\utube\pipeline\providers\llm.py (LANGUAGE_PYTHON)
+Cursor is on line: 176
+Other open documents:
+- c:\Users\ASUS\Documents\GitHub\utube\pipeline\providers\puter.py (LANGUAGE_PYTHON)
+- c:\Users\ASUS\Documents\GitHub\utube\config\providers.yaml (LANGUAGE_YAML)
+- c:\Users\ASUS\Documents\GitHub\utube\pipeline\orchestrator.py (LANGUAGE_PYTHON)
+- c:\Users\ASUS\Documents\GitHub\utube\pipeline\providers\llm.py (LANGUAGE_PYTHON)
+</ADDITIONAL_METADATA>

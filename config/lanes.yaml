@@ -13,17 +13,10 @@ subtopics:
     description: "How everyday tech actually works — the parts they don't tell you."
     fit_keywords: [phone, wifi, bluetooth, GPS, camera, screen, battery, charger, app, update, notification]
     sources:
-      - type: reddit
-        subreddits: [technology, explainlikeimfive, Damnthatsinteresting]
-        time_filter: day
-      - type: hackernews
-        front_page: true
+      - type: brave_search
+        query: "technology mechanics how it works"
       - type: google_trends
         geos: [US, IN, GLOBAL]
-      - type: rss
-        urls:
-          - https://techcrunch.com/feed/
-          - https://www.theverge.com/rss/index.xml
     voice: en-US-AvaMultilingualNeural
     voice_style: friendly
     palette: ["#FFB347", "#2B2D42"]
@@ -34,11 +27,8 @@ subtopics:
     description: "AI facts that change how you think about your daily tools."
     fit_keywords: [ai, machine learning, chatbot, deepfake, voice clone, recommendation, algorithm, model, training]
     sources:
-      - type: reddit
-        subreddits: [MachineLearning, LocalLLaMA, singularity, artificial]
-        time_filter: day
-      - type: hackernews
-        front_page: true
+      - type: brave_search
+        query: "artificial intelligence breakthroughs"
       - type: google_trends
         geos: [US, IN, GLOBAL]
     voice: en-US-AriaNeural
@@ -51,14 +41,10 @@ subtopics:
     description: "Scams, hacks, and privacy traps that affect real people."
     fit_keywords: [scam, phishing, hack, breach, password, privacy, tracking, data leak, ransomware, identity theft]
     sources:
-      - type: reddit
-        subreddits: [netsec, cybersecurity, privacy, Scams]
-        time_filter: day
+      - type: brave_search
+        query: "cybersecurity privacy scams"
       - type: google_trends
         geos: [US, GLOBAL]
-      - type: rss
-        urls:
-          - https://feeds.feedburner.com/TheHackersNews
     voice: en-US-DavisNeural
     voice_style: serious
     palette: ["#00FF41", "#0D0208"]
@@ -69,13 +55,10 @@ subtopics:
     description: "How technology costs, saves, or wastes your money."
     fit_keywords: [subscription, price, cost, billion, trillion, revenue, startup, investment, layoff, salary, fee]
     sources:
-      - type: hackernews
-        front_page: true
+      - type: brave_search
+        query: "technology business money"
       - type: google_trends
         geos: [US, IN, GLOBAL]
-      - type: rss
-        urls:
-          - https://techcrunch.com/feed/
     voice: en-US-GuyNeural
     voice_style: newscast
     palette: ["#E63946", "#1D3557"]
@@ -86,12 +69,8 @@ subtopics:
     description: "Breakthroughs and discoveries that sound like science fiction."
     fit_keywords: [space, quantum, fusion, biotech, gene, robot, drone, satellite, mars, brain, surgery, cure]
     sources:
-      - type: reddit
-        subreddits: [Futurology, science, space]
-        time_filter: day
-      - type: rss
-        urls:
-          - https://www.arstechnica.com/feed/
+      - type: brave_search
+        query: "future science space discoveries"
     voice: en-US-JennyNeural
     voice_style: cinematic
     palette: ["#06FFA5", "#011627"]
@@ -102,11 +81,8 @@ subtopics:
     description: "How the internet, apps, and platforms actually work behind the scenes."
     fit_keywords: [internet, server, cloud, DNS, CDN, cable, fiber, 5G, download, streaming, buffer, latency]
     sources:
-      - type: reddit
-        subreddits: [todayilearned, technology, InternetIsBeautiful]
-        time_filter: day
-      - type: hackernews
-        front_page: true
+      - type: brave_search
+        query: "internet platforms how they work"
     voice: en-US-AvaMultilingualNeural
     voice_style: friendly
     palette: ["#FF6B6B", "#1A1A2E"]
@@ -118,9 +94,8 @@ subtopics:
     fit_keywords: [history, invention, origin, accident, patent, founder, first, 1990, 2000, old, forgotten]
     sources:
       - type: wikipedia_otd
-      - type: reddit
-        subreddits: [todayilearned, technology]
-        time_filter: week
+      - type: brave_search
+        query: "tech history accidental inventions"
       - type: github_trending
     voice: en-US-AvaMultilingualNeural
     voice_style: friendly
@@ -132,11 +107,8 @@ subtopics:
     description: "Common tech beliefs that are completely wrong."
     fit_keywords: [myth, misconception, wrong, actually, truth, believe, fake, real, urban legend]
     sources:
-      - type: reddit
-        subreddits: [todayilearned, explainlikeimfive, technology]
-        time_filter: week
-      - type: hackernews
-        front_page: true
+      - type: brave_search
+        query: "tech myths busted misconception"
     voice: en-US-GuyNeural
     voice_style: newscast
     palette: ["#FF9A3C", "#2D2D2D"]

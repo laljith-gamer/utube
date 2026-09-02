@@ -8,11 +8,12 @@ from ..config import get_config
 from ..providers.image import ImageRouter
 from ..providers.stock import StockRouter
 from ..providers.video import VideoRouter
+from ..providers.llm import LLMRouter
 
 LOG = logging.getLogger("utube.visuals")
 
 
-def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRouter, script: dict, out_dir: Path) -> list[dict]:
+def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRouter, llm_vision: LLMRouter | None = None, script: dict, out_dir: Path) -> list[dict]:
     cfg = get_config()
     width = int(cfg.get_path("video.width", 1080))
     height = int(cfg.get_path("video.height", 1920))
@@ -44,6 +45,63 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
             except Exception as exc:
                 record["attempts"].append({"type": "stock", "status": "failed", "error": str(exc)})
                 LOG.warning("scene %d: stock search failed: %s", i, exc)
+
+        # ── Priority 1.5: Brave Search Images + Vision LLM Validation ──
+        if llm_vision and (broll or prompt):
+            try:
+                from ..providers.brave import BraveProvider
+                from ..providers.llm import ProviderStatus
+                import requests
+                import base64
+                
+                search_q = " ".join(broll) if broll else prompt
+                img_cands = BraveProvider.search_images(search_q, count=3)
+                
+                real_img_path = scene_dir / "real.jpg"
+                real_ok = False
+                
+                for cand in img_cands:
+                    img_url = cand.get("url")
+                    if not img_url: continue
+                    
+                    try:
+                        resp = requests.get(img_url, timeout=10)
+                        resp.raise_for_status()
+                        mime = resp.headers.get("content-type", "image/jpeg")
+                        b64 = base64.b64encode(resp.content).decode("utf-8")
+                        data_uri = f"data:{mime};base64,{b64}"
+                        
+                        sys_prompt = "You are a visual investigator. Given the image and a scene description, rate the image relevance from 0 to 100. Return JSON: {'relevance': int, 'reason': 'str'}."
+                        user_prompt = f"Scene Description: {prompt}\nKeywords: {broll}"
+                        
+                        messages = [
+                            {"role": "system", "content": sys_prompt},
+                            {"role": "user", "content": [
+                                {"type": "text", "text": user_prompt},
+                                {"type": "image_url", "image_url": {"url": data_uri}}
+                            ]}
+                        ]
+                        
+                        res = llm_vision.chat_json_structured(messages, max_tokens=150)
+                        if res.status == ProviderStatus.SUCCESS and res.parsed:
+                            score = res.parsed.get("relevance", 0)
+                            if score > 70:
+                                real_img_path.write_bytes(resp.content)
+                                real_ok = True
+                                record.update({"image": str(real_img_path.relative_to(out_dir)), "source": "brave_images", "motion_treatment": "zoom_pan"})
+                                record["attempts"].append({"type": "brave_image", "status": "ok", "relevance": score, "url": img_url})
+                                LOG.info("scene %d: brave image validated with score %s", i, score)
+                                break
+                            else:
+                                record["attempts"].append({"type": "brave_image", "status": "rejected", "relevance": score})
+                    except Exception as e:
+                        LOG.debug("scene %d: brave image check failed: %s", i, e)
+                        
+                if real_ok:
+                    return record
+            except Exception as exc:
+                record["attempts"].append({"type": "brave_image", "status": "failed", "error": str(exc)})
+                LOG.warning("scene %d: brave image search failed: %s", i, exc)
 
         # ── Priority 2: Generated still (+ optional SVD animation) ──
         still_path = scene_dir / "still.png"

@@ -79,7 +79,7 @@ class LLMRouter:
 
     def chat_structured(
         self,
-        messages: list[dict[str, str]],
+        messages: list[dict[str, Any]],
         *,
         max_tokens: int = 2000,
         temperature: float = 0.7,
@@ -192,7 +192,22 @@ class LLMRouter:
                                     sys_inst = m["content"]
                                 else:
                                     role = "user" if m["role"] == "user" else "model"
-                                    gemini_msgs.append(types.Content(role=role, parts=[types.Part.from_text(text=m["content"])]))
+                                    parts = []
+                                    if isinstance(m["content"], str):
+                                        parts.append(types.Part.from_text(text=m["content"]))
+                                    elif isinstance(m["content"], list):
+                                        for part in m["content"]:
+                                            if part.get("type") == "text":
+                                                parts.append(types.Part.from_text(text=part["text"]))
+                                            elif part.get("type") == "image_url":
+                                                import base64
+                                                uri = part["image_url"]["url"]
+                                                mime, b64 = uri.split(";", 1)
+                                                mime = mime.replace("data:", "")
+                                                b64 = b64.replace("base64,", "")
+                                                raw = base64.b64decode(b64)
+                                                parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
+                                    gemini_msgs.append(types.Content(role=role, parts=parts))
                             
                             config_kwargs = {
                                 "max_output_tokens": provider_params.get("max_tokens", max_tokens),
@@ -342,7 +357,7 @@ class LLMRouter:
 
     def chat_json_structured(
         self,
-        messages: list[dict[str, str]],
+        messages: list[dict[str, Any]],
         *,
         max_tokens: int = 2000,
         temperature: float = 0.7,
@@ -375,7 +390,7 @@ class LLMRouter:
 
     def chat(
         self,
-        messages: list[dict[str, str]],
+        messages: list[dict[str, Any]],
         *,
         max_tokens: int = 2000,
         temperature: float = 0.7,
@@ -396,7 +411,7 @@ class LLMRouter:
 
     def chat_json(
         self,
-        messages: list[dict[str, str]],
+        messages: list[dict[str, Any]],
         *,
         max_tokens: int = 2000,
         temperature: float = 0.7,

@@ -55,16 +55,9 @@ def discover_candidates(*, limit: int | None = None) -> list[dict[str, Any]]:
     for src in source_specs:
         try:
             t = src["type"]
-            if t == "hackernews":
-                candidates += _hackernews(int(per_limits.get("hackernews", 15)))
-            elif t == "reddit":
-                n = int(per_limits.get("reddit_per_subreddit", 8))
-                for sub in src.get("subreddits", []):
-                    candidates += _reddit(sub, src.get("time_filter", "day"), n)
-            elif t == "rss":
-                n = int(per_limits.get("rss", 8))
-                for url in src.get("urls", []):
-                    candidates += _rss(url, n)
+            if t == "brave_search":
+                query = src.get("query", "technology news")
+                candidates += _brave_search(query, int(per_limits.get("brave_search", 15)))
             elif t == "wikipedia_otd":
                 candidates += _wikipedia_otd(int(per_limits.get("wikipedia_otd", 10)))
             elif t == "github_trending":
@@ -128,16 +121,9 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
     for src in slot.get("sources", []):
         try:
             t = src["type"]
-            if t == "hackernews":
-                candidates += _hackernews(int(per_limits.get("hackernews", 15)))
-            elif t == "reddit":
-                n = int(per_limits.get("reddit_per_subreddit", 8))
-                for sub in src.get("subreddits", []):
-                    candidates += _reddit(sub, src.get("time_filter", "day"), n)
-            elif t == "rss":
-                n = int(per_limits.get("rss", 8))
-                for url in src.get("urls", []):
-                    candidates += _rss(url, n)
+            if t == "brave_search":
+                query = src.get("query", "technology news")
+                candidates += _brave_search(query, int(per_limits.get("brave_search", 15)))
             elif t == "wikipedia_otd":
                 candidates += _wikipedia_otd(int(per_limits.get("wikipedia_otd", 10)))
             elif t == "github_trending":
@@ -183,10 +169,8 @@ def discover_for_niche(slot: dict, *, limit: int | None = None) -> list[dict[str
 def _source_key(src: dict) -> str:
     """Unique key for a source config to avoid duplicate fetches."""
     t = src.get("type", "")
-    if t == "reddit":
-        return f"reddit:{','.join(sorted(src.get('subreddits', [])))}"
-    if t == "rss":
-        return f"rss:{','.join(sorted(src.get('urls', [])))}"
+    if t == "brave_search":
+        return f"brave_search:{src.get('query', '')}"
     if t == "google_trends":
         return f"google_trends:{','.join(sorted(src.get('geos', [])))}"
     return t
@@ -317,160 +301,20 @@ def _timeout() -> int:
     return int(_cfg().get("request_timeout_sec", 20))
 
 
-def _hackernews(limit: int) -> list[dict]:
+def _brave_search(query: str, limit: int) -> list[dict]:
+    from ..providers.brave import BraveProvider
     ledger = Ledger.load(repo_root() / "ledger.json")
-    health_score = ledger.get_source_health("hackernews")
-    if health_score < 0.5:
-        limit = max(1, int(limit * health_score))
-        
-    try:
-        r = requests.get(
-            "https://hn.algolia.com/api/v1/search",
-            params={"tags": "front_page", "hitsPerPage": limit},
-            headers={"User-Agent": _ua()},
-            timeout=_timeout(),
-        )
-        r.raise_for_status()
-        out = []
-        for h in r.json().get("hits", []):
-            out.append({
-                "title": h.get("title") or "",
-                "url": h.get("url") or f"https://news.ycombinator.com/item?id={h.get('objectID')}",
-                "score": h.get("points") or 0,
-                "summary": "",
-                "source": "hackernews",
-                "source_class": "tier2",
-                "credibility_tier": 2,
-                "num_comments": h.get("num_comments", 0),
-            })
-        ledger.record_source_health("hackernews", True)
-        return out
-    except Exception as exc:
-        ledger.record_source_health("hackernews", False, str(exc))
-        LOG.warning("HackerNews failed: %s", exc)
-        return []
-
-
-_REDDIT_RATE_LIMITED = False
-
-def _reddit(subreddit: str, time_filter: str, limit: int) -> list[dict]:
-    global _REDDIT_RATE_LIMITED
-    if _REDDIT_RATE_LIMITED:
-        return []
-        
-    """Fetch Reddit JSON, with an RSS fallback for hosted CI runners."""
-    ledger = Ledger.load(repo_root() / "ledger.json")
-    src_key = f"reddit:{subreddit}"
+    src_key = f"brave_search:{query}"
     health_score = ledger.get_source_health(src_key)
     if health_score < 0.5:
         limit = max(1, int(limit * health_score))
-    params = {"t": time_filter, "limit": limit}
-    headers = {"User-Agent": _ua()}
-    
-    # Polite delay to prevent Reddit from immediately 429'ing the IP
-    time.sleep(1.5)
-    
-    url = f"https://www.reddit.com/r/{subreddit}/top.json"
-    try:
-        r = requests.get(url, params=params, headers=headers, timeout=_timeout())
-        if r.status_code == 429:
-            LOG.warning("Reddit rate-limited for r/%s (429). Skipping RSS fallback.", subreddit)
-            return []
-        elif r.status_code == 403:
-            LOG.warning("Reddit blocked JSON access for r/%s; trying RSS fallback", subreddit)
-        else:
-            r.raise_for_status()
-            out = []
-            for c in r.json().get("data", {}).get("children", []):
-                d = c.get("data", {})
-                if d.get("over_18") or d.get("stickied"):
-                    continue
-                out.append({
-                    "title": d.get("title", ""),
-                    "url": "https://reddit.com" + d.get("permalink", ""),
-                    "external_url": d.get("url"),
-                    "score": d.get("score", 0),
-                    "summary": (d.get("selftext") or "")[:500],
-                    "source": src_key,
-                    "source_class": "tier2",
-                    "credibility_tier": 2,
-                    "num_comments": d.get("num_comments", 0),
-                })
-            ledger.record_source_health(src_key, True)
-            return out
-    except requests.RequestException as exc:
-        LOG.warning("Reddit JSON failed for r/%s: %s; trying RSS fallback", subreddit, exc)
-
-    # Reddit's RSS endpoint is often available when JSON is blocked by CI IPs.
-    try:
-        rss = requests.get(
-            f"https://www.reddit.com/r/{subreddit}/top/.rss",
-            params={"t": time_filter, "limit": limit},
-            headers=headers,
-            timeout=_timeout(),
-        )
-        if rss.status_code == 429:
-            LOG.warning("Reddit RSS rate-limited (429). Halting all further Reddit fetches.")
-            _REDDIT_RATE_LIMITED = True
-            return []
-        rss.raise_for_status()
-        feed = feedparser.parse(rss.content)
-        out = []
-        for entry in feed.entries[:limit]:
-            link = entry.get("link", "")
-            title = entry.get("title", "")
-            summary = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))[:500]
-            out.append({
-                "title": title,
-                "url": link,
-                "external_url": link,
-                "score": 0,
-                "summary": summary,
-                "source": src_key,
-                "source_class": "tier2",
-                "credibility_tier": 2,
-                "num_comments": 0,
-            })
-        ledger.record_source_health(src_key, True)
-        return out
-    except Exception as exc:
-        ledger.record_source_health(src_key, False, str(exc))
-        LOG.warning("Reddit RSS fallback failed for r/%s: %s", subreddit, exc)
-        return []
-
-
-def _rss(url: str, limit: int) -> list[dict]:
-    ledger = Ledger.load(repo_root() / "ledger.json")
-    health_score = ledger.get_source_health(url)
-    if health_score < 0.5:
-        limit = max(1, int(limit * health_score))
         
-    try:
-        feed = feedparser.parse(url)
-        out = []
-        now = time.time()
-        for e in feed.entries[:limit]:
-            score = 0
-            if e.get("published_parsed"):
-                pub_ts = time.mktime(e.published_parsed)
-                age_hours = (now - pub_ts) / 3600
-                score = max(0, int(100 * (1 - age_hours / 168)))
-
-            out.append({
-                "title": e.get("title", ""),
-                "url": e.get("link", ""),
-                "score": score,
-                "summary": (e.get("summary") or "")[:500],
-                "source": f"rss:{feed.feed.get('title', 'rss')}",
-                "source_class": "tier1",
-                "credibility_tier": 1,
-            })
-        ledger.record_source_health(url, True)
-        return out
-    except Exception as exc:
-        ledger.record_source_health(url, False, str(exc))
-        LOG.warning("RSS failed for %s: %s", url, exc)
-        return []
+    out = BraveProvider.search_news(query, count=limit)
+    if out:
+        ledger.record_source_health(src_key, True)
+    else:
+        ledger.record_source_health(src_key, False, "No results returned")
+    return out
 
 
 def _wikipedia_otd(limit: int) -> list[dict]:

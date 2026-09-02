@@ -20,9 +20,7 @@ discover:
   user_agent: "script:utube-automation:v1.0 (by /u/laljith-gamer)"
   total_candidates_limit: 40        # raised — scoring engine needs a wider pool
   per_source_limits:
-    hackernews: 15
-    reddit_per_subreddit: 8
-    rss: 8
+    brave_search: 15
     wikipedia_otd: 10
     github_trending: 10
     devto: 10

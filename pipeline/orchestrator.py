@@ -32,6 +32,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
     llm_research = LLMRouter("llm_research")
     llm_script = LLMRouter("llm_script")
     img, vid, tts, stock = ImageRouter(), VideoRouter(), TTSRouter(), StockRouter()
+    llm_vision = LLMRouter("llm_vision")
     mem_ctx = content_memory.ContentMemory().get_context_for_scoring()
     result: dict = {"run_id": run_id, "ok": False, "out_dir": str(out)}
 
@@ -199,7 +200,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         # ── Write ASS ──
         captions_file = out / "captions.ass"
         captions.write_ass(asr_segments, asr_info, captions_file)
-        vis = visuals.generate_visuals(image=img, video=vid, stock=stock, script=sc, out_dir=out)
+        vis = visuals.generate_visuals(image=img, video=vid, stock=stock, llm_vision=llm_vision, script=sc, out_dir=out)
         write_json(out / "6_visuals.json", vis)
         thumb_path = out / "thumbnail.jpg"
         thumb_palette = cfg.get_path("thumbnail.palette", None)
