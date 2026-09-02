@@ -72,6 +72,8 @@ class TTSRouter:
                     return self._edge_tts(text, voice)
                 if backend == "gtts":
                     return self._gtts(text, voice, p.get("params", {}) or {})
+                if backend == "mistral_tts":
+                    return self._mistral_tts(p, text, voice)
                 if name == "nim_magpie":
                     return self._nim_magpie(p, text, voice)
                 LOG.warning("Unknown TTS provider in chain: %s (backend=%s)", name, backend)
@@ -446,4 +448,40 @@ class TTSRouter:
         if not audio_b64:
             raise RuntimeError(f"NIM Magpie returned no audio: {str(data)[:200]}")
         LOG.info("TTS via NIM Magpie")
+        return base64.b64decode(audio_b64)
+
+    # ------------------------------------------------------------------ mistral
+
+    def _mistral_tts(self, p: dict, text: str, voice: str) -> bytes:
+        api_key = env(p.get("api_key_env", "MISTRAL_API_KEY"))
+        if not api_key:
+            raise RuntimeError("Mistral API key not set")
+        
+        params = p.get("params", {}) or {}
+        mistral_voice = voice if voice else params.get("default_voice", "gb_oliver_neutral")
+        mistral_model = params.get("model", "voxtral-mini-tts-2603")
+        
+        payload = {
+            "model": mistral_model,
+            "input": text,
+            "voice_id": mistral_voice,
+            "response_format": "mp3"
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        
+        r = requests.post(p.get("url", "https://api.mistral.ai/v1/audio/speech"), json=payload, headers=headers, timeout=self.timeout)
+        if r.status_code != 200:
+            raise RuntimeError(f"Mistral TTS failed ({r.status_code}): {r.text}")
+        
+        data = r.json()
+        audio_b64 = data.get("audio_data") or data.get("audio") or ""
+        if not audio_b64:
+            raise RuntimeError(f"Mistral TTS returned no audio data: {str(data)[:200]}")
+            
+        LOG.info("TTS via Mistral (%s)", mistral_voice)
         return base64.b64decode(audio_b64)

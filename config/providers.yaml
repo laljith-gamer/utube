@@ -204,7 +204,7 @@ video:
   providers: {}
 
 tts:
-  chain: [nim_magpie]
+  chain: [mistral, nim_magpie]
   default_rate: "+0%"
   default_pitch: "+0Hz"
   continuous_narration: true
@@ -214,10 +214,14 @@ tts:
   silence_keep_sec: 0.40
   request_timeout_sec: 1800
   providers:
+    mistral:
+      backend: mistral_tts
+      url: https://api.mistral.ai/v1/audio/speech
+      api_key_env: MISTRAL_API_KEY
+      params:
+        model: voxtral-mini-tts-2603
+        default_voice: gb_oliver_neutral
     f5tts:
-      backend: f5_tts
-      ref_audio_env: F5_REF_AUDIO
-      ref_text_env: F5_REF_TEXT
       params:
         model: F5TTS_v1_Base
         device: cpu
