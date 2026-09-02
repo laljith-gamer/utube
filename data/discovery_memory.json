@@ -3537,13 +3537,8 @@
     },
     "public-apis-public-apis-a-collective-lis-90e2d260": {
       "first_seen_at": "2026-09-01T08:11:04.725568+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316189+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515653+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902318+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767525+00:00",
           "mentions": 1,
@@ -3588,6 +3583,11 @@
           "timestamp": "2026-09-02T10:17:14.316189+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515653+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3595,13 +3595,8 @@
     },
     "freecodecamp-freecodecamp-freecodecamp-o-96ffafc4": {
       "first_seen_at": "2026-09-01T08:11:04.725580+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316221+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515667+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902333+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767539+00:00",
           "mentions": 1,
@@ -3646,6 +3641,11 @@
           "timestamp": "2026-09-02T10:17:14.316221+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515667+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3653,13 +3653,8 @@
     },
     "ebookfoundation-free-programming-books-b-0f045c90": {
       "first_seen_at": "2026-09-01T08:11:04.725589+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316247+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515679+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902346+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767551+00:00",
           "mentions": 1,
@@ -3704,6 +3699,11 @@
           "timestamp": "2026-09-02T10:17:14.316247+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515679+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3711,13 +3711,8 @@
     },
     "openclaw-openclaw-your-own-personal-ai-a-5f7dbd23": {
       "first_seen_at": "2026-09-01T08:11:04.725602+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316265+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515691+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902363+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767567+00:00",
           "mentions": 1,
@@ -3762,6 +3757,11 @@
           "timestamp": "2026-09-02T10:17:14.316265+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515691+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3769,13 +3769,8 @@
     },
     "awesome-selfhosted-awesome-selfhosted-a--856a67d5": {
       "first_seen_at": "2026-09-01T08:11:04.725614+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316310+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515743+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902407+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767613+00:00",
           "mentions": 1,
@@ -3820,6 +3815,11 @@
           "timestamp": "2026-09-02T10:17:14.316310+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515743+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3827,13 +3827,8 @@
     },
     "practical-tutorials-project-based-learni-9d5f53be": {
       "first_seen_at": "2026-09-01T08:11:04.725623+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316323+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515755+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902420+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767625+00:00",
           "mentions": 1,
@@ -3878,6 +3873,11 @@
           "timestamp": "2026-09-02T10:17:14.316323+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515755+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3885,13 +3885,8 @@
     },
     "obra-superpowers-an-agentic-skills-frame-9e59785c": {
       "first_seen_at": "2026-09-01T08:11:04.725695+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316353+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515766+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902433+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767637+00:00",
           "mentions": 1,
@@ -3934,6 +3929,11 @@
         },
         {
           "timestamp": "2026-09-02T10:17:14.316353+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515766+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -4206,13 +4206,8 @@
     },
     "vinta-awesome-python-the-definitive-list-3866ff9b": {
       "first_seen_at": "2026-09-01T09:00:00.410140+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316295+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515731+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902392+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767595+00:00",
           "mentions": 1,
@@ -4255,6 +4250,11 @@
         },
         {
           "timestamp": "2026-09-02T10:17:14.316295+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515731+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -4368,13 +4368,8 @@
     },
     "nilbuild-developer-roadmap-interactive-r-a5294fd2": {
       "first_seen_at": "2026-09-01T09:29:15.084094+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316280+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515716+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T09:54:31.902377+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-01T10:29:47.767580+00:00",
           "mentions": 1,
@@ -4417,6 +4412,11 @@
         },
         {
           "timestamp": "2026-09-02T10:17:14.316280+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515716+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -5507,7 +5507,7 @@
     },
     "on-september-02-2024-four-people-are-kil-4f619908": {
       "first_seen_at": "2026-09-02T04:09:24.595686+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315867+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515461+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595686+00:00",
@@ -5523,6 +5523,11 @@
           "timestamp": "2026-09-02T10:17:14.315867+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515461+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5530,7 +5535,7 @@
     },
     "on-september-02-2024-a-suicide-bombing-i-e7351843": {
       "first_seen_at": "2026-09-02T04:09:24.595700+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315882+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515485+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595700+00:00",
@@ -5546,6 +5551,11 @@
           "timestamp": "2026-09-02T10:17:14.315882+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515485+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5553,7 +5563,7 @@
     },
     "on-september-02-2024-at-least-129-inmate-76c22d51": {
       "first_seen_at": "2026-09-02T04:09:24.595716+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315899+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515503+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595716+00:00",
@@ -5569,6 +5579,11 @@
           "timestamp": "2026-09-02T10:17:14.315899+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515503+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5576,7 +5591,7 @@
     },
     "on-september-02-2023-india-s-first-solar-9313abc8": {
       "first_seen_at": "2026-09-02T04:09:24.595730+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315915+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515518+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595730+00:00",
@@ -5592,6 +5607,11 @@
           "timestamp": "2026-09-02T10:17:14.315915+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515518+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5599,7 +5619,7 @@
     },
     "on-september-02-2022-eighteen-people-are-2e0d8074": {
       "first_seen_at": "2026-09-02T04:09:24.595743+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315946+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515532+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595743+00:00",
@@ -5615,6 +5635,11 @@
           "timestamp": "2026-09-02T10:17:14.315946+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515532+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5622,7 +5647,7 @@
     },
     "on-september-02-2019-hurricane-dorian-a--6388c0d8": {
       "first_seen_at": "2026-09-02T04:09:24.595758+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315974+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515549+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595758+00:00",
@@ -5638,6 +5663,11 @@
           "timestamp": "2026-09-02T10:17:14.315974+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515549+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5645,7 +5675,7 @@
     },
     "on-september-02-2019-the-dive-boat-mv-co-87440129": {
       "first_seen_at": "2026-09-02T04:09:24.595772+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.315991+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515566+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595772+00:00",
@@ -5661,6 +5691,11 @@
           "timestamp": "2026-09-02T10:17:14.315991+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515566+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5668,7 +5703,7 @@
     },
     "on-september-02-2018-national-museum-of--f43285d1": {
       "first_seen_at": "2026-09-02T04:09:24.595797+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316018+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515594+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595797+00:00",
@@ -5684,6 +5719,11 @@
           "timestamp": "2026-09-02T10:17:14.316018+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515594+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5691,7 +5731,7 @@
     },
     "on-september-02-2013-the-eastern-span-re-5585510b": {
       "first_seen_at": "2026-09-02T04:09:24.595815+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316040+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515612+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595815+00:00",
@@ -5707,6 +5747,11 @@
           "timestamp": "2026-09-02T10:17:14.316040+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515612+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5714,7 +5759,7 @@
     },
     "on-september-02-2010-israel-palestinian--093d163c": {
       "first_seen_at": "2026-09-02T04:09:24.595828+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316062+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515625+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595828+00:00",
@@ -5730,6 +5775,11 @@
           "timestamp": "2026-09-02T10:17:14.316062+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515625+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -5737,7 +5787,7 @@
     },
     "sindresorhus-awesome-awesome-lists-about-f47e5bd0": {
       "first_seen_at": "2026-09-02T04:09:24.595844+00:00",
-      "last_seen_at": "2026-09-02T10:17:14.316174+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515642+00:00",
       "history": [
         {
           "timestamp": "2026-09-02T04:09:24.595844+00:00",
@@ -5751,6 +5801,11 @@
         },
         {
           "timestamp": "2026-09-02T10:17:14.316174+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-02T15:53:50.515642+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -7029,6 +7084,32 @@
       ],
       "max_mentions": 1,
       "max_traffic": 0
+    },
+    "mandalorian-a862f474": {
+      "first_seen_at": "2026-09-02T15:53:50.515415+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515415+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-02T15:53:50.515415+00:00",
+          "mentions": 1,
+          "traffic_volume": 500
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 500
+    },
+    "dear-lottery-5aac6bdc": {
+      "first_seen_at": "2026-09-02T15:53:50.515442+00:00",
+      "last_seen_at": "2026-09-02T15:53:50.515442+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-02T15:53:50.515442+00:00",
+          "mentions": 1,
+          "traffic_volume": 10000
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 10000
     }
   }
 }
