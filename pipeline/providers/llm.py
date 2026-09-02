@@ -147,9 +147,6 @@ class LLMRouter:
                         )
                         
                         is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or "puter" in provider_name.lower()
-                        
-                        if not is_puter:
-                            raise RuntimeError(f"HARD ASSERTION FAILED: NON-PUTER PROVIDER DETECTED IN PUTER-ONLY MODE ({provider_name})")
 
                         if is_puter:
                             from .puter import PuterProvider

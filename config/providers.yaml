@@ -3,9 +3,10 @@
 # `chain` = order in which providers are tried.
 
 llm_research:
-  # PUTER ONLY MODE ENABLED: Do not use other providers. 
-  # This chain is currently constrained to Puter-only per configuration.
-  chain: [puter_opus]
+  # Puter (Claude Opus) is first preference and is tried first on every call.
+  # If every Puter account/token is rate-limited or out of usage, the router
+  # automatically falls back to the next provider in this chain.
+  chain: [puter_opus, nvidia_nim_research, openrouter_research]
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -40,8 +41,10 @@ llm_research:
         max_tokens: 12000
 
 llm_script:
-  # PUTER ONLY MODE ENABLED
-  chain: [puter_opus]
+  # Puter (Claude Opus) is first preference and is tried first on every call.
+  # If every Puter account/token is rate-limited or out of usage, the router
+  # automatically falls back to the next provider in this chain.
+  chain: [puter_opus, openrouter_script, nvidia_nim_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -64,8 +67,10 @@ llm_script:
       supports_reasoning_effort: false
 
 llm_concept:
-  # PUTER ONLY MODE ENABLED
-  chain: [puter_opus]
+  # Puter (Claude Opus) is first preference and is tried first on every call.
+  # If every Puter account/token is rate-limited or out of usage, the router
+  # automatically falls back to the next provider in this chain.
+  chain: [puter_opus, openrouter_research, nvidia_nim_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -96,8 +101,10 @@ llm_concept:
         max_tokens: 4000
 
 llm_qc:
-  # PUTER ONLY MODE ENABLED
-  chain: [puter_opus]
+  # Puter (Claude Opus) is first preference and is tried first on every call.
+  # If every Puter account/token is rate-limited or out of usage, the router
+  # automatically falls back to the next provider in this chain.
+  chain: [puter_opus, openrouter_research, nvidia_nim_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -128,8 +135,10 @@ llm_qc:
         max_tokens: 3000
 
 llm_premium_rewrite:
-  # PUTER ONLY MODE ENABLED
-  chain: [puter_opus]
+  # Puter (Claude Opus) is first preference and is tried first on every call.
+  # If every Puter account/token is rate-limited or out of usage, the router
+  # automatically falls back to the next provider in this chain.
+  chain: [puter_opus, openrouter_research, nvidia_nim_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -141,6 +150,25 @@ llm_premium_rewrite:
         temperature: 0.2
         max_tokens: 4000
         max_credits_per_run: 500
+    openrouter_research:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: deepseek/deepseek-v4-flash-0731
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.2
+        top_p: 0.95
+        max_tokens: 4000
+    nvidia_nim_research:
+      request_timeout_sec: 7200
+      base_url: https://integrate.api.nvidia.com/v1
+      api_key_env: NVIDIA_NIM_API_KEY
+      model: nvidia/nemotron-3.5-lightning-30b-a3b
+      supports_reasoning_effort: false
+      params:
+        temperature: 0.2
+        top_p: 0.95
+        max_tokens: 4000
 
 image:
   chain: [pollinations]
