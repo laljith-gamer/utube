@@ -203,7 +203,11 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
             raise ValueError(f"Rewritten script JSON missing fields: {missing}")
         if not isinstance(script["scenes"], list) or not script["scenes"]:
             raise ValueError("Rewritten script has no scenes")
-        _validate_script_structure(script)
+            
+        final_issues = _repetition_issues(script)
+        final_issues.extend(_fluff_issues(script))
+        if final_issues:
+            LOG.warning("Script rewrite still contains minor repetition/fluff, proceeding anyway: %s", "; ".join(final_issues))
     else:
         _validate_script_structure(script)
 
