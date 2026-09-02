@@ -139,6 +139,17 @@ def build_research_brief(
 
     evidence_text = "\n\nEVENT EVIDENCE PACKET:\n" + str(topic.get("evidence_packet", {})) if topic.get("evidence_packet") else ""
     
+    # Do more research using Brave to fetch extra context
+    try:
+        from ..providers.brave import BraveProvider
+        extra_news = BraveProvider.search_news(topic.get("title", ""), count=3)
+        if extra_news:
+            evidence_text += "\n\nADDITIONAL BRAVE SEARCH CONTEXT:\n"
+            for n in extra_news:
+                evidence_text += f"- {n.get('title')}: {n.get('summary')}\n"
+    except Exception as e:
+        LOG.warning("Failed to fetch extra Brave context: %s", e)
+    
     prompt = template.format(
         goal=goal_summary(),
         topic_title=topic.get("title", ""),
