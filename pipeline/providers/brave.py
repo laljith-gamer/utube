@@ -17,17 +17,18 @@ class BraveProvider:
     _answers_exhausted = False
     
     @classmethod
-    def _key(cls) -> str:
-        key = env("BRAVE_API_KEY")
+    def _key(cls, plan: str = "search") -> str:
+        env_key_specific = f"BRAVE_API_KEY_{plan.upper()}"
+        key = env(env_key_specific) or env("BRAVE_API_KEY")
         if not key:
-            raise RuntimeError("BRAVE_API_KEY is not set.")
+            raise RuntimeError(f"Neither {env_key_specific} nor BRAVE_API_KEY is set.")
         return key
         
     @classmethod
-    def _headers(cls) -> dict:
+    def _headers(cls, plan: str = "search") -> dict:
         return {
             "Accept": "application/json",
-            "X-Subscription-Token": cls._key()
+            "X-Subscription-Token": cls._key(plan)
         }
 
     @classmethod
@@ -37,7 +38,7 @@ class BraveProvider:
             r = requests.get(
                 f"{cls.BASE_URL}/spellcheck/search",
                 params={"q": query},
-                headers=cls._headers(),
+                headers=cls._headers("spellcheck"),
                 timeout=5
             )
             r.raise_for_status()
@@ -54,7 +55,7 @@ class BraveProvider:
             r = requests.get(
                 f"{cls.BASE_URL}/suggest/search",
                 params={"q": query, "count": count},
-                headers=cls._headers(),
+                headers=cls._headers("autosuggest"),
                 timeout=5
             )
             r.raise_for_status()
@@ -80,7 +81,7 @@ class BraveProvider:
             r = requests.get(
                 f"{cls.BASE_URL}/news/search",
                 params={"q": query, "count": min(count, 20), "freshness": freshness},
-                headers=cls._headers(),
+                headers=cls._headers("search"),
                 timeout=10
             )
             if r.status_code in (402, 403, 429):
@@ -120,7 +121,7 @@ class BraveProvider:
             r = requests.get(
                 f"{cls.BASE_URL}/images/search",
                 params={"q": query, "count": min(count, 50), "safesearch": "moderate"},
-                headers=cls._headers(),
+                headers=cls._headers("search"),
                 timeout=10
             )
             if r.status_code in (402, 403, 429):
@@ -156,7 +157,7 @@ class BraveProvider:
             r = requests.get(
                 f"{cls.BASE_URL}/web/search",
                 params={"q": query, "count": min(count, 10), "safesearch": "moderate"},
-                headers=cls._headers(),
+                headers=cls._headers("search"),
                 timeout=10
             )
             if r.status_code in (402, 403, 429):
@@ -191,7 +192,7 @@ class BraveProvider:
             cls._request_count += 1
             r = requests.post(
                 f"{cls.BASE_URL}/chat/completions",
-                headers=cls._headers(),
+                headers=cls._headers("answers"),
                 json={
                     "messages": [{"role": "user", "content": f"Give me a highly detailed summary and fascinating facts about: {query}"}],
                     "model": "brave",
