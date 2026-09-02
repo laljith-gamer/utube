@@ -278,7 +278,15 @@ class LLMRouter:
             if provider_success and result.finish_reason not in ("length", "max_tokens"):
                 result.status = ProviderStatus.SUCCESS
                 return result
-                
+
+            # Keep the failure reason current so the final aggregate error (if
+            # every provider in the chain fails) reflects the LAST provider
+            # actually attempted, not a stale exception from an earlier one.
+            last_err = RuntimeError(
+                f"{provider_name}: {result.failure_type or result.status.name} "
+                f"({result.error_summary or f'finish_reason={result.finish_reason}'})"
+            )
+
             if result.status == ProviderStatus.PERMANENT:
                 continue # Try next provider
                 
@@ -418,6 +426,9 @@ def _parse_json(text: str) -> dict[str, Any]:
     """
     original = text
     text = text.strip()
+    
+    # Strip DeepSeek/Nemotron <think> blocks before trying to parse
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
     # Attempt 1: raw parse
     try:

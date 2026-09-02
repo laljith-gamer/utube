@@ -26,7 +26,6 @@ LOG = logging.getLogger("utube.orchestrator")
 
 def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger) -> dict:
     cfg = get_config()
-    qual_cfg = cfg.get("quality", {}) or {}
     run_id = f"run_{datetime.now(timezone.utc).strftime('%H%M%S')}"
     out = run_dir(run_id)
     llm_research = LLMRouter("llm_research")
@@ -44,7 +43,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         if not candidates:
             raise RuntimeError("No candidates discovered.")
 
-        memory_days = int(qual_cfg.get("memory_days", 30))
+        memory_days = int(cfg.get_path("memory_days", 30))
         recent_hashes = ledger.recent_hashes("global", days=memory_days)
         scored = topic_scoring.score_candidates(candidates, content_memory=mem_ctx, recent_hashes=recent_hashes)
         write_json(out / "2_scored_candidates.json", scored)
@@ -58,7 +57,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         
         for candidate_attempt in range(max_candidate_attempts):
             available_scored = [c for c in scored if c.get("content_hash") not in blacklisted_hashes]
-            best = topic_scoring.select_best(available_scored, exploration_ratio=float(qual_cfg.get("exploration_ratio", 0.25)))
+            best = topic_scoring.select_best(available_scored, exploration_ratio=float(cfg.get_path("topic_scoring.exploration_ratio", 0.25)))
             if not best:
                 result.update({"ok": True, "reason": "No candidate passed minimum quality threshold."})
                 write_json(out / "result.json", result)
@@ -87,7 +86,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             except (ValueError, TypeError):
                 conf_val = 0.0
 
-            if conf_val < float(qual_cfg.get("min_fact_confidence", 70)):
+            if conf_val < float(cfg.get_path("min_fact_confidence", 70)):
                 LOG.warning("Fact confidence too low (%s) for candidate %s. Blacklisting and retrying.", conf_val, topic_hash)
                 blacklisted_hashes.add(topic_hash)
                 evaluated_candidates.append((conf_val, best, top_concept, brief))
@@ -109,7 +108,7 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
         sc = None
         qc_result = None
         rep_result = None
-        max_attempts = int(qual_cfg.get("max_regenerations", 2)) + 1
+        max_attempts = int(cfg.get_path("script_qc.max_regenerations", 2)) + 1
         for attempt in range(max_attempts):
             sc = script.generate_script(
                 llm_script, slot=lane, topic=best, concept=top_concept,
@@ -187,16 +186,37 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
             write_json(out / "result.json", result)
             return result
 
-        audio_summary = audio.synthesize_narration(tts, script=sc, slot=lane, out_dir=out)
-        
-        # ── Audio Validation (ASR) ──
-        master_audio = out / audio_summary["master"]
-        asr_text, asr_segments, asr_info = captions.transcribe_audio(master_audio)
-        if asr_text:
+        # ── TTS synthesis + Audio Validation (ASR), with retry on a bad take ──
+        # F5-TTS occasionally leaks fragments of the voice-clone reference audio
+        # into the narration (or mistranscribes badly). Re-synthesizing usually
+        # produces a clean take since inference isn't seed-pinned, so we retry
+        # the whole narration before giving up.
+        max_audio_attempts = int(cfg.get_path("audio_validation.max_retries", 2)) + 1
+        audio_summary: dict = {}
+        asr_text, asr_segments, asr_info = "", [], None
+        for audio_attempt in range(max_audio_attempts):
+            audio_summary = audio.synthesize_narration(tts, script=sc, slot=lane, out_dir=out)
+
+            master_audio = out / audio_summary["master"]
+            asr_text, asr_segments, asr_info = captions.transcribe_audio(master_audio)
+            if not asr_text:
+                break  # Whisper unavailable/disabled — nothing to validate against
+
             from .stages.audio_validation import validate_audio
             ref_text = cfg.get_path("tts.providers.f5_tts.params.ref_text", env("F5_REF_TEXT", ""))
-            validate_audio(sc, asr_text, ref_text)
-        
+            try:
+                validate_audio(sc, asr_text, ref_text)
+                write_json(out / f"audio_validation_v{audio_attempt + 1}.json", {"passed": True})
+                break
+            except ValueError as e:
+                write_json(out / f"audio_validation_v{audio_attempt + 1}.json", {"passed": False, "reason": str(e)})
+                if audio_attempt >= max_audio_attempts - 1:
+                    raise
+                LOG.warning(
+                    "Audio validation failed on attempt %d/%d, re-synthesizing narration: %s",
+                    audio_attempt + 1, max_audio_attempts, e,
+                )
+
         # ── Write ASS ──
         captions_file = out / "captions.ass"
         captions.write_ass(asr_segments, asr_info, captions_file)

@@ -2,7 +2,11 @@
 # quality-related decisions. Every "magic number" that decides pass/fail lives
 # here, not scattered across Python files.
 
-# ── Topic Scoring ───────────────────────────────────────────────────────────
+# How many days of ledger history to check when excluding recently-used
+# topic hashes from a fresh discovery pass.
+memory_days: 30
+
+# ── Topic Scoring ──────────────────────────────────────────────────────
 topic_scoring:
   # Multi-dimensional scoring weights (must sum to 1.0)
   weights:
@@ -71,6 +75,13 @@ visual_qc:
   max_filler_scenes: 2
   # Min visual relevance score (keyword match) for stock footage
   min_relevance_score: 0.3
+
+# ── Audio Validation ────────────────────────────────────────────────────────
+audio_validation:
+  # Extra full-narration re-synthesis attempts if the ASR fidelity check or
+  # the reference-voice-leak check fails on a take. TTS inference isn't
+  # seed-pinned, so a retry usually produces a clean take.
+  max_retries: 2
 
 # ── Content Output ──────────────────────────────────────────────────────────
 output:
