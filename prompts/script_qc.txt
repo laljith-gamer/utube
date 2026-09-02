@@ -28,6 +28,7 @@ Known failure patterns to watch for:
 - Generic CTA ("what do you think?")
 - Too many abstract/unfilmable visual prompts
 - Vague language that would sound robotic in TTS
+- FATAL: Presence of quotes (", '), parentheses, or symbols ($, %, &, +). These break the TTS engine. If you see ANY of these, fail the script.
 
 Respond with ONLY a JSON object:
 {{

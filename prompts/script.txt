@@ -74,10 +74,10 @@ HARD WRITING RULES
 ==============================================================
 TTS PRONUNCIATION RULES (the AI voice reads your text literally)
 ==============================================================
-- SPELL OUT abbreviations: 'N A S A' not 'NASA', 'U S' not 'US'.
-- Write numbers as words if possible or keep them clean.
-- NEVER use symbols: no '&', '+', '/', '#', '@'. Write 'and', 'plus', etc.
-- End EVERY narration with a period, question mark, or exclamation mark.
+- NO QUOTES OR PARENTHESES: Never use ", ', (, or ). They break the TTS chunking and cause fatal audio hallucinations.
+- NO SYMBOLS: Never use $, %, &, +, /, #, @. Spell them out: "fifty dollars", "percent", "and", "plus".
+- SPELL OUT ABBREVIATIONS: Write "United States" instead of US. Write "N A S A" instead of NASA. Never use periods in acronyms.
+- End EVERY narration scene with exactly one period, question mark, or exclamation mark.
 - Add COMMA after introductory words.
 
 ==============================================================

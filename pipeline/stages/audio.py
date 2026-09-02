@@ -104,6 +104,7 @@ def _synthesize_continuous(
 ) -> dict:
     master = audio_dir / "narration.mp3"
     full_text = " ".join(text.strip() for _, text in segments if text.strip())
+    full_text = _sanitize_for_tts(full_text)
     data = tts.synthesize(full_text, voice=voice)
     master.write_bytes(data)
     _postprocess_segment(
@@ -153,7 +154,8 @@ def _synthesize_segmented(
 
     def _generate_segment(name: str, text: str) -> dict:
         mp3 = audio_dir / f"{name}.mp3"
-        data = tts.synthesize(text, voice=voice)
+        clean_text = _sanitize_for_tts(text)
+        data = tts.synthesize(clean_text, voice=voice)
         mp3.write_bytes(data)
         _postprocess_segment(
             mp3,
@@ -215,6 +217,20 @@ def _script_segments(script: dict) -> list[tuple[str, str]]:
     if script.get("cta"):
         segments.append(("cta", script["cta"]))
     return [(name, str(text)) for name, text in segments if str(text).strip()]
+
+
+def _sanitize_for_tts(text: str) -> str:
+    """Strip characters that break F5-TTS chunking (quotes, parens, symbols)."""
+    t = text
+    t = t.replace('"', '').replace("'", "")
+    t = t.replace("(", ", ").replace(")", ", ")
+    t = t.replace("$", " dollars ").replace("%", " percent ")
+    t = t.replace("&", " and ").replace("+", " plus ").replace("@", " at ")
+    t = t.replace("#", " hashtag ")
+    # Clean up double spaces or floating commas
+    t = re.sub(r'\s+', ' ', t)
+    t = re.sub(r'\s+,\s*', ', ', t)
+    return t.strip()
 
 
 def _estimate_segment_timings(segments: list[tuple[str, str]], total_duration: float) -> list[dict]:
