@@ -83,6 +83,16 @@
       ],
       "cta": "Do you think Governor Hochul is right to be worried about the 'Hochulization' tool?",
       "title": "The real reason 3D-printed guns are a threat to your rights"
+    },
+    {
+      "run_id": "run_190913",
+      "timestamp": "2026-09-02T19:19:42.532064+00:00",
+      "hook": "What's behind the staggering $31.6 trillion price tag of the AI revolution by 2050, a sum that's more than the entire US GDP?",
+      "scenes": [
+        "Global data center spending is set to jump from $800 billion in 2026 to $1.8 trillion in 2050, with the US and Asia-Pacific region leading the charge. The US is expected to capture nearly half of this spending, with $15.1 trillion going towards data centers, while the Asia-Pacific region will invest $8.2 trillion, driven by growing demand for AI. This massive investment will be fueled by the need to upgrade AI infrastructure every 4 to 6 years, creating a constant cycle of investment."
+      ],
+      "cta": "What do you think is the most significant way this data center spending boom will affect your daily life, from increased costs to potential benefits?",
+      "title": "AI Boom: 31 Trillion Price Tag"
     }
   ]
 }

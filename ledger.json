@@ -32,7 +32,8 @@
       "on-september-02-2023-india-s-first-solar-9313abc8": "2026-09-02T16:05:05.229338+00:00",
       "scam-site-tries-to-sell-pc-version-of-gt-848a4306": "2026-09-02T16:27:30.212116+00:00",
       "survey-ai-financial-scams-have-already-r-8b6928f2": "2026-09-02T18:56:29.308498+00:00",
-      "these-russian-mathematicians-taught-ai-m-34564cd3": "2026-09-02T19:01:51.591867+00:00"
+      "these-russian-mathematicians-taught-ai-m-34564cd3": "2026-09-02T19:01:51.591867+00:00",
+      "data-center-spending-to-reach-31-6-trill-0657fa1e": "2026-09-02T19:09:47.297490+00:00"
     }
   },
   "families": {},
@@ -1350,6 +1351,298 @@
         "video_id": "lOqiwV2hZsA",
         "url": "https://youtu.be/lOqiwV2hZsA",
         "title": "The real reason 3D-printed guns are a threat to your rights",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-09-02T19:19:42.532042+00:00",
+      "run_id": "run_190913",
+      "topic": {
+        "title": "Data Center Spending to Reach $31.6 Trillion by 2050 on AI Boom",
+        "url": "https://deccanchronicle.com/technology/data-center-spending-to-reach-316-trillion-by-2050-on-ai-boom-1984295",
+        "summary": "At the same time, the tech industry is trying to blunt a backlash against data centers that threatens to slow down the buildout",
+        "source": "brave_news",
+        "normalized_hotness": 100,
+        "content_hash": "data-center-spending-to-reach-31-6-trill-0657fa1e",
+        "keywords": [
+          "data",
+          "center",
+          "spending",
+          "reach",
+          "trillion",
+          "boom"
+        ],
+        "evidence_packet": {
+          "event_id": "data-center-spending-to-reach-31-6-trill-0657fa1e",
+          "representative_title": "Data Center Spending to Reach $31.6 Trillion by 2050 on AI Boom",
+          "canonical_sources": [
+            "brave_news"
+          ],
+          "all_relevant_urls": [
+            "https://deccanchronicle.com/technology/data-center-spending-to-reach-316-trillion-by-2050-on-ai-boom-1984295"
+          ],
+          "source_classes": [
+            "tier1"
+          ],
+          "independent_source_count": 1,
+          "mention_count": 1,
+          "velocity": 0,
+          "acceleration": 0.0,
+          "novelty": 0.9831341918568122,
+          "trend_momentum": 0,
+          "enriched_text": "Top Home South Andhra Pradesh Telangana Tamil Nadu Karnataka Keralam Nation Youth Entertainment Sholay Tollywood Bollywood Sandalwood Kollywood Mollywood Hollywood Movie Reviews Television Music Theatre OTT Sports Cricket Football Tennis Other News AI Videos Opinion and Editorials Business Enviroment Technology Youth Queer Beat Education Hyderabad Chronicle DC Decaf Featured Astroguide Home \u00bb Technology Data Center Spending to Reach $31.6 Trillion by 2050 on AI Boom Technology Bloomberg 2 Sept 2026 4:54 PM IST 2 Sept 2026 4:54 PM IST At the same time, the tech industry is trying to blunt a backlash against data centers that threatens to slow down the buildout x The bulk of the spending will go into what fills the data centers \u2014 hardware from companies such as global AI chip leader Nvidia. (Photo: Bloomberg) As Preferred Source Global data center spending is set to reach $31.6 trillion through 2050 to meet the world\u2019s growing appetite for AI, an investment boom with no precedent in history, according to PricewaterhouseCoopers. Dwarfing projects such as the railways, internet and electrification, spending on data centers could even hit $50 trillion over the next two and a half decades if AI adoption accelerates beyond PwC\u2019s \u201ccentral scenario\u201d forecast, the firm said in a report Wednesday. For comparison: the US gross domestic product is roughly $30 trillion. With consumers, companies and governments increasingly using AI, tech giants like Microsoft and Amazon and smaller data center providers are setting up new computing facilities across the planet at a rapid clip. The bulk of the spending will go into what fills the data centers \u2014 hardware from companies such as global AI chip leader Nvidia. At the same time, the tech industry is trying to blunt a backlash against data centers that threatens to slow down the buildout. At least 75 projects, worth about $130 billion combined, were blocked or delayed by local opposition during the first three months of this year, according to research group Data Center Watch. Protesters cite concerns about environmental impact, resource consumption and more broadly how AI could upend employment and society. The US will capture nearly half the projected data center spending, at $15.1 trillion, PwC said. The Asia-Pacific region will follow at $8.2 trillion, Europe at $5.6 trillion, the Middle East at $1.1 trillion and Africa at $255 billion of the cumulative capital expenditure, according to PwC\u2019s inaugural Global Data Center Outlook. Spending will keep rising through mid-century as graphics processing units, servers, storage systems, networking equipment and other hardware will require routine replacement. Recurring chip upgrades \u2014 the computational power \u2014 and not land or construction, will account for most of the investment, quite unlike traditional capex cycles like prior generations of memory chip production or the global fiber internet rollout, which \u201cfront loaded\u201d investments, taking on costs and risks upfront."
+        },
+        "scores": {
+          "freshness": 100,
+          "source_quality": 60,
+          "specificity": 85,
+          "velocity": 0,
+          "acceleration": 0,
+          "corroboration": 25,
+          "trend_momentum": 0,
+          "trend_volume": 0,
+          "novelty": 98,
+          "evergreen_value": 50,
+          "strategy_alignment": 50
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "ai",
+          "matches": []
+        },
+        "total_score": 45.5,
+        "decision_object": {
+          "selected_index": 1,
+          "overall_reason": "The topic of data center spending reaching $31.6 trillion by 2050 due to the AI boom offers a compelling narrative with significant evidence support from reputable sources like Bloomberg. It aligns with current trends in technology and AI, providing substantial audience value. The topic is novel and not overly saturated, offering a fresh perspective on the future of data centers and AI. The narrative strength is high, as it naturally supports a hook (the massive spending forecast), escalation (the growth of AI and its implications), and consequence (the impact on the tech industry and beyond). Visual storytelling opportunities are abundant, with potential for diagrams, data centers, and AI-related imagery.",
+          "evidence_strength": "Strong, with specific data and forecasts from credible sources like Bloomberg.",
+          "audience_value": "High, given the current interest in AI and technology advancements.",
+          "narrative_value": "High, with a clear and compelling story arc about the future of data centers and AI.",
+          "visual_value": "High, with numerous opportunities for engaging visuals related to data centers and AI technology.",
+          "risks": "Factual risks are minimal due to the credible sources used. Production risks could include finding engaging visuals to represent complex data center and AI concepts.",
+          "rejected_alternatives": [
+            "Topic 0 was rejected because, although it discusses a significant increase in Taiwan's chip industry revenue, it lacks the broader implications and narrative strength of topic 1.",
+            "Topic 2 was rejected due to its focus on the limitations of AI, which, while interesting, does not offer the same level of forward-looking insight and broad industry impact as topic 1.",
+            "Topic 3 was rejected because, although cybersecurity awareness is important, the specific event described is localized and does not offer the same level of global technological insight and trend analysis as topic 1."
+          ],
+          "_llm_usage": {},
+          "_llm_provider": "openrouter_research"
+        }
+      },
+      "concept": {
+        "topic_title": "Data Center Spending to Reach $31.6 Trillion by 2050 on AI Boom",
+        "topic_url": "https://deccanchronicle.com/technology/data-center-spending-to-reach-316-trillion-by-2050-on-ai-boom-1984295",
+        "topic_source": "brave_news",
+        "topic_score": 45.5,
+        "chosen_angle": "You won't believe the staggering $31.6 trillion price tag of the AI revolution by 2050",
+        "hook_type": "surprising_number",
+        "core_claim": "The AI boom will cost $31.6 trillion by 2050, affecting the global economy and individual lives",
+        "viewer_problem": "The massive spending on data centers may lead to increased costs of goods and services, affecting their purchasing power",
+        "curiosity_gap": "What will be the impact of the $31.6 trillion data center spending on my daily life?",
+        "emotional_driver": "surprise",
+        "payoff": "The $31.6 trillion data center spending boom will lead to increased costs of goods and services, affecting your purchasing power",
+        "concept_score": 90.0,
+        "risk_flags": [
+          "too focused on the number, not the impact"
+        ],
+        "all_angles": [
+          {
+            "angle": "The massive $31.6 trillion data center spending boom by 2050 is actually a hidden cost of your daily AI usage",
+            "hook_type": "hidden_cause",
+            "core_claim": "Data center spending is driven by AI adoption, which affects ordinary people's daily lives",
+            "viewer_problem": "Rising energy costs and environmental concerns from data centers may impact their daily lives",
+            "curiosity_gap": "How does my daily AI usage contribute to the massive data center spending boom?",
+            "emotional_driver": "curiosity",
+            "payoff": "Your daily AI usage is one of the main drivers of the $31.6 trillion data center spending boom, which will impact your energy costs and environment",
+            "concept_score": 85,
+            "risk_flags": [
+              "needs simple visual explanations"
+            ]
+          },
+          {
+            "angle": "You won't believe the staggering $31.6 trillion price tag of the AI revolution by 2050",
+            "hook_type": "surprising_number",
+            "core_claim": "The AI boom will cost $31.6 trillion by 2050, affecting the global economy and individual lives",
+            "viewer_problem": "The massive spending on data centers may lead to increased costs of goods and services, affecting their purchasing power",
+            "curiosity_gap": "What will be the impact of the $31.6 trillion data center spending on my daily life?",
+            "emotional_driver": "surprise",
+            "payoff": "The $31.6 trillion data center spending boom will lead to increased costs of goods and services, affecting your purchasing power",
+            "concept_score": 90,
+            "risk_flags": [
+              "too focused on the number, not the impact"
+            ]
+          },
+          {
+            "angle": "The dark side of the AI boom: how data centers threaten to slow down the buildout and impact your daily life",
+            "hook_type": "contradiction",
+            "core_claim": "The AI boom is driving data center growth, but it also poses environmental and economic risks that may slow down the buildout",
+            "viewer_problem": "The backlash against data centers may impact the development of AI technologies that they rely on",
+            "curiosity_gap": "How can the AI boom be both beneficial and harmful to my daily life?",
+            "emotional_driver": "fear",
+            "payoff": "The data center buildout, driven by the AI boom, poses significant environmental and economic risks that may slow down the development of AI technologies",
+            "concept_score": 80,
+            "risk_flags": [
+              "too negative, needs balanced view"
+            ]
+          },
+          {
+            "angle": "What if the $31.6 trillion data center spending boom by 2050 is not just about tech, but about your future?",
+            "hook_type": "forbidden_question",
+            "core_claim": "The data center spending boom is not just about technology, but about the future of our society and individual lives",
+            "viewer_problem": "The massive investment in data centers may shape the future of work, entertainment, and daily life",
+            "curiosity_gap": "How will the data center spending boom impact my future and the world I live in?",
+            "emotional_driver": "curiosity",
+            "payoff": "The $31.6 trillion data center spending boom will shape the future of our society, impacting the way we work, entertain, and live our daily lives",
+            "concept_score": 88,
+            "risk_flags": [
+              "too broad, needs focus on specific aspects"
+            ]
+          },
+          {
+            "angle": "The $31.6 trillion data center spending boom by 2050: a comparison of the environmental costs and benefits",
+            "hook_type": "comparison",
+            "core_claim": "The data center spending boom has both significant environmental costs and benefits that need to be weighed",
+            "viewer_problem": "The environmental impact of data centers may affect their daily life and the planet",
+            "curiosity_gap": "What are the environmental costs and benefits of the data center spending boom, and how do they compare?",
+            "emotional_driver": "curiosity",
+            "payoff": "The data center spending boom has significant environmental costs, but also benefits, such as increased efficiency and reduced energy consumption",
+            "concept_score": 82,
+            "risk_flags": [
+              "too focused on environmental aspects, needs broader view"
+            ]
+          },
+          {
+            "angle": "You have only a few years to prepare for the $31.6 trillion data center spending boom and its impact on your daily life",
+            "hook_type": "time_pressure",
+            "core_claim": "The data center spending boom will have a significant impact on individual lives and the global economy, and people need to prepare",
+            "viewer_problem": "The massive investment in data centers may lead to significant changes in their daily life, and they need to be prepared",
+            "curiosity_gap": "What can I do to prepare for the impact of the data center spending boom on my daily life?",
+            "emotional_driver": "fear",
+            "payoff": "You can prepare for the impact of the data center spending boom by understanding the technologies and trends driving it, and adapting to the changes it will bring",
+            "concept_score": 78,
+            "risk_flags": [
+              "too alarmist, needs balanced view"
+            ]
+          },
+          {
+            "angle": "The mysterious world of data centers: uncovering the truth behind the $31.6 trillion spending boom",
+            "hook_type": "mystery",
+            "core_claim": "The data center spending boom is driven by a complex array of factors, including AI adoption, cloud computing, and cybersecurity",
+            "viewer_problem": "The lack of understanding about data centers and their impact may lead to misconceptions and fears",
+            "curiosity_gap": "What is really driving the $31.6 trillion data center spending boom, and how will it impact my life?",
+            "emotional_driver": "curiosity",
+            "payoff": "The data center spending boom is driven by a combination of technological, economic, and social factors, and understanding these factors can help you navigate the changes it will bring",
+            "concept_score": 80,
+            "risk_flags": [
+              "too focused on the mystery, needs clear explanations"
+            ]
+          },
+          {
+            "angle": "The $31.6 trillion data center spending boom: a personal danger to your privacy and security?",
+            "hook_type": "personal_danger",
+            "core_claim": "The data center spending boom poses significant risks to individual privacy and security, and people need to be aware of these risks",
+            "viewer_problem": "The massive investment in data centers may lead to increased risks of data breaches and cyber attacks",
+            "curiosity_gap": "How does the data center spending boom impact my personal privacy and security?",
+            "emotional_driver": "fear",
+            "payoff": "The data center spending boom poses significant risks to individual privacy and security, but there are steps you can take to protect yourself",
+            "concept_score": 85,
+            "risk_flags": [
+              "too focused on the risks, needs balanced view"
+            ]
+          },
+          {
+            "angle": "The $31.6 trillion data center spending boom: a money-making opportunity or a costly mistake?",
+            "hook_type": "money_hook",
+            "core_claim": "The data center spending boom offers significant opportunities for investment and growth, but also poses risks of costly mistakes",
+            "viewer_problem": "The massive investment in data centers may lead to significant financial gains or losses, depending on how it is managed",
+            "curiosity_gap": "How can I benefit from the $31.6 trillion data center spending boom, and what are the risks?",
+            "emotional_driver": "curiosity",
+            "payoff": "The data center spending boom offers significant opportunities for investment and growth, but it is essential to understand the risks and challenges involved",
+            "concept_score": 82,
+            "risk_flags": [
+              "too focused on the financial aspects, needs broader view"
+            ]
+          },
+          {
+            "angle": "Before and after the $31.6 trillion data center spending boom: how will it change your life?",
+            "hook_type": "before_after",
+            "core_claim": "The data center spending boom will have a significant impact on individual lives and the global economy, leading to both positive and negative changes",
+            "viewer_problem": "The massive investment in data centers may lead to significant changes in their daily life, and they need to understand what to expect",
+            "curiosity_gap": "How will the data center spending boom change my life, and what can I expect in the future?",
+            "emotional_driver": "curiosity",
+            "payoff": "The data center spending boom will lead to significant changes in the way we live, work, and interact with technology, and understanding these changes can help you prepare for the future",
+            "concept_score": 88,
+            "risk_flags": [
+              "too focused on the changes, needs clear explanations"
+            ]
+          }
+        ],
+        "concept_provider": "openrouter_research",
+        "concept_model": "meta-llama/llama-3.3-70b-instruct",
+        "concept_generation_mode": "llm",
+        "validation_status": "valid"
+      },
+      "script": {
+        "hook": "What's behind the staggering $31.6 trillion price tag of the AI revolution by 2050, a sum that's more than the entire US GDP?",
+        "scenes": [
+          {
+            "narration": "Global data center spending is set to jump from $800 billion in 2026 to $1.8 trillion in 2050, with the US and Asia-Pacific region leading the charge. The US is expected to capture nearly half of this spending, with $15.1 trillion going towards data centers, while the Asia-Pacific region will invest $8.2 trillion, driven by growing demand for AI. This massive investment will be fueled by the need to upgrade AI infrastructure every 4 to 6 years, creating a constant cycle of investment.",
+            "duration_sec": 9,
+            "visual_prompt": "Drone shot of a massive data center under construction, with a split-screen comparison of the US and Asia-Pacific regions, and an animation of a graph showing the cyclical nature of AI infrastructure investment",
+            "broll_keywords": [
+              "cranes",
+              "construction workers",
+              "data center",
+              "server racks",
+              "cables",
+              "cityscape",
+              "graph",
+              "investment cycle",
+              "AI infrastructure"
+            ]
+          }
+        ],
+        "cta": "What do you think is the most significant way this data center spending boom will affect your daily life, from increased costs to potential benefits?",
+        "title": "AI Boom: 31 Trillion Price Tag",
+        "description": "The growing appetite for AI is driving an unprecedented investment boom in data centers, with global spending projected to reach $31.6 trillion by 2050. https://deccanchronicle.com/technology/data-center-spending-to-reach-316-trillion-by-2050-on-ai-boom-1984295",
+        "hashtags": [
+          "#shorts",
+          "#ai",
+          "#datacenters",
+          "#technology",
+          "#innovation"
+        ],
+        "thumbnail_prompt": "High-contrast image of a data center with a surprised face in the foreground",
+        "thumbnail_text": "AI Boom: 31 Trillion",
+        "_llm_usage": {},
+        "_llm_provider": "openrouter_research",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "surprising_number",
+          "angle": "You won't believe the staggering $31.6 trillion price tag of the AI revolution by 2050",
+          "emotional_driver": "surprise",
+          "concept_score": 90.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 1,
+        "sources": {
+          "svd": 0,
+          "stock": 1,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "rXiqFxJ0Vog",
+        "video_id": "rXiqFxJ0Vog",
+        "url": "https://youtu.be/rXiqFxJ0Vog",
+        "title": "AI Boom: 31 Trillion Price Tag",
         "dry_run": false
       }
     }
