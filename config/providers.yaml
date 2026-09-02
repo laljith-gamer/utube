@@ -6,7 +6,7 @@ llm_research:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research]
+  chain: [llmsrelay_opus, openrouter_research]
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -14,9 +14,10 @@ llm_research:
     high: 16000
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_opus:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-8
+    llmsrelay_opus:
+      base_url: https://api.llmsrelay.com/v1
+      api_key_env: LLMSRELAY_API_KEY
+      model: claude-3-opus-20240229
       supports_reasoning_effort: false
       params:
         max_tokens: 6000
@@ -54,13 +55,14 @@ llm_script:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_script]
+  chain: [llmsrelay_opus, openrouter_script]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_opus:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-8
+    llmsrelay_opus:
+      base_url: https://api.llmsrelay.com/v1
+      api_key_env: LLMSRELAY_API_KEY
+      model: claude-3-opus-20240229
       supports_reasoning_effort: false
       params:
         max_tokens: 8000
@@ -86,13 +88,14 @@ llm_concept:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research]
+  chain: [llmsrelay_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_opus:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-8
+    llmsrelay_opus:
+      base_url: https://api.llmsrelay.com/v1
+      api_key_env: LLMSRELAY_API_KEY
+      model: claude-3-opus-20240229
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
@@ -130,13 +133,14 @@ llm_qc:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research]
+  chain: [llmsrelay_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_opus:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-8
+    llmsrelay_opus:
+      base_url: https://api.llmsrelay.com/v1
+      api_key_env: LLMSRELAY_API_KEY
+      model: claude-3-opus-20240229
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
@@ -174,18 +178,18 @@ llm_premium_rewrite:
   # Puter (Claude Opus) is first preference and is tried first on every call.
   # If every Puter account/token is rate-limited or out of usage, the router
   # automatically falls back to the next provider in this chain.
-  chain: [puter_opus, openrouter_research]
+  chain: [llmsrelay_opus, openrouter_research]
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_opus:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-opus-4-8
+    llmsrelay_opus:
+      base_url: https://api.llmsrelay.com/v1
+      api_key_env: LLMSRELAY_API_KEY
+      model: claude-3-opus-20240229
       supports_reasoning_effort: false
       params:
         temperature: 0.2
         max_tokens: 4000
-        max_credits_per_run: 500
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY

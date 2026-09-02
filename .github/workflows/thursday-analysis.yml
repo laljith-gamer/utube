@@ -34,14 +34,7 @@ jobs:
       - name: Run Thursday Learning Loop
         env:
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
-          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
-          PUTER_AUTH_TOKEN_2: ${{ secrets.PUTER_AUTH_TOKEN_2 }}
-          PUTER_AUTH_TOKEN_3: ${{ secrets.PUTER_AUTH_TOKEN_3 }}
-          PUTER_AUTH_TOKEN_4: ${{ secrets.PUTER_AUTH_TOKEN_4 }}
-          PUTER_AUTH_TOKEN_5: ${{ secrets.PUTER_AUTH_TOKEN_5 }}
-          PUTER_AUTH_TOKEN_6: ${{ secrets.PUTER_AUTH_TOKEN_6 }}
-          PUTER_AUTH_TOKEN_7: ${{ secrets.PUTER_AUTH_TOKEN_7 }}
-          PUTER_AUTH_TOKEN_8: ${{ secrets.PUTER_AUTH_TOKEN_8 }}
+          LLMSRELAY_API_KEY: ${{ secrets.LLMSRELAY_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
