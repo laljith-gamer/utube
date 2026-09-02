@@ -11,6 +11,8 @@ LOG = logging.getLogger("utube.brave")
 
 class BraveProvider:
     BASE_URL = "https://api.search.brave.com/res/v1"
+    MAX_REQUESTS_PER_RUN = 25
+    _request_count = 0
     
     @classmethod
     def _key(cls) -> str:
@@ -32,7 +34,12 @@ class BraveProvider:
         Search Brave News API.
         freshness: 'pd' (past day), 'pw' (past week), 'pm' (past month)
         """
+        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave API limit reached (%d). Skipping News request.", cls.MAX_REQUESTS_PER_RUN)
+            return []
+            
         try:
+            cls._request_count += 1
             r = requests.get(
                 f"{cls.BASE_URL}/news/search",
                 params={"q": query, "count": min(count, 20), "freshness": freshness},
@@ -63,7 +70,12 @@ class BraveProvider:
     @classmethod
     def search_images(cls, query: str, count: int = 5) -> list[dict]:
         """Search Brave Images API."""
+        if cls._request_count >= cls.MAX_REQUESTS_PER_RUN:
+            LOG.warning("Brave API limit reached (%d). Skipping Image request.", cls.MAX_REQUESTS_PER_RUN)
+            return []
+            
         try:
+            cls._request_count += 1
             r = requests.get(
                 f"{cls.BASE_URL}/images/search",
                 params={"q": query, "count": min(count, 50), "safesearch": "moderate"},
