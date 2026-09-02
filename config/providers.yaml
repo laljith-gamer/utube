@@ -17,7 +17,7 @@ llm_research:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 6000
@@ -44,7 +44,7 @@ llm_research:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.4
@@ -62,14 +62,14 @@ llm_script:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 8000
     openrouter_script:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
     nvidia_nim_primary:
       request_timeout_sec: 7200
@@ -95,14 +95,14 @@ llm_concept:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -140,14 +140,14 @@ llm_qc:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -185,7 +185,7 @@ llm_premium_rewrite:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         temperature: 0.2
@@ -193,7 +193,7 @@ llm_premium_rewrite:
     openrouter_research:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.2
