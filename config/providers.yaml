@@ -34,7 +34,7 @@ llm_research:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-8b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.4
@@ -119,7 +119,7 @@ llm_concept:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-8b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -163,7 +163,7 @@ llm_qc:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-8b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -209,7 +209,7 @@ llm_premium_rewrite:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.1-8b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.2
