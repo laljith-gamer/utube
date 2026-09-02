@@ -19,12 +19,6 @@ llm_research:
       supports_reasoning_effort: false
       params:
         max_tokens: 6000
-    gemini_flash:
-      api_key_env: GEMINI_API_KEY
-      model: gemini-3.7-flash
-      supports_reasoning_effort: true
-      params:
-        max_tokens: 6000
     nvidia_nim_research:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
@@ -57,12 +51,6 @@ llm_script:
       supports_reasoning_effort: false
       params:
         max_tokens: 8000
-    gemini_flash:
-      api_key_env: GEMINI_API_KEY
-      model: gemini-3.7-flash
-      supports_reasoning_effort: true
-      params:
-        max_tokens: 8000
     openrouter_script:
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
@@ -85,12 +73,6 @@ llm_concept:
       api_key_env: PUTER_AUTH_TOKEN
       model: claude-opus-4-8
       supports_reasoning_effort: false
-      params:
-        max_tokens: 4000
-    gemini_flash:
-      api_key_env: GEMINI_API_KEY
-      model: gemini-3.7-flash
-      supports_reasoning_effort: true
       params:
         max_tokens: 4000
     openrouter_research:
@@ -123,12 +105,6 @@ llm_qc:
       api_key_env: PUTER_AUTH_TOKEN
       model: claude-opus-4-8
       supports_reasoning_effort: false
-      params:
-        max_tokens: 4000
-    gemini_flash:
-      api_key_env: GEMINI_API_KEY
-      model: gemini-3.7-flash
-      supports_reasoning_effort: true
       params:
         max_tokens: 4000
     openrouter_research:

@@ -127,8 +127,6 @@ class LLMRouter:
                     try:
                         fault = os.environ.get("CONCEPT_FAULT_INJECTION")
                         if fault:
-                            if fault == "gemini_503" and "gemini" in provider_name.lower():
-                                raise RuntimeError("503 Service Unavailable")
                             if fault == "openrouter_length" and "openrouter" in provider_name.lower():
                                 result.content = accumulated_content + "{\n  \"angles\": [\n    {\n      \"angle\": \"Some angle"
                                 result.finish_reason = "length"
@@ -148,7 +146,6 @@ class LLMRouter:
                             provider_name, model_name, provider_timeout, max_provider_retries, retry_attempt + 1, continuation_count
                         )
                         
-                        is_gemini = "gemini" in model_name.lower() or p.get("api_key_env") == "GEMINI_API_KEY"
                         is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or "puter" in provider_name.lower()
                         
                         if not is_puter:
@@ -178,60 +175,6 @@ class LLMRouter:
                             finish = resp_dict.get("finishReason", "stop")
                             result.usage = resp_dict.get("usage", {})
                             result.account_index = resp_dict.get("_account_index")
-
-                        elif is_gemini:
-                            from google import genai
-                            from google.genai import types
-                            
-                            client = genai.Client(api_key=p["api_key"])
-                            
-                            sys_inst = None
-                            gemini_msgs = []
-                            for m in current_messages:
-                                if m["role"] == "system":
-                                    sys_inst = m["content"]
-                                else:
-                                    role = "user" if m["role"] == "user" else "model"
-                                    parts = []
-                                    if isinstance(m["content"], str):
-                                        parts.append(types.Part.from_text(text=m["content"]))
-                                    elif isinstance(m["content"], list):
-                                        for part in m["content"]:
-                                            if part.get("type") == "text":
-                                                parts.append(types.Part.from_text(text=part["text"]))
-                                            elif part.get("type") == "image_url":
-                                                import base64
-                                                uri = part["image_url"]["url"]
-                                                mime, b64 = uri.split(";", 1)
-                                                mime = mime.replace("data:", "")
-                                                b64 = b64.replace("base64,", "")
-                                                raw = base64.b64decode(b64)
-                                                parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
-                                    gemini_msgs.append(types.Content(role=role, parts=parts))
-                            
-                            config_kwargs = {
-                                "max_output_tokens": provider_params.get("max_tokens", max_tokens),
-                            }
-                            if json_mode:
-                                config_kwargs["response_mime_type"] = "application/json"
-                                
-                            if reasoning_effort and p.get("supports_reasoning_effort"):
-                                if reasoning_effort == "low":
-                                    tl = types.ThinkingLevel.LOW
-                                elif reasoning_effort == "high":
-                                    tl = types.ThinkingLevel.HIGH
-                                else:
-                                    tl = types.ThinkingLevel.MEDIUM
-                                config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=tl)
-                                
-                            if sys_inst:
-                                config_kwargs["system_instruction"] = sys_inst
-                                
-                            config = types.GenerateContentConfig(**config_kwargs)
-                            resp = client.models.generate_content(model=model_name, contents=gemini_msgs, config=config)
-                            chunk_content = (resp.text or "").strip()
-                            raw_finish = getattr(resp.candidates[0] if resp.candidates else None, "finish_reason", None)
-                            finish = str(raw_finish.name if hasattr(raw_finish, "name") else raw_finish).lower()
 
                         else:
                             client = OpenAI(

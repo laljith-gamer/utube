@@ -17,9 +17,8 @@ class DummyConfig:
             return {"llm": {"max_tokens": 1000}, "min_concept_score": 70}
         if key == "llm":
             return {
-                "chain": ["gemini_fast", "openrouter_fast", "nvidia_fast"],
+                "chain": ["openrouter_fast", "nvidia_fast"],
                 "providers": {
-                    "gemini_fast": {"model": "gemini-3.7-flash", "api_key_env": "FAKE"},
                     "openrouter_fast": {"model": "deepseek/deepseek-v4-flash-0731", "api_key_env": "FAKE"},
                     "nvidia_fast": {"model": "nvidia/nemotron-3.5-lightning-30b-a3b", "api_key_env": "FAKE"}
                 }
@@ -43,18 +42,6 @@ class TestConceptRecovery(unittest.TestCase):
             "source": "Tech News",
             "total_score": 85.0
         }
-
-    def test_gemini_503_recovery(self):
-        """Simulate Gemini returning 503, should recover via another provider or fallback."""
-        os.environ["CONCEPT_FAULT_INJECTION"] = "gemini_503"
-        # We don't have real keys in test env, so all LLMs will fail or fallback
-        # Let's see if it falls back to deterministic.
-        res = concept.generate_concept(self.topic)
-        self.assertIsNotNone(res)
-        self.assertEqual(res["validation_status"], "valid")
-        # Ensure it went to fallback because we don't have keys or it failed
-        self.assertIn(res["concept_provider"], ["deterministic_fallback", "chain"])
-        del os.environ["CONCEPT_FAULT_INJECTION"]
 
     def test_openrouter_length_recovery(self):
         """Simulate OpenRouter truncating with finish_reason=length."""
