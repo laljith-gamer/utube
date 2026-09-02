@@ -17,11 +17,11 @@ class BraveProvider:
     _answers_exhausted = False
     
     @classmethod
-    def _key(cls, plan: str = "search") -> str:
+    def _key(cls, plan: str) -> str:
         env_key_specific = f"BRAVE_API_KEY_{plan.upper()}"
-        key = env(env_key_specific) or env("BRAVE_API_KEY")
+        key = env(env_key_specific)
         if not key:
-            raise RuntimeError(f"Neither {env_key_specific} nor BRAVE_API_KEY is set.")
+            raise RuntimeError(f"{env_key_specific} is not set.")
         return key
         
     @classmethod

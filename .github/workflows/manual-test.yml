@@ -64,7 +64,6 @@ jobs:
 
       - name: Run pipeline (no upload)
         env:
-          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           BRAVE_API_KEY_SEARCH: ${{ secrets.BRAVE_API_KEY_SEARCH }}
           BRAVE_API_KEY_ANSWERS: ${{ secrets.BRAVE_API_KEY_ANSWERS }}
           BRAVE_API_KEY_SPELLCHECK: ${{ secrets.BRAVE_API_KEY_SPELLCHECK }}
