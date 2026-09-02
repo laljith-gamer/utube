@@ -64,6 +64,7 @@ jobs:
 
       - name: Run pipeline (no upload)
         env:
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
           PUTER_AUTH_TOKEN_2: ${{ secrets.PUTER_AUTH_TOKEN_2 }}
           PUTER_AUTH_TOKEN_3: ${{ secrets.PUTER_AUTH_TOKEN_3 }}
