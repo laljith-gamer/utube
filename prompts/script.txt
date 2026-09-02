@@ -32,6 +32,7 @@ Continue directly from the hook. Establish the stakes. Why does this matter TO T
 
 Beat 3 — EVIDENCE & MECHANISM (Scenes 2-4):
 How does it actually work? Provide 2-3 concrete facts (numbers, dates, dollars).
+- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script to maximize audience retention! Make them feel the stakes.
 Explain the cause-and-effect (CAUSALITY). A caused B, which led to C.
 
 Beat 4 — CONSEQUENCE (Scenes 5-6):

@@ -15,12 +15,13 @@ Source excerpt:
 ---
 
 Rules:
-- Use ONLY facts supportable from the excerpt. If the excerpt is thin, mark gaps
+- Use ONLY facts supportable from the excerpt. NEVER hallucinate or invent data. If the excerpt is thin, mark gaps
   in `open_questions` instead of inventing.
 - Every fact in `key_facts` must be SPECIFIC: a number, a name, a date, a place,
   a percentage, a dollar figure. Reject vague "many people / a lot / often".
 - `reveal_fact` is the single most counterintuitive, surprising, or "I didn't
   know that" fact — the scriptwriter will use it as the payoff at the end.
+- `hype_data` must contain the single most shocking statistic, dramatic stake, or mind-blowing quote from the article that will instantly hook a mainstream audience.
 - `comment_bait_question` must reference a specific element from the brief, not
   a generic "what do you think?".
 - `confidence` is 0-100 how confident you are that these facts are accurate.
@@ -32,6 +33,7 @@ Respond with ONLY a JSON object:
 {{
   "key_facts":             ["<5-8 specific bullets, each one short sentence with a number/name/date>"],
   "reveal_fact":           "<the single most counterintuitive fact — used as the script payoff>",
+  "hype_data":             "<the most dramatic, shocking, or high-stakes fact/metric to excite the audience>",
   "context":               "<one short paragraph of background a viewer needs>",
   "comment_bait_question": "<question that references something specific from the brief>",
   "open_questions":        ["<questions the source did NOT answer — the script must avoid these>"],
