@@ -93,6 +93,18 @@
       ],
       "cta": "What do you think is the most significant way this data center spending boom will affect your daily life, from increased costs to potential benefits?",
       "title": "AI Boom: 31 Trillion Price Tag"
+    },
+    {
+      "run_id": "run_193008",
+      "timestamp": "2026-09-02T19:45:45.717632+00:00",
+      "hook": "The US Department of Justice is backing OpenAI's push for unrestricted access to vast amounts of data, but what's driving this stance?",
+      "scenes": [
+        "The DOJ believes that American prosperity hinges on the development of AI, and that requires massive datasets to train these systems effectively.",
+        "Restricting access to this data could have significant economic implications, potentially hindering the growth of AI and impacting the US economy.",
+        "By supporting OpenAI, the DOJ is emphasizing the importance of data availability for the advancement of AI technology, which they see as crucial for the country's future."
+      ],
+      "cta": "How do you think the US government's support for OpenAI will impact your personal data privacy?",
+      "title": "US Gov Backs AI Data Use"
     }
   ]
 }
