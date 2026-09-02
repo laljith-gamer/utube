@@ -36,6 +36,17 @@ def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger)
     result: dict = {"run_id": run_id, "ok": False, "out_dir": str(out)}
 
     try:
+        LOG.info("Running LLM preflight check to ensure models are available...")
+        llm_research.chat([{"role": "user", "content": "Reply with the word 'pong'"}], max_tokens=5, temperature=0.1)
+        LOG.info("LLM preflight check passed. Models are online.")
+    except Exception as e:
+        msg = f"LLM preflight check failed! All configured providers are down or returning errors. Details: {e}"
+        LOG.error(msg)
+        result.update({"error": msg, "traceback": traceback.format_exc()})
+        write_json(out / "result.json", result)
+        return result
+
+    try:
         candidates = discover.discover_candidates()
         for seed in themes_mod.pick_seeds(5):
             candidates.append({"title": seed, "url": "", "source": "theme_seed", "summary": seed, "source_score": 1.0, "freshness_score": 1.0, "source_quality_score": 1.0, "keywords": []})
