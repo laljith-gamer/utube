@@ -17,7 +17,7 @@ llm_research:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 6000
@@ -62,7 +62,7 @@ llm_script:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 8000
@@ -95,7 +95,7 @@ llm_concept:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
@@ -140,7 +140,7 @@ llm_qc:
     llmsrelay_opus:
       base_url: https://api.llmsrelay.com/v1
       api_key_env: LLMSRELAY_API_KEY
-      model: claude-3-opus-20240229
+      model: claude-opus-4-8
       supports_reasoning_effort: false
       params:
         max_tokens: 4000
