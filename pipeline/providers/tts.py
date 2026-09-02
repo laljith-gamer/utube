@@ -458,6 +458,15 @@ class TTSRouter:
             raise RuntimeError("Mistral API key not set")
         
         params = p.get("params", {}) or {}
+        
+        valid_mistral_voices = [
+            "en_paul_sad", "en_paul_neutral", "en_paul_happy", "en_paul_frustrated", 
+            "en_paul_excited", "en_paul_confident", "en_paul_cheerful", "en_paul_angry",
+            "gb_oliver_neutral", "gb_jane_sarcasm"
+        ]
+        if voice not in valid_mistral_voices:
+            voice = ""
+            
         mistral_voice = voice if voice else params.get("default_voice", "gb_oliver_neutral")
         mistral_model = params.get("model", "voxtral-mini-tts-2603")
         
