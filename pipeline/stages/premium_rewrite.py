@@ -110,6 +110,7 @@ Rewrite the script to dramatically improve its quality while preserving the foll
 5. Make it sound completely natural and continuous, like a real person talking briskly but comfortably.
 6. The hook MUST NOT be paraphrased in the scenes.
 7. Keep the exact same JSON structure.
+8. DO NOT change the number of scenes. You must keep the exact same number of scenes as the original script.
 
 Return ONLY the rewritten JSON object.
 """
