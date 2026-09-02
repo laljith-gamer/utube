@@ -71,6 +71,7 @@ jobs:
           LLMSRELAY_API_KEY: ${{ secrets.LLMSRELAY_API_KEY }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           F5_REF_AUDIO: assets/voice_ref.wav
           F5_REF_TEXT:  ${{ secrets.F5_REF_TEXT }}
           PEXELS_API_KEY:     ${{ secrets.PEXELS_API_KEY }}
