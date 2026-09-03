@@ -32,7 +32,7 @@ llm_research:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.4
@@ -48,7 +48,7 @@ llm_script:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
     nvidia_nim_primary:
       request_timeout_sec: 7200
@@ -72,7 +72,7 @@ llm_concept:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -108,7 +108,7 @@ llm_qc:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -144,7 +144,7 @@ llm_premium_rewrite:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct:free
+      model: meta-llama/llama-3.3-70b-instruct
       supports_reasoning_effort: false
       params:
         temperature: 0.2
