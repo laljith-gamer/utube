@@ -120,7 +120,7 @@ class BraveProvider:
             cls._request_count += 1
             r = requests.get(
                 f"{cls.BASE_URL}/images/search",
-                params={"q": query, "count": min(count, 50), "safesearch": "moderate"},
+                params={"q": query, "count": min(count, 50), "safe_search": "moderate"},
                 headers=cls._headers("search"),
                 timeout=10
             )
@@ -156,7 +156,7 @@ class BraveProvider:
             cls._request_count += 1
             r = requests.get(
                 f"{cls.BASE_URL}/web/search",
-                params={"q": query, "count": min(count, 10), "safesearch": "moderate"},
+                params={"q": query, "count": min(count, 10), "safe_search": "moderate"},
                 headers=cls._headers("search"),
                 timeout=10
             )
