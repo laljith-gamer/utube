@@ -5,9 +5,9 @@ video:                              # final output specs
   width: 1080
   height: 1920
   fps: 30
-  target_duration_sec: 25
-  min_duration_sec: 20              # tightened: dense pro-paced shorts can land at 25-42s
-  max_duration_sec: 30
+  target_duration_sec: 40
+  min_duration_sec: 30              
+  max_duration_sec: 50
 
 # Visuals: every scene is motion-based.
 # Fallback order: Stock B-roll → Generated still + Ken Burns motion → animated-gradient filler.
@@ -38,13 +38,13 @@ script:
   max_tokens: 15000                 # raised from 12000 for maximum depth
   temperature: 0.7
   reasoning_effort: high
-  words_per_second: 3.0
+  words_per_second: 2.5
   hook_max_seconds: 1.5             # tightened from 2 — Shorts need sub-2s hooks
   min_scenes: 4                     # story-rhythm range instead of fixed count
   max_scenes: 6
 
 tts:
-  default_rate: "+15%"
+  default_rate: "+0%"
 
 audio:
   bitrate: "128k"
