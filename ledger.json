@@ -34,7 +34,8 @@
       "survey-ai-financial-scams-have-already-r-8b6928f2": "2026-09-02T18:56:29.308498+00:00",
       "these-russian-mathematicians-taught-ai-m-34564cd3": "2026-09-02T19:01:51.591867+00:00",
       "data-center-spending-to-reach-31-6-trill-0657fa1e": "2026-09-02T19:09:47.297490+00:00",
-      "us-department-of-justice-backs-openai-ar-5450d8d1": "2026-09-02T19:30:45.987702+00:00"
+      "us-department-of-justice-backs-openai-ar-5450d8d1": "2026-09-02T19:30:45.987702+00:00",
+      "what-a-fool-i-was-reported-scams-reach-r-f7ae7dd9": "2026-09-03T05:50:58.820208+00:00"
     }
   },
   "families": {},
@@ -1879,6 +1880,247 @@
         "video_id": "-4IL5LdpT1g",
         "url": "https://youtu.be/-4IL5LdpT1g",
         "title": "US Gov Backs AI Data Use",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-09-03T06:05:11.168674+00:00",
+      "run_id": "run_055022",
+      "topic": {
+        "title": "'What a fool I was': Reported scams reach record high of $15.9 billion, and estimates reach upwards of $500 billion annually | Fortune",
+        "url": "https://fortune.com/2026/09/02/scams-record-highs-us-victims",
+        "summary": "According to former prosecutor and founder of nonprofit Operation Shamrock Erin West, \"what happens after the scam might even be worse than the scam itself.\"",
+        "source": "brave_news",
+        "normalized_hotness": 100,
+        "content_hash": "what-a-fool-i-was-reported-scams-reach-r-f7ae7dd9",
+        "keywords": [
+          "fool",
+          "reported",
+          "scams",
+          "reach",
+          "record",
+          "high",
+          "billion",
+          "estimates",
+          "reach",
+          "upwards",
+          "billion",
+          "annually",
+          "fortune"
+        ],
+        "evidence_packet": {
+          "event_id": "what-a-fool-i-was-reported-scams-reach-r-f7ae7dd9",
+          "representative_title": "'What a fool I was': Reported scams reach record high of $15.9 billion, and estimates reach upwards of $500 billion annually | Fortune",
+          "canonical_sources": [
+            "brave_news"
+          ],
+          "all_relevant_urls": [
+            "https://fortune.com/2026/09/02/scams-record-highs-us-victims"
+          ],
+          "source_classes": [
+            "tier1"
+          ],
+          "independent_source_count": 1,
+          "mention_count": 1,
+          "velocity": 1,
+          "acceleration": 0.0,
+          "novelty": 1.0,
+          "trend_momentum": 0,
+          "enriched_text": "When Simon\u2019s wife of 43 years passed away, it felt a bit like he\u2019d died too. Recommended Video In his overwhelming grief, Simon sought companionship online, like so many other lonely widows and widowers. Almost immediately he met Emily. But over the next few months, Emily, who Simon realized too late was a fake, stole $800,000 from him. And that was just the beginning. Simon was stuck paying back $185,000 he had borrowed, and tens of thousands of dollars in additional taxes on money he had withdrawn and lost. He tried to report the crime to his local police and the FBI, he said, but nothing came of it. Instead, he was contacted by yet another scammer \u2014 offering to connect him with the Secret Service to recoup his losses in exchange for even more money. Like Simon, virtually every American has been targeted by scammers in some way, exclusive new polling data shows . Scams in the U.S. have surged to a record high, causing billions in losses for Americans . But the U.S. still lags behind some other countries in tackling the problem, holding financial and social media companies responsible and regulating the cryptocurrency scammers rely on, an investigation by The Associated Press and FRONTLINE found. And although both the Trump administration and Congress are pursuing new options, victims still have little recourse and sometimes end up losing even more. In interviews with almost five dozen victims, AP and FRONTLINE found that many faced ridicule and stigma from friends and family, mounting pressure from banks and lenders, additional taxes, dismissive law enforcement and neglect from a government they believed would protect them. \u201cWhat happens after the scam might even be worse than the scam itself,\u201d said Erin West, a former prosecutor and founder of the nonprofit Operation Shamrock that provides support for victims of online scams. \u201cIt\u2019s a travesty.\u201d While victims say they seldom get any answers from authorities, AP/FRONTLINE found these crimes can be traceable. With the help of leaked documents and cryptowallet addresses, AP/FRONTLINE tracked Emily and Simon\u2019s stolen funds to a notorious scam compound halfway around the world in Myanmar with thousands of victims. Simon was stunned to see Emily\u2019s fake profile and hundreds of pages of conversations he thought were encrypted. \u201cWhat a fool I was,\u201d he said. Today, much of the Myanmar compound where his scam originated lies in rubble, destroyed by local authorities. Yet many of the illicit operations simply moved, new sites opened immediately, and Simon is no closer to getting his money back. He asked not to be identified by his full name because he is too ashamed to tell most of his family about the crime. Local police and the FBI declined to comment on the case. \u201c(The police) told me right away that, you know, \u2018You have to kiss that money goodbye,\u2019\u201d he said, fighting back tears. \u201cAlready I experienced something very bad and now I have to pay for the consequences on top of it, and see my money evaporate"
+        },
+        "scores": {
+          "freshness": 100,
+          "source_quality": 60,
+          "specificity": 85,
+          "velocity": 10,
+          "acceleration": 0,
+          "corroboration": 25,
+          "trend_momentum": 0,
+          "trend_volume": 0,
+          "novelty": 100,
+          "evergreen_value": 50,
+          "strategy_alignment": 50
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "other",
+          "matches": []
+        },
+        "total_score": 46.2,
+        "decision_object": {
+          "selected_index": 0,
+          "overall_reason": "The topic of scams reaching a record high of $15.9 billion and estimates reaching upwards of $500 billion annually is a critical issue that affects a wide range of people. It has strong factual support, with evidence from reputable sources such as Fortune and Operation Shamrock. The topic also has high audience value, as it is a relatable and concerning issue that many people can identify with. Additionally, the narrative strength of this topic is high, with a clear hook, escalation, and consequence. The story of Simon, who lost $800,000 to a scam, is a compelling example of the devastating impact of scams.",
+          "evidence_strength": "Strong, with evidence from reputable sources such as Fortune and Operation Shamrock",
+          "audience_value": "High, as it is a relatable and concerning issue that many people can identify with",
+          "narrative_value": "High, with a clear hook, escalation, and consequence",
+          "visual_value": "Medium, as it may require some creative visualization to convey the impact of scams",
+          "risks": "Low, as the topic is well-supported by evidence and is a legitimate concern",
+          "rejected_alternatives": [
+            "Topic 1 has limited enriched evidence and lacks a clear narrative arc",
+            "Topic 2 is more focused on a specific company's funding and may not have broad audience appeal",
+            "Topic 3, while interesting, may be seen as more of a promotional piece for the robot rather than a critical issue that affects a wide range of people"
+          ],
+          "_llm_usage": {},
+          "_llm_provider": "openrouter_research"
+        }
+      },
+      "concept": {
+        "topic_title": "'What a fool I was': Reported scams reach record high of $15.9 billion, and estimates reach upwards of $500 billion annually | Fortune",
+        "topic_url": "https://fortune.com/2026/09/02/scams-record-highs-us-victims",
+        "topic_source": "brave_news",
+        "topic_score": 46.2,
+        "chosen_angle": "The shocking truth about what happens after you've been scammed",
+        "hook_type": "forbidden_question",
+        "core_claim": "The aftermath of an online scam can be more devastating than the initial loss",
+        "viewer_problem": "You might not only lose money but also face long-term consequences, such as identity theft",
+        "curiosity_gap": "What exactly happens after a scam, and how can I mitigate the damage?",
+        "emotional_driver": "outrage",
+        "payoff": "Understanding the potential long-term effects of online scams can help you take proactive steps to secure your personal and financial information",
+        "concept_score": 88.0,
+        "risk_flags": [
+          "may require expert interview"
+        ],
+        "all_angles": [
+          {
+            "angle": "You're more likely to be scammed online than you think, and it's not just about the money",
+            "hook_type": "surprising_number",
+            "core_claim": "Online scams are reaching record highs, affecting ordinary people's financial security",
+            "viewer_problem": "You could be the next victim, losing money and compromising personal info",
+            "curiosity_gap": "What makes online scams so successful, and how can I avoid being a target?",
+            "emotional_driver": "fear",
+            "payoff": "Learning the most common scam tactics and how to protect yourself can significantly reduce the risk of being scammed",
+            "concept_score": 85,
+            "risk_flags": [
+              "needs examples to illustrate"
+            ]
+          },
+          {
+            "angle": "The shocking truth about what happens after you've been scammed",
+            "hook_type": "forbidden_question",
+            "core_claim": "The aftermath of an online scam can be more devastating than the initial loss",
+            "viewer_problem": "You might not only lose money but also face long-term consequences, such as identity theft",
+            "curiosity_gap": "What exactly happens after a scam, and how can I mitigate the damage?",
+            "emotional_driver": "outrage",
+            "payoff": "Understanding the potential long-term effects of online scams can help you take proactive steps to secure your personal and financial information",
+            "concept_score": 88,
+            "risk_flags": [
+              "may require expert interview"
+            ]
+          },
+          {
+            "angle": "Why online scams are a sign of a larger issue with our digital lives",
+            "hook_type": "hidden_cause",
+            "core_claim": "The rise in online scams reveals underlying vulnerabilities in our technology and online behaviors",
+            "viewer_problem": "Your daily online activities might be putting you at risk, and it's not just about being cautious with links and emails",
+            "curiosity_gap": "What are the underlying reasons for the surge in online scams, and how can we address them?",
+            "emotional_driver": "curiosity",
+            "payoff": "Recognizing the root causes of online scams can lead to a safer and more secure digital environment for everyone",
+            "concept_score": 82,
+            "risk_flags": [
+              "too abstract",
+              "needs expert insight"
+            ]
+          },
+          {
+            "angle": "You could be losing more than you think to online scams every year",
+            "hook_type": "money_hook",
+            "core_claim": "The financial impact of online scams on individuals and society is staggering, reaching into billions of dollars annually",
+            "viewer_problem": "You might be unknowingly contributing to the scam economy, and it's affecting your wallet and the economy at large",
+            "curiosity_gap": "How much money are online scams really costing me and society as a whole, and what can be done to stop it?",
+            "emotional_driver": "surprise",
+            "payoff": "Understanding the true cost of online scams can motivate individuals and governments to take action against these crimes",
+            "concept_score": 80,
+            "risk_flags": [
+              "needs credible sources to back claims"
+            ]
+          }
+        ],
+        "concept_provider": "openrouter_research",
+        "concept_model": "meta-llama/llama-3.3-70b-instruct",
+        "concept_generation_mode": "llm",
+        "validation_status": "valid"
+      },
+      "script": {
+        "hook": "You've just been scammed - what's the worst that could happen next?",
+        "scenes": [
+          {
+            "narration": "Scam losses have skyrocketed to a record $15.9 billion, with the Federal Trade Commission estimating the real toll could be as high as $500 billion annually due to underreporting. That's a staggering amount of money lost to scams.",
+            "duration_sec": 3,
+            "visual_prompt": "Drone shot of a person looking at their bank statement with a shocked expression",
+            "broll_keywords": [
+              "bank statement",
+              "computer",
+              "password",
+              "shocked face"
+            ]
+          },
+          {
+            "narration": "One of the most surprising consequences of being scammed is that victims may owe taxes on the stolen money. In some cases, they even receive tax bills for the fraudulent transactions, adding insult to injury. This can lead to a prolonged and frustrating process to clear their name and finances.",
+            "duration_sec": 3,
+            "visual_prompt": "Close-up of a person talking to a scammer on the phone, then receiving a tax bill in the mail with a look of confusion and concern",
+            "broll_keywords": [
+              "phone",
+              "scammer",
+              "victim",
+              "tax bill",
+              "mail",
+              "confused face"
+            ]
+          },
+          {
+            "narration": "To minimize the damage, it's crucial to act swiftly. Reporting the scam to your bank, freezing your accounts, and monitoring your credit reports can significantly reduce the risk of further financial loss. By taking these proactive steps, you can protect yourself from additional harm and hold financial institutions accountable for their role in prevention.",
+            "duration_sec": 3,
+            "visual_prompt": "Shot of a person on the phone with their bank, then checking their credit report online with a determined expression",
+            "broll_keywords": [
+              "bank",
+              "credit report",
+              "online security",
+              "determined face"
+            ]
+          }
+        ],
+        "cta": "Take these three steps to protect yourself from scam losses and hold financial institutions accountable: report scams immediately, freeze your accounts, and regularly monitor your credit reports.",
+        "title": "The Shocking Truth About Scams",
+        "description": "Scams in the United States have surged to record highs, causing billions in losses for Americans. The majority of victims get no help, and some even end up losing more. Learn how to protect yourself. https://fortune.com/2026/09/02/scams-record-highs-us-victims",
+        "hashtags": [
+          "#shorts",
+          "#scams",
+          "#financialprotection",
+          "#consumerrights",
+          "#cybercrime"
+        ],
+        "thumbnail_prompt": "High-contrast image of a person looking worried while on the phone",
+        "thumbnail_text": "Scam Alert",
+        "_llm_usage": {},
+        "_llm_provider": "openrouter_research",
+        "_learning": {
+          "strategy_version": 0
+        },
+        "_concept": {
+          "hook_type": "forbidden_question",
+          "angle": "The shocking truth about what happens after you've been scammed",
+          "emotional_driver": "outrage",
+          "concept_score": 88.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 3,
+        "sources": {
+          "svd": 0,
+          "stock": 3,
+          "image_motion": 0,
+          "filler": 0
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "1IqyeSNhwR8",
+        "video_id": "1IqyeSNhwR8",
+        "url": "https://youtu.be/1IqyeSNhwR8",
+        "title": "The Shocking Truth About Scams",
         "dry_run": false
       }
     }

@@ -105,6 +105,18 @@
       ],
       "cta": "How do you think the US government's support for OpenAI will impact your personal data privacy?",
       "title": "US Gov Backs AI Data Use"
+    },
+    {
+      "run_id": "run_055022",
+      "timestamp": "2026-09-03T06:05:11.168698+00:00",
+      "hook": "You've just been scammed - what's the worst that could happen next?",
+      "scenes": [
+        "Scam losses have skyrocketed to a record $15.9 billion, with the Federal Trade Commission estimating the real toll could be as high as $500 billion annually due to underreporting. That's a staggering amount of money lost to scams.",
+        "One of the most surprising consequences of being scammed is that victims may owe taxes on the stolen money. In some cases, they even receive tax bills for the fraudulent transactions, adding insult to injury. This can lead to a prolonged and frustrating process to clear their name and finances.",
+        "To minimize the damage, it's crucial to act swiftly. Reporting the scam to your bank, freezing your accounts, and monitoring your credit reports can significantly reduce the risk of further financial loss. By taking these proactive steps, you can protect yourself from additional harm and hold financial institutions accountable for their role in prevention."
+      ],
+      "cta": "Take these three steps to protect yourself from scam losses and hold financial institutions accountable: report scams immediately, freeze your accounts, and regularly monitor your credit reports.",
+      "title": "The Shocking Truth About Scams"
     }
   ]
 }
