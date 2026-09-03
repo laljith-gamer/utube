@@ -21,6 +21,7 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
     min_relevance = float(cfg.get_path("visual_qc.min_relevance_score", 0.3))
     visuals_dir = out_dir / "visuals"
     visuals_dir.mkdir(parents=True, exist_ok=True)
+    used_image_urls = set()
 
     def generate_scene(i: int, scene: dict) -> dict:
         scene_dir = visuals_dir / f"scene_{i:02d}"
@@ -59,12 +60,13 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                 search_q = " ".join(broll) if broll else prompt
                 search_q = BraveProvider.spellcheck(search_q) or search_q
                 
-                img_cands = BraveProvider.search_images(search_q, count=3)
+                img_cands = BraveProvider.search_images(search_q, count=5)
                 real_img_path = scene_dir / "real.jpg"
                 
                 for cand in img_cands:
                     img_url = cand.get("url")
-                    if not img_url: continue
+                    if not img_url or img_url in used_image_urls:
+                        continue
                     
                     try:
                         resp = requests.get(img_url, timeout=10)
@@ -93,6 +95,7 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                                 record.update({"image": str(real_img_path.relative_to(out_dir)), "evidence_url": img_url})
                                 record["attempts"].append({"type": "brave_image", "status": "ok", "relevance": score, "url": img_url})
                                 LOG.info("scene %d: brave image validated with score %s", i, score)
+                                used_image_urls.add(img_url)
                                 break
                             else:
                                 record["attempts"].append({"type": "brave_image", "status": "rejected", "relevance": score})
