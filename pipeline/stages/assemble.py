@@ -50,7 +50,10 @@ def assemble_video(
         added_dur = fade_dur if i < len(visuals) - 1 else 0.0
         dur = max(seg_durations[i], 1.5) + added_dur
         out_clip = work_dir / f"scene_{i:02d}.mp4"
-        if "video" in v:
+        comp = v.get("composition", "")
+        if comp == "pip_evidence":
+            _render_pip_evidence(out_dir / v["video"], out_dir / v["image"], out_clip, dur, width, height, fps, acfg)
+        elif "video" in v and comp != "brave_images":
             _render_from_video(out_dir / v["video"], out_clip, dur, width, height, fps, acfg)
         elif "image" in v:
             _render_from_image(out_dir / v["image"], out_clip, dur, width, height, fps, acfg)
@@ -156,6 +159,49 @@ def _render_from_image(src: Path, out: Path, dur: float, w: int, h: int, fps: in
         "-pix_fmt", f.get("pix_fmt", "yuv420p"),
         "-r", str(fps),
         str(out),
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+
+def _render_pip_evidence(stock_src: Path, img_src: Path, out: Path, dur: float, w: int, h: int, fps: int, acfg: dict) -> None:
+    """Render a Picture-in-Picture composition with stock video background and animated image foreground."""
+    f = acfg.get("ffmpeg", {}) or {}
+    pip_cfg = acfg.get("pip_evidence", {}) or {}
+    
+    scale_w = pip_cfg.get("scale_w", 800)
+    scale_h = pip_cfg.get("scale_h", 800)
+    blur_radius = pip_cfg.get("blur_radius", 10)
+    darken = pip_cfg.get("darken_opacity", 0.6)
+    
+    frames = int(dur * fps)
+    
+    # Background: loop, scale, crop, blur, darken
+    bg_vf = (
+        f"scale={w}:{h}:force_original_aspect_ratio=increase,"
+        f"crop={w}:{h},setsar=1,fps={fps},"
+        f"boxblur={blur_radius}:1,"
+        f"colorchannelmixer=rr={darken}:gg={darken}:bb={darken}"
+    )
+    
+    # Foreground: fit in box, white padding border, Ken Burns zoompan
+    fg_vf = (
+        f"scale={scale_w-32}:{scale_h-32}:force_original_aspect_ratio=decrease,"
+        f"pad={scale_w}:{scale_h}:(ow-iw)/2:(oh-ih)/2:white,"
+        f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={scale_w}x{scale_h}:fps={fps}"
+    )
+    
+    cmd = [
+        "ffmpeg", "-y", 
+        "-stream_loop", "-1", "-i", str(stock_src),
+        "-loop", "1", "-i", str(img_src),
+        "-filter_complex", 
+        f"[0:v]{bg_vf}[bg];[1:v]{fg_vf}[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2:shortest=1",
+        "-t", f"{dur:.2f}",
+        "-an",
+        "-c:v", f.get("video_codec", "libx264"),
+        "-pix_fmt", f.get("pix_fmt", "yuv420p"),
+        "-r", str(fps),
+        str(out)
     ]
     subprocess.run(cmd, check=True, capture_output=True, text=True)
 

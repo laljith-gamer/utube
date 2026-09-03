@@ -29,24 +29,26 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
         broll = scene.get("broll_keywords") or []
         record = {"index": i, "prompt": prompt, "attempts": []}
 
-        # ── Priority 1: Stock B-roll (always motion, cheapest) ──
+        # ── Priority 1: Stock B-roll (Background) ──
+        has_stock = False
         if broll:
             try:
                 stock_bytes = stock.find_video(broll, orientation="portrait")
                 if stock_bytes:
                     path = scene_dir / "stock.mp4"
                     path.write_bytes(stock_bytes)
-                    record.update({"video": str(path.relative_to(out_dir)), "source": "stock"})
+                    record.update({"video": str(path.relative_to(out_dir))})
+                    has_stock = True
                     record["attempts"].append({"type": "stock", "status": "ok", "relevance": None, "relevance_status": "unavailable"})
-                    LOG.info("scene %d: stock B-roll used", i)
-                    return record
+                    LOG.info("scene %d: stock B-roll found", i)
                 else:
                     record["attempts"].append({"type": "stock", "status": "not_found"})
             except Exception as exc:
                 record["attempts"].append({"type": "stock", "status": "failed", "error": str(exc)})
                 LOG.warning("scene %d: stock search failed: %s", i, exc)
 
-        # ── Priority 1.5: Brave Search Images + Vision LLM Validation ──
+        # ── Priority 1.5: Brave Search Images (Evidence Foreground) ──
+        has_brave = False
         if llm_vision and (broll or prompt):
             try:
                 from ..providers.brave import BraveProvider
@@ -55,14 +57,10 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                 import base64
                 
                 search_q = " ".join(broll) if broll else prompt
-                
-                # Fix any AI-hallucinated typos in the prompt before searching
                 search_q = BraveProvider.spellcheck(search_q) or search_q
                 
                 img_cands = BraveProvider.search_images(search_q, count=3)
-                
                 real_img_path = scene_dir / "real.jpg"
-                real_ok = False
                 
                 for cand in img_cands:
                     img_url = cand.get("url")
@@ -91,8 +89,8 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                             score = res.parsed.get("relevance", 0)
                             if score > 70:
                                 real_img_path.write_bytes(resp.content)
-                                real_ok = True
-                                record.update({"image": str(real_img_path.relative_to(out_dir)), "source": "brave_images", "motion_treatment": "zoom_pan"})
+                                has_brave = True
+                                record.update({"image": str(real_img_path.relative_to(out_dir)), "evidence_url": img_url})
                                 record["attempts"].append({"type": "brave_image", "status": "ok", "relevance": score, "url": img_url})
                                 LOG.info("scene %d: brave image validated with score %s", i, score)
                                 break
@@ -101,11 +99,20 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                     except Exception as e:
                         LOG.debug("scene %d: brave image check failed: %s", i, e)
                         
-                if real_ok:
-                    return record
             except Exception as exc:
                 record["attempts"].append({"type": "brave_image", "status": "failed", "error": str(exc)})
                 LOG.warning("scene %d: brave image search failed: %s", i, exc)
+                
+        # Determine composition based on found assets
+        if has_stock and has_brave:
+            record.update({"composition": "pip_evidence", "source": "stock_and_brave"})
+            return record
+        elif has_stock:
+            record.update({"composition": "fullscreen", "source": "stock"})
+            return record
+        elif has_brave:
+            record.update({"composition": "fullscreen", "source": "brave_images", "motion_treatment": "zoom_pan"})
+            return record
 
         # ── Priority 2: Generated still (+ optional SVD animation) ──
         still_path = scene_dir / "still.png"
