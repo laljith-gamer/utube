@@ -43,7 +43,7 @@ llm_research:
       params:
         temperature: 0.4
         top_p: 0.95
-        max_tokens: 12000
+        max_tokens: 4000
 
 llm_script:
   # Puter (Claude Opus) is first preference and is tried first on every call.
