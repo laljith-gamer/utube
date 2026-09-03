@@ -35,7 +35,7 @@ research:
     reasoning_effort: high
 
 script:
-  max_tokens: 15000                 # raised from 12000 for maximum depth
+  max_tokens: 4000                  # Lowered to prevent OpenRouter 402 insufficient funds errors
   temperature: 0.7
   reasoning_effort: high
   words_per_second: 2.5
