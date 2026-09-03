@@ -184,18 +184,21 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     if not isinstance(script["scenes"], list) or not script["scenes"]:
         raise ValueError("Script has no scenes")
 
-    # LLMs can still occasionally repeat a hook or distinctive phrase despite
+    # LLMs can still occasionally repeat a hook or use AI fluff despite
     # instructions. Give the model one targeted rewrite opportunity before QC.
     repetition_issues = _repetition_issues(script)
-    if repetition_issues:
-        LOG.warning("Script repetition detected; requesting targeted rewrite: %s", "; ".join(repetition_issues))
+    fluff_issues = _fluff_issues(script)
+    all_issues = repetition_issues + fluff_issues
+    
+    if all_issues:
+        LOG.warning("Script issues detected; requesting targeted rewrite: %s", "; ".join(all_issues))
         feedback = (
-            "\n\n[MANDATORY REPETITION REPAIR]\n"
-            "The generated script contains repeated spoken material. Rewrite the script so every spoken unit is unique. "
+            "\n\n[MANDATORY REPAIR]\n"
+            "The generated script contains issues. Rewrite the script so every spoken unit is unique and free of AI buzzwords. "
             "The hook is spoken separately and MUST NOT appear or be paraphrased in any scene. "
             "Do not reuse any distinctive 5+ word phrase. Keep the same topic, factual claims, story promise, and CTA intent. "
             "Return the complete corrected JSON only.\n"
-            "Detected issues:\n- " + "\n- ".join(repetition_issues)
+            "Detected issues:\n- " + "\n- ".join(all_issues)
         )
         script = _call(feedback)
         missing = [k for k in required if k not in script]
@@ -207,9 +210,7 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
         final_issues = _repetition_issues(script)
         final_issues.extend(_fluff_issues(script))
         if final_issues:
-            LOG.warning("Script rewrite still contains minor repetition/fluff, proceeding anyway: %s", "; ".join(final_issues))
-    else:
-        _validate_script_structure(script)
+            LOG.warning("Script rewrite still contains minor issues, proceeding anyway: %s", "; ".join(final_issues))
 
     script["_learning"] = {"strategy_version": strategy.get("strategy_version", 0)}
     if concept:
