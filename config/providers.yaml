@@ -1,12 +1,6 @@
-# All external service endpoints, models, and their default parameters.
-# Add or reorder providers here; no code changes needed.
-# `chain` = order in which providers are tried.
-
 llm_research:
-  # Puter (Claude Opus) is first preference and is tried first on every call.
-  # If every Puter account/token is rate-limited or out of usage, the router
-  # automatically falls back to the next provider in this chain.
-  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain:
+  - openrouter_research
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -38,18 +32,15 @@ llm_research:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
       params:
         temperature: 0.4
         top_p: 0.95
         max_tokens: 4000
-
 llm_script:
-  # Puter (Claude Opus) is first preference and is tried first on every call.
-  # If every Puter account/token is rate-limited or out of usage, the router
-  # automatically falls back to the next provider in this chain.
-  chain: [openrouter_script, nvidia_nim_primary, nvidia_nim_fallback]
+  chain:
+  - openrouter_script
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -57,7 +48,7 @@ llm_script:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
     nvidia_nim_primary:
       request_timeout_sec: 7200
@@ -71,12 +62,9 @@ llm_script:
       api_key_env: NVIDIA_NIM_API_KEY
       model: mistralai/mixtral-8x22b-instruct-v0.1
       supports_reasoning_effort: false
-
 llm_concept:
-  # Puter (Claude Opus) is first preference and is tried first on every call.
-  # If every Puter account/token is rate-limited or out of usage, the router
-  # automatically falls back to the next provider in this chain.
-  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain:
+  - openrouter_research
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -84,7 +72,7 @@ llm_concept:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -110,12 +98,9 @@ llm_concept:
         temperature: 0.6
         top_p: 0.95
         max_tokens: 4000
-
 llm_qc:
-  # Puter (Claude Opus) is first preference and is tried first on every call.
-  # If every Puter account/token is rate-limited or out of usage, the router
-  # automatically falls back to the next provider in this chain.
-  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain:
+  - openrouter_research
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -123,7 +108,7 @@ llm_qc:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -149,12 +134,9 @@ llm_qc:
         temperature: 0.3
         top_p: 0.95
         max_tokens: 3000
-
 llm_premium_rewrite:
-  # Puter (Claude Opus) is first preference and is tried first on every call.
-  # If every Puter account/token is rate-limited or out of usage, the router
-  # automatically falls back to the next provider in this chain.
-  chain: [openrouter_research, nvidia_nim_primary, nvidia_nim_fallback]
+  chain:
+  - openrouter_research
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -162,7 +144,7 @@ llm_premium_rewrite:
       max_retries: 8
       base_url: https://openrouter.ai/api/v1
       api_key_env: OPENROUTER_API_KEY
-      model: meta-llama/llama-3.3-70b-instruct
+      model: meta-llama/llama-3.3-70b-instruct:free
       supports_reasoning_effort: false
       params:
         temperature: 0.2
@@ -188,30 +170,30 @@ llm_premium_rewrite:
         temperature: 0.2
         top_p: 0.95
         max_tokens: 4000
-
 image:
-  chain: [pollinations]
-  default_negative_prompt: "low quality, blurry, watermark, text, signature, deformed, extra limbs"
+  chain:
+  - pollinations
+  default_negative_prompt: low quality, blurry, watermark, text, signature, deformed,
+    extra limbs
   request_timeout_sec: 120
   providers:
     pollinations:
-      url_template: "https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true"
+      url_template: https://image.pollinations.ai/prompt/{prompt}?width={w}&height={h}&nologo=true&enhance=true
       min_response_bytes: 1000
-
 video:
   chain: []
   request_timeout_sec: 300
   providers: {}
-
 tts:
-  chain: [mistral, nim_magpie]
-  default_rate: "+0%"
-  default_pitch: "+0Hz"
+  chain:
+  - mistral
+  default_rate: +0%
+  default_pitch: +0Hz
   continuous_narration: true
   normalize_output: true
   trim_silence: true
   silence_threshold_db: -45
-  silence_keep_sec: 0.40
+  silence_keep_sec: 0.4
   request_timeout_sec: 1800
   providers:
     mistral:
@@ -234,15 +216,13 @@ tts:
         language: en-us
         voice_id: 147320
         speech_model: mars-instruct
-        user_instructions: >-
-          Speak like a calm friend explaining something fascinating. Keep the
-          delivery ultra-natural, continuous, clear, subtly expressive, brisk
-          but comfortable, and never robotic, theatrical, dramatic, or like a
-          news anchor. Preserve the supplied text exactly; do not rewrite,
-          summarize, add, remove, repeat, or skip any words. Use natural
-          emphasis on important words, slight pacing variation for hooks,
-          facts, reveals, and endings, and only tiny human-like pauses where
-          they feel natural.
+        user_instructions: Speak like a calm friend explaining something fascinating.
+          Keep the delivery ultra-natural, continuous, clear, subtly expressive, brisk
+          but comfortable, and never robotic, theatrical, dramatic, or like a news
+          anchor. Preserve the supplied text exactly; do not rewrite, summarize, add,
+          remove, repeat, or skip any words. Use natural emphasis on important words,
+          slight pacing variation for hooks, facts, reveals, and endings, and only
+          tiny human-like pauses where they feel natural.
         enhance_named_entities_pronunciation: true
         output_configuration:
           format: wav
@@ -265,10 +245,11 @@ tts:
       params:
         encoding: mp3
         sample_rate_hz: 22050
-        default_voice: "Magpie-Multilingual.EN-US.Ray"
-
+        default_voice: Magpie-Multilingual.EN-US.Ray
 stock:
-  chain: [pexels, pixabay]
+  chain:
+  - pexels
+  - pixabay
   request_timeout_sec: 120
   providers:
     pexels:
@@ -281,13 +262,13 @@ stock:
       api_key_env: PIXABAY_API_KEY
       per_page: 5
       safesearch: true
-
 youtube:
-  category_id: "28"
+  category_id: '28'
   upload_chunk_size_mb: 8
-  scopes: ["https://www.googleapis.com/auth/youtube.upload"]
+  scopes:
+  - https://www.googleapis.com/auth/youtube.upload
   default_made_for_kids: false
-  token_uri: "https://oauth2.googleapis.com/token"
+  token_uri: https://oauth2.googleapis.com/token
   client_id_env: YOUTUBE_CLIENT_ID
   client_secret_env: YOUTUBE_CLIENT_SECRET
   refresh_token_env: YOUTUBE_REFRESH_TOKEN
