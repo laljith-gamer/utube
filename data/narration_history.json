@@ -117,6 +117,19 @@
       ],
       "cta": "Take these three steps to protect yourself from scam losses and hold financial institutions accountable: report scams immediately, freeze your accounts, and regularly monitor your credit reports.",
       "title": "The Shocking Truth About Scams"
+    },
+    {
+      "run_id": "run_082815",
+      "timestamp": "2026-09-03T08:42:50.693169+00:00",
+      "hook": "Could a spacecraft with a price tag of fifteen million dollars change your daily life in 3 years?",
+      "scenes": [
+        "In 2029, the Fermi Explorer Mission will launch, marking humanity's first attempt to send a spacecraft to a star beyond our solar system. This mission will travel an incredible distance, with a destination entered in the navigation system - a staggering 80,000 years to arrival.",
+        "The spacecraft will carry a device containing information about Earth's location and natural scenery, traveling at twenty kilometers per second towards the Alpha Centauri system. This device will serve as a message to any potential life form in the system.",
+        "The mission's goal is to expand our understanding of the universe, and the technological innovations driven by this mission could lead to breakthroughs in fields like medicine and transportation.",
+        "For example, advancements in communication technology could enable faster and more reliable internet connectivity, while improvements in transportation could lead to more efficient and sustainable travel options. These innovations could have a profound impact on our daily lives."
+      ],
+      "cta": "How could a spacecraft that won't arrive for 80,000 years improve your life tomorrow?",
+      "title": "80,000 Years to Arrival"
     }
   ]
 }
