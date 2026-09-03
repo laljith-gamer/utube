@@ -103,6 +103,11 @@ assemble:
     zoom_rate: 0.0015                # zoom per frame (subtle)
     pan_speed: 2                     # pixels per frame
     duration_sec: 4                  # how long each image-motion clip lasts
+  pip_evidence:
+    scale_w: 800
+    scale_h: 800
+    blur_radius: 10
+    darken_opacity: 0.6
   music:
     volume: 0.18                   # bg music level (1.0 = original)
     loop: true
