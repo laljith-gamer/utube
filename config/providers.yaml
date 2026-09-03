@@ -186,7 +186,7 @@ video:
   providers: {}
 tts:
   chain:
-  - nim_magpie
+  - mistral
   default_rate: +0%
   default_pitch: +0Hz
   continuous_narration: true
