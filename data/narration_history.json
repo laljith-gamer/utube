@@ -130,6 +130,20 @@
       ],
       "cta": "How could a spacecraft that won't arrive for 80,000 years improve your life tomorrow?",
       "title": "80,000 Years to Arrival"
+    },
+    {
+      "run_id": "run_104108",
+      "timestamp": "2026-09-03T11:04:40.201847+00:00",
+      "hook": "Your Netflix subscription is secretly building AI data centers.",
+      "scenes": [
+        "A three point six trillion dollar buildout starts in 2026.",
+        "That's Germany's entire GDP, and it's not just governments footing the bill.",
+        "A fifty billion dollar GPU center can recover its upfront investment in nine to ten months.",
+        "Because big cloud customers prepay fifty to sixty percent of fees before it's built. Streaming services and cloud storage providers are passing these prepayment costs to you through higher subscription fees.",
+        "So you're an involuntary investor in Big Tech's AI arms race."
+      ],
+      "cta": "Would you cancel your streaming subscription if you knew part of it funded AI data centers?",
+      "title": "Your Electric Bill Is Funding AI Data Centers"
     }
   ]
 }
