@@ -1,6 +1,6 @@
 llm_research:
   chain:
-  - openrouter_research
+  - nvidia_nim_primary
   request_timeout_sec: 300
   reasoning_token_floor:
     low: 3000
@@ -12,7 +12,7 @@ llm_research:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.4
@@ -40,7 +40,7 @@ llm_research:
         max_tokens: 4000
 llm_script:
   chain:
-  - openrouter_script
+  - nvidia_nim_primary
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -54,7 +54,7 @@ llm_script:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
     nvidia_nim_fallback:
       request_timeout_sec: 7200
@@ -64,7 +64,7 @@ llm_script:
       supports_reasoning_effort: false
 llm_concept:
   chain:
-  - openrouter_research
+  - nvidia_nim_primary
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -82,7 +82,7 @@ llm_concept:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.6
@@ -100,7 +100,7 @@ llm_concept:
         max_tokens: 4000
 llm_qc:
   chain:
-  - openrouter_research
+  - nvidia_nim_primary
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -118,7 +118,7 @@ llm_qc:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.3
@@ -136,7 +136,7 @@ llm_qc:
         max_tokens: 3000
 llm_premium_rewrite:
   chain:
-  - openrouter_research
+  - nvidia_nim_primary
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
@@ -154,7 +154,7 @@ llm_premium_rewrite:
       request_timeout_sec: 7200
       base_url: https://integrate.api.nvidia.com/v1
       api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.3-70b-instruct
+      model: deepseek-ai/deepseek-v4-pro-0813
       supports_reasoning_effort: false
       params:
         temperature: 0.2
@@ -186,7 +186,7 @@ video:
   providers: {}
 tts:
   chain:
-  - mistral
+  - nim_magpie
   default_rate: +0%
   default_pitch: +0Hz
   continuous_narration: true
