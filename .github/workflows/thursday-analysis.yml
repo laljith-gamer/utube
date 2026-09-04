@@ -54,6 +54,7 @@ jobs:
           git add trend_report.md config/goal.yaml data/content_memory.json data/performance.json data/dynamic_strategy.json
           if ! git diff --cached --quiet; then
             git commit -m "chore(analysis): update learning state $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase origin ${{ github.ref_name }}
             git push origin "HEAD:${{ github.ref_name }}"
           else
             echo "Nothing to commit."

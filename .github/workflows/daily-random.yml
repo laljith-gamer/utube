@@ -131,6 +131,7 @@ jobs:
           fi
           if ! git diff --cached --quiet; then
             git commit -m "chore(run): daily batch $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase origin ${{ github.ref_name }}
             git push origin HEAD:${{ github.ref_name }}
           else
             echo "Nothing to commit."
