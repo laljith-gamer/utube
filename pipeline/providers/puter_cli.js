@@ -13,7 +13,11 @@ async function main() {
     }
     
     const command = args[0];
-    const payloadStr = args[1] || '{}';
+    let payloadStr = args[1];
+    if (payloadStr === '-') {
+        payloadStr = require('fs').readFileSync(0, 'utf-8').trim();
+    }
+    if (!payloadStr) payloadStr = '{}';
     let payload = {};
     try {
         payload = JSON.parse(payloadStr);

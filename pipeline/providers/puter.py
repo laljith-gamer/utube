@@ -157,7 +157,8 @@ class PuterProvider:
                 
             try:
                 result = subprocess.run(
-                    ["node", str(cli_script), "chat", json.dumps(payload)],
+                    ["node", str(cli_script), "chat", "-"],
+                    input=json.dumps(payload),
                     capture_output=True,
                     text=True,
                     env=my_env
