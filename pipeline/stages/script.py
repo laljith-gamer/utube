@@ -12,6 +12,88 @@ from ..utils import repo_root
 
 LOG = logging.getLogger("utube.script")
 
+ARCHETYPES = {
+    "The Standard Loop": """Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
+Cold open. Make the viewer's thumb stop. Use the "{hook_type}" pattern.
+NO 'hey guys', NO 'welcome back', NO slow intro.
+Open the curiosity loop. Do NOT solve it yet.
+
+Beat 2 — CONTEXT (Scene 1):
+Continue directly from the hook. Establish the stakes. Why does this matter TO THE VIEWER?
+
+Beat 3 — EVIDENCE & MECHANISM (Scenes 2-4):
+How does it actually work? Provide 2-3 concrete facts (numbers, dates, dollars).
+- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script to maximize audience retention! Make them feel the stakes.
+Explain the cause-and-effect (CAUSALITY). A caused B, which led to C.
+
+Beat 4 — CONSEQUENCE (Scenes 5-6):
+What is the direct impact of this? Show the scale or the personal consequence.
+
+Beat 5 — PAYOFF (Second-to-last scene):
+Resolve the curiosity loop opened in the hook. The 'ah-ha' moment. Must feel earned.
+
+Beat 6 — CTA (final line, separate from scenes):
+A specific comment-bait question referencing the core mechanism.""",
+
+    "The Mythbuster": """Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
+Cold open. State a commonly held belief or myth using the "{hook_type}" pattern.
+Immediately shatter it or cast doubt on it.
+
+Beat 2 — THE REALITY (Scene 1):
+Introduce the real truth. What is actually happening instead of the myth?
+
+Beat 3 — THE EVIDENCE (Scenes 2-4):
+Prove the reality. Provide 2-3 concrete facts (numbers, dates, dollars) that debunk the myth.
+- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script!
+Show the scientific, historical, or economic mechanism.
+
+Beat 4 — THE ORIGIN (Scenes 5-6):
+Why did we believe the myth in the first place? How did the misconception start?
+
+Beat 5 — PAYOFF (Second-to-last scene):
+The final nail in the coffin of the myth. The ultimate realization for the viewer.
+
+Beat 6 — CTA (final line, separate from scenes):
+Ask the viewer what other myths they believed, tying back to the topic.""",
+
+    "The Deep Dive": """Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
+Cold open. Introduce a bizarre or extreme fact using the "{hook_type}" pattern.
+
+Beat 2 — THE MECHANISM (Scene 1):
+Break down exactly how this extreme fact is physically or logically possible.
+
+Beat 3 — THE HIDDEN HISTORY (Scenes 2-4):
+Who discovered this or when did it start? Give specific dates and numbers.
+- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script!
+
+Beat 4 — THE IMPACT (Scenes 5-6):
+How is this changing the world today? What is the downstream consequence?
+
+Beat 5 — PAYOFF (Second-to-last scene):
+Tie the history and the mechanism back together into a mind-blowing summary.
+
+Beat 6 — CTA (final line, separate from scenes):
+A specific comment-bait question asking if they would use/experience this thing.""",
+
+    "The Comparison": """Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
+Cold open. Present two seemingly similar things with a massive hidden difference using the "{hook_type}" pattern.
+
+Beat 2 — THE STAKES (Scene 1):
+Why does this difference matter? Establish the scale or cost of misunderstanding it.
+
+Beat 3 — THE HIDDEN DIFFERENCE (Scenes 2-4):
+Explain exactly what separates them. Provide 2-3 concrete facts (numbers, dates, dollars).
+- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script!
+
+Beat 4 — CONSEQUENCE (Scenes 5-6):
+Who wins and who loses because of this difference?
+
+Beat 5 — PAYOFF (Second-to-last scene):
+The final verdict. Which one actually matters more and why?
+
+Beat 6 — CTA (final line, separate from scenes):
+Ask the viewer which side they fall on or prefer."""
+}
 
 def _load_strategy() -> dict:
     path = repo_root() / "data" / "dynamic_strategy.json"
@@ -156,6 +238,8 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
     if previous_repetition and not previous_repetition.passed:
         rep_feedback = f"\n\n[REPETITION FEEDBACK TO FIX]\nIssues: {', '.join(previous_repetition.all_issues)}"
 
+    beat_structure = ARCHETYPES.get(cfg.get_path("script.archetype", "The Standard Loop"), ARCHETYPES["The Standard Loop"])
+    
     prompt = template.format(
         goal=goal_summary(), niche_title=slot.get("title", ""), voice_style=slot.get("voice_style", "neutral"), visual_style=slot.get("style", ""),
         topic_title=topic.get("title", ""), angle=angle, hook_type=hook_type, curiosity_gap=curiosity_gap,
@@ -164,6 +248,7 @@ def generate_script(llm: LLMRouter, *, slot: dict, topic: dict, research: dict, 
         format_label=cfg.get_path("channel.format", "shorts"), hook_max_seconds=float(scfg.get("hook_max_seconds", 1.5)),
         title_max_chars=title_max, ai_disclosure=cfg.get_path("channel.ai_disclosure", "AI-assisted"),
         hashtags_count=hashtags_count, hashtags_count_minus_one=hashtags_count - 1,
+        beat_structure=beat_structure,
     )
     prompt += strategy_context + qc_feedback + rep_feedback
 

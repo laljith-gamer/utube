@@ -22,27 +22,7 @@ The CTA is also spoken separately and must not repeat any earlier narration.
 Every narration unit — hook, each scene, and CTA — must add new information or a new rhetorical move.
 
 BEAT STRUCTURE:
-Beat 1 — HOOK (separate `hook` field, <= {hook_max_seconds}s):
-Cold open. Make the viewer's thumb stop. Use the "{hook_type}" pattern.
-NO 'hey guys', NO 'welcome back', NO slow intro.
-Open the curiosity loop. Do NOT solve it yet.
-
-Beat 2 — CONTEXT (Scene 1):
-Continue directly from the hook. Establish the stakes. Why does this matter TO THE VIEWER?
-
-Beat 3 — EVIDENCE & MECHANISM (Scenes 2-4):
-How does it actually work? Provide 2-3 concrete facts (numbers, dates, dollars).
-- INJECT HYPE: You MUST prominently feature the `hype_data` from the research brief early in the script to maximize audience retention! Make them feel the stakes.
-Explain the cause-and-effect (CAUSALITY). A caused B, which led to C.
-
-Beat 4 — CONSEQUENCE (Scenes 5-6):
-What is the direct impact of this? Show the scale or the personal consequence.
-
-Beat 5 — PAYOFF (Second-to-last scene):
-Resolve the curiosity loop opened in the hook. The 'ah-ha' moment. Must feel earned.
-
-Beat 6 — CTA (final line, separate from scenes):
-A specific comment-bait question referencing the core mechanism.
+{beat_structure}
 
 ==============================================================
 CONTENT DENSITY & FACTUAL FIDELITY — MANDATORY

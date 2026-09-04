@@ -24,8 +24,57 @@ from .utils import env, env_bool, repo_root, run_date, run_dir, setup_logging, s
 LOG = logging.getLogger("utube.orchestrator")
 
 
+def _apply_dynamic_templates(cfg: dict) -> None:
+    """Inject randomized dynamic settings into the pipeline configuration."""
+    # 1. Script Archetype
+    archetypes = ["The Standard Loop", "The Mythbuster", "The Deep Dive", "The Comparison"]
+    if "script" not in cfg:
+        cfg["script"] = {}
+    cfg["script"]["archetype"] = random.choice(archetypes)
+    LOG.info("Dynamic Template: Selected Archetype '%s'", cfg["script"]["archetype"])
+
+    # 2. Caption Styling
+    if "assemble" not in cfg:
+        cfg["assemble"] = {}
+    if "cinematic_caption_style" not in cfg["assemble"]:
+        cfg["assemble"]["cinematic_caption_style"] = {}
+        
+    style = cfg["assemble"]["cinematic_caption_style"]
+    
+    fonts = ["DejaVu Sans", "Arial", "Impact", "Trebuchet MS", "Verdana"]
+    style["fontname"] = random.choice(fonts)
+    
+    if "captions" not in cfg:
+        cfg["captions"] = {}
+        
+    # ASS format override colors: \c&H<BB><GG><RR>&
+    highlights = [
+        "&H00FFFF&", # Yellow
+        "&H00FF00&", # Green
+        "&HFFFF00&", # Cyan
+        "&H00A5FF&", # Orange
+        "&H0000FF&", # Red
+        "&HFF00FF&", # Magenta
+    ]
+    cfg["captions"]["highlight_color"] = random.choice(highlights)
+    
+    # 5=center, 2=bottom-center
+    style["alignment"] = random.choice([2, 5])
+    if style["alignment"] == 2:
+        style["margin_v"] = random.randint(150, 300)
+    else:
+        style["margin_v"] = 0
+        
+    cfg["captions"]["fade_ms"] = random.choice([0, 50, 100, 150])
+    cfg["captions"]["words_per_chunk"] = random.choice([1, 2, 3])
+    
+    LOG.info("Dynamic Template: Caption font='%s', highlight='%s', align=%d, chunk=%d", 
+             style["fontname"], cfg["captions"]["highlight_color"], style["alignment"], cfg["captions"]["words_per_chunk"])
+
+
 def produce_one(upload: bool, skip_svd: bool, script_only: bool, ledger: Ledger) -> dict:
     cfg = get_config()
+    _apply_dynamic_templates(cfg)
     run_id = f"run_{datetime.now(timezone.utc).strftime('%H%M%S')}"
     out = run_dir(run_id)
     llm_research = LLMRouter("llm_research")
