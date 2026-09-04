@@ -183,19 +183,23 @@ def _render_pip_evidence(stock_src: Path, img_src: Path, out: Path, dur: float, 
         f"colorchannelmixer=rr={darken}:gg={darken}:bb={darken}"
     )
     
-    # Foreground: fit in box, white padding border, Ken Burns zoompan
+    # Foreground: perfectly crop to inner box, Ken Burns zoompan, static white border, fade-in with alpha
     fg_vf = (
-        f"scale={scale_w-32}:{scale_h-32}:force_original_aspect_ratio=decrease,"
+        f"scale={scale_w-32}:{scale_h-32}:force_original_aspect_ratio=increase,"
+        f"crop={scale_w-32}:{scale_h-32},"
+        f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={scale_w-32}x{scale_h-32}:fps={fps},"
         f"pad={scale_w}:{scale_h}:(ow-iw)/2:(oh-ih)/2:white,"
-        f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={scale_w}x{scale_h}:fps={fps}"
+        f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
     )
+    
+    overlay_filter = f"[bg][fg]overlay=x='(W-w)/2':y='if(lte(t,0.5), (H-h)/2 + 100*(0.5-t)/0.5, (H-h)/2)':shortest=1"
     
     cmd = [
         "ffmpeg", "-y", 
         "-stream_loop", "-1", "-i", str(stock_src),
         "-loop", "1", "-i", str(img_src),
         "-filter_complex", 
-        f"[0:v]{bg_vf}[bg];[1:v]{fg_vf}[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2:shortest=1",
+        f"[0:v]{bg_vf}[bg];[1:v]{fg_vf}[fg];{overlay_filter}",
         "-t", f"{dur:.2f}",
         "-an",
         "-c:v", f.get("video_codec", "libx264"),
