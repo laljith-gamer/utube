@@ -158,6 +158,21 @@
       ],
       "cta": "That report you wrote last week? AI could have done it in 30 seconds.",
       "title": "AI Is 80% to AGI—Your Job Is Already Changing"
+    },
+    {
+      "run_id": "run_154419",
+      "timestamp": "2026-09-04T16:05:22.940475+00:00",
+      "hook": "Harvard tripled the record for keeping human brain tissue alive outside a body.",
+      "scenes": [
+        "The old record was 694 days, but these organoids passed five years.",
+        "Each one holds over a million cells from the cerebral cortex.",
+        "Researchers analyzed 110 organoids and nearly 425,000 individual cells.",
+        "The DNA methylation patterns matched a real child's developing brain.",
+        "Older cells exposed to neuron signals skipped ahead, making later-stage neurons in two weeks.",
+        "That time warp could finally let scientists test drugs for Alzheimer's before symptoms appear."
+      ],
+      "cta": "If a lab-grown brain can skip its own development, what does that tell us about how your brain stores time?",
+      "title": "Harvard Tripled the Record for Keeping Human Brain Tissue Alive—Here's Why"
     }
   ]
 }

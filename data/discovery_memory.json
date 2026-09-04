@@ -3537,13 +3537,8 @@
     },
     "public-apis-public-apis-a-collective-lis-90e2d260": {
       "first_seen_at": "2026-09-01T08:11:04.725568+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962046+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432692+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:30:21.036816+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039355+00:00",
           "mentions": 1,
@@ -3588,6 +3583,11 @@
           "timestamp": "2026-09-04T02:34:00.962046+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432692+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3595,13 +3595,8 @@
     },
     "freecodecamp-freecodecamp-freecodecamp-o-96ffafc4": {
       "first_seen_at": "2026-09-01T08:11:04.725580+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962058+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432707+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:30:21.036832+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039369+00:00",
           "mentions": 1,
@@ -3644,6 +3639,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962058+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432707+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -3769,13 +3769,8 @@
     },
     "awesome-selfhosted-awesome-selfhosted-a--856a67d5": {
       "first_seen_at": "2026-09-01T08:11:04.725614+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962095+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432753+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:30:21.036907+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039481+00:00",
           "mentions": 1,
@@ -3818,6 +3813,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962095+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432753+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -3885,13 +3885,8 @@
     },
     "obra-superpowers-an-agentic-skills-frame-9e59785c": {
       "first_seen_at": "2026-09-01T08:11:04.725695+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962107+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432769+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T16:14:30.027920+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-02T16:19:27.226835+00:00",
           "mentions": 1,
@@ -3936,6 +3931,11 @@
           "timestamp": "2026-09-04T02:34:00.962107+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432769+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -3943,13 +3943,8 @@
     },
     "react-react-the-library-for-web-and-nati-4a15ce5b": {
       "first_seen_at": "2026-09-01T08:11:04.725706+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962118+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432796+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T16:50:00.537492+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039493+00:00",
           "mentions": 1,
@@ -3994,6 +3989,11 @@
           "timestamp": "2026-09-04T02:34:00.962118+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432796+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -4023,12 +4023,8 @@
     },
     "affaan-m-ecc-the-agent-harness-performan-8e9a6fa4": {
       "first_seen_at": "2026-09-01T08:11:04.725729+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962141+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432816+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-01T08:11:04.725729+00:00",
-          "mentions": 1
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039509+00:00",
           "mentions": 1,
@@ -4071,6 +4067,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962141+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432816+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -4429,13 +4430,8 @@
     },
     "nilbuild-developer-roadmap-interactive-r-a5294fd2": {
       "first_seen_at": "2026-09-01T09:29:15.084094+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962082+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432738+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:30:21.036876+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039444+00:00",
           "mentions": 1,
@@ -4478,6 +4474,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962082+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432738+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -6163,13 +6164,8 @@
     },
     "sindresorhus-awesome-awesome-lists-about-f47e5bd0": {
       "first_seen_at": "2026-09-02T04:09:24.595844+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962033+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432679+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:30:21.036802+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.039342+00:00",
           "mentions": 1,
@@ -6212,6 +6208,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962033+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432679+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -10452,13 +10453,8 @@
     },
     "survey-ai-financial-scams-have-already-r-8b6928f2": {
       "first_seen_at": "2026-09-02T18:56:01.052344+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961651+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432019+00:00",
       "history": [
-        {
-          "timestamp": "2026-09-02T19:09:27.666918+00:00",
-          "mentions": 1,
-          "traffic_volume": 0
-        },
         {
           "timestamp": "2026-09-03T05:50:34.038863+00:00",
           "mentions": 1,
@@ -10501,6 +10497,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.961651+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432019+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -12361,7 +12362,7 @@
     },
     "25-misconceptions-everyone-wants-you-to--8278e159": {
       "first_seen_at": "2026-09-03T05:50:34.039521+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962151+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432840+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T05:50:34.039521+00:00",
@@ -12405,6 +12406,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962151+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432840+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -12851,7 +12857,7 @@
     },
     "25-bizarre-origin-stories-behind-everyda-5df0cdca": {
       "first_seen_at": "2026-09-03T06:55:53.430323+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962007+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432638+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T06:55:53.430323+00:00",
@@ -12885,6 +12891,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.962007+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432638+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13089,7 +13100,7 @@
     },
     "cost-of-doing-business-rising-indian-com-c2dd9c4b": {
       "first_seen_at": "2026-09-03T09:37:03.724509+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961694+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432122+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T09:37:03.724509+00:00",
@@ -13113,6 +13124,11 @@
         },
         {
           "timestamp": "2026-09-04T02:34:00.961694+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432122+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13148,10 +13164,15 @@
     },
     "new-humanoid-robot-lets-developers-build-15765001": {
       "first_seen_at": "2026-09-03T10:13:13.334964+00:00",
-      "last_seen_at": "2026-09-03T10:13:13.334964+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431893+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T10:13:13.334964+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.431893+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13490,7 +13511,7 @@
     },
     "busting-the-myth-keeping-people-away-fro-0bbb5815": {
       "first_seen_at": "2026-09-03T10:41:23.772877+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962163+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432853+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T10:41:23.772877+00:00",
@@ -13501,6 +13522,11 @@
           "timestamp": "2026-09-04T02:34:00.962163+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432853+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -13508,7 +13534,7 @@
     },
     "why-your-business-can-t-trust-the-data-b-104826cb": {
       "first_seen_at": "2026-09-03T10:41:23.772927+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962204+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432877+00:00",
       "history": [
         {
           "timestamp": "2026-09-03T10:41:23.772927+00:00",
@@ -13519,6 +13545,11 @@
           "timestamp": "2026-09-04T02:34:00.962204+00:00",
           "mentions": 1,
           "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432877+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
         }
       ],
       "max_mentions": 1,
@@ -13526,10 +13557,15 @@
     },
     "there-is-no-conflict-between-quantum-phy-4ca139dc": {
       "first_seen_at": "2026-09-04T02:34:00.961412+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961412+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431670+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961412+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.431670+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13539,10 +13575,15 @@
     },
     "ned-curic-calls-for-stronger-engineering-6f2e8f1e": {
       "first_seen_at": "2026-09-04T02:34:00.961454+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961454+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431706+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961454+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.431706+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13552,10 +13593,15 @@
     },
     "is-it-even-possible-to-understand-quantu-70506b47": {
       "first_seen_at": "2026-09-04T02:34:00.961465+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961465+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431755+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961465+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.431755+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13669,10 +13715,15 @@
     },
     "8-best-robotics-stocks-to-buy-in-2026-an-b9662e64": {
       "first_seen_at": "2026-09-04T02:34:00.961575+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961575+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431875+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961575+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.431875+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13721,10 +13772,15 @@
     },
     "researching-employment-scams-schneier-on-bce6c24e": {
       "first_seen_at": "2026-09-04T02:34:00.961641+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961641+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432004+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961641+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432004+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13773,10 +13829,15 @@
     },
     "the-ai-token-economy-businessworld-onlin-441a2de0": {
       "first_seen_at": "2026-09-04T02:34:00.961704+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961704+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432176+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961704+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432176+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13838,10 +13899,15 @@
     },
     "scientists-have-found-the-most-convincin-6f70877b": {
       "first_seen_at": "2026-09-04T02:34:00.961753+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961753+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432193+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961753+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432193+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13851,10 +13917,15 @@
     },
     "reminder-lisa-science-gaps-2026-nasa-sci-5348cab3": {
       "first_seen_at": "2026-09-04T02:34:00.961763+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961763+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432229+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961763+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432229+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13864,10 +13935,15 @@
     },
     "nasa-s-new-rocket-experiment-reveals-hid-cd5e63b2": {
       "first_seen_at": "2026-09-04T02:34:00.961774+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961774+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432261+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961774+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432261+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13877,10 +13953,15 @@
     },
     "sservi-can-5-final-text-released-nasa-sc-37c4ce40": {
       "first_seen_at": "2026-09-04T02:34:00.961782+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961782+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432217+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961782+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432217+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13890,10 +13971,15 @@
     },
     "nasa-s-newest-space-telescope-was-built--1338bad9": {
       "first_seen_at": "2026-09-04T02:34:00.961794+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961794+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432247+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961794+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432247+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13903,10 +13989,15 @@
     },
     "nasa-s-latest-mission-to-map-the-cosmos--596cedda": {
       "first_seen_at": "2026-09-04T02:34:00.961804+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961804+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432305+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961804+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432305+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13916,10 +14007,15 @@
     },
     "breakthrough-science-discoveries-unveile-88262264": {
       "first_seen_at": "2026-09-04T02:34:00.961815+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961815+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432321+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961815+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432321+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13942,10 +14038,15 @@
     },
     "reuters-science-news-summary-412cd8bf": {
       "first_seen_at": "2026-09-04T02:34:00.961833+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961833+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432336+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961833+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432336+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13968,10 +14069,15 @@
     },
     "how-the-early-dreams-of-the-internet-cha-8ff441f7": {
       "first_seen_at": "2026-09-04T02:34:00.961855+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961855+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432362+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961855+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432362+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13981,10 +14087,15 @@
     },
     "is-india-s-internet-boom-running-into-an-bac50ee3": {
       "first_seen_at": "2026-09-04T02:34:00.961869+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961869+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432377+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961869+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432377+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -13994,10 +14105,15 @@
     },
     "the-u-s-spent-30-billion-replacing-books-04e3e8e2": {
       "first_seen_at": "2026-09-04T02:34:00.961884+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961884+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432444+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961884+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432444+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14007,10 +14123,15 @@
     },
     "on-september-04-2024-a-14-year-old-gunma-feda1b6a": {
       "first_seen_at": "2026-09-04T02:34:00.961896+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961896+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432462+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961896+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432462+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14020,10 +14141,15 @@
     },
     "on-september-04-2022-ten-people-are-kill-b2f457aa": {
       "first_seen_at": "2026-09-04T02:34:00.961909+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961909+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432481+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961909+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432481+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14033,10 +14159,15 @@
     },
     "on-september-04-2020-pope-benedict-xvi-b-f2d1a3d5": {
       "first_seen_at": "2026-09-04T02:34:00.961921+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961921+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432497+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961921+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432497+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14046,10 +14177,15 @@
     },
     "on-september-04-2007-three-terrorists-su-bbea52ea": {
       "first_seen_at": "2026-09-04T02:34:00.961936+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961936+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432513+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961936+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432513+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14059,10 +14195,15 @@
     },
     "on-september-04-2002-the-oakland-athleti-3b2d4cfd": {
       "first_seen_at": "2026-09-04T02:34:00.961948+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961948+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432528+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961948+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432528+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14072,10 +14213,15 @@
     },
     "on-september-04-2001-tokyo-disneysea-ope-8c656ec2": {
       "first_seen_at": "2026-09-04T02:34:00.961958+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961958+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432542+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961958+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432542+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14085,10 +14231,15 @@
     },
     "on-september-04-1998-google-is-founded-b-a8efedf5": {
       "first_seen_at": "2026-09-04T02:34:00.961969+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961969+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432556+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961969+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432556+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14098,10 +14249,15 @@
     },
     "on-september-04-1995-the-1995-okinawa-ra-6a023ac1": {
       "first_seen_at": "2026-09-04T02:34:00.961979+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961979+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432573+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961979+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432573+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14111,10 +14267,15 @@
     },
     "on-september-04-1989-in-leipzig-east-ger-21534efb": {
       "first_seen_at": "2026-09-04T02:34:00.961989+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961989+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432608+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961989+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432608+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14124,10 +14285,15 @@
     },
     "on-september-04-1985-the-discovery-of-bu-7f01e9b2": {
       "first_seen_at": "2026-09-04T02:34:00.961998+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.961998+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432626+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.961998+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432626+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14137,10 +14303,15 @@
     },
     "13-foods-invented-because-someone-ran-ou-4c5c406f": {
       "first_seen_at": "2026-09-04T02:34:00.962018+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962018+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432657+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.962018+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432657+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14150,10 +14321,15 @@
     },
     "openclaw-openclaw-the-ai-that-really-doe-bd0370cb": {
       "first_seen_at": "2026-09-04T02:34:00.962072+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962072+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432723+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.962072+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432723+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14163,10 +14339,15 @@
     },
     "mattpocock-skills-skills-for-real-engine-3073b719": {
       "first_seen_at": "2026-09-04T02:34:00.962128+00:00",
-      "last_seen_at": "2026-09-04T02:34:00.962128+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432783+00:00",
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.962128+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        },
+        {
+          "timestamp": "2026-09-04T15:44:31.432783+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
@@ -14193,6 +14374,500 @@
       "history": [
         {
           "timestamp": "2026-09-04T02:34:00.962215+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "whatsapp-now-lets-you-pay-fastag-water-o-a0ea88f4": {
+      "first_seen_at": "2026-09-04T15:44:31.431728+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431728+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431728+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "four-main-types-of-mechanisms-explained--7f6b4bef": {
+      "first_seen_at": "2026-09-04T15:44:31.431742+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431742+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431742+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "ssc-je-2026-notification-pdf-out-ssc-gov-9531c612": {
+      "first_seen_at": "2026-09-04T15:44:31.431773+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431773+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431773+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "wild-experiment-reveals-quantum-objects--e658d1d0": {
+      "first_seen_at": "2026-09-04T15:44:31.431784+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431784+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431784+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "bilibili-vs-youtube-2026-why-creators-ma-02ada796": {
+      "first_seen_at": "2026-09-04T15:44:31.431802+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431802+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431802+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "council-post-why-the-smartest-leaders-ar-39a7cd5e": {
+      "first_seen_at": "2026-09-04T15:44:31.431818+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431818+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431818+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "what-is-gmail-confidential-mode-how-it-w-6ed2a95e": {
+      "first_seen_at": "2026-09-04T15:44:31.431833+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431833+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431833+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "what-to-consider-for-smooth-deposits-at--b82664cf": {
+      "first_seen_at": "2026-09-04T15:44:31.431846+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431846+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431846+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "aryna-sabalenka-970438ce": {
+      "first_seen_at": "2026-09-04T15:44:31.431859+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431859+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431859+00:00",
+          "mentions": 2,
+          "traffic_volume": 2000
+        }
+      ],
+      "max_mentions": 2,
+      "max_traffic": 2000
+    },
+    "physics-advance-could-improve-how-ai-rem-f4fe72c6": {
+      "first_seen_at": "2026-09-04T15:44:31.431907+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431907+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431907+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "harvard-neuroscientists-kept-human-brain-19a71ad5": {
+      "first_seen_at": "2026-09-04T15:44:31.431925+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431925+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431925+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "commentary-china-s-real-robot-revolution-ff11e92e": {
+      "first_seen_at": "2026-09-04T15:44:31.431938+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431938+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431938+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "explore-what-pompeii-looked-like-before--a3cbc1ca": {
+      "first_seen_at": "2026-09-04T15:44:31.431949+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431949+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431949+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "medical-ai-training-data-learns-hospital-dec87e95": {
+      "first_seen_at": "2026-09-04T15:44:31.431960+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431960+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431960+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "sam-altman-bloomberg-interview-astra-gpt-3d10cf94": {
+      "first_seen_at": "2026-09-04T15:44:31.431971+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431971+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431971+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "sivers-expands-glasgow-facility-with-30--b8a9bac4": {
+      "first_seen_at": "2026-09-04T15:44:31.431982+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431982+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431982+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "quantum-computing-photonics-and-ai-break-7e2e3ecf": {
+      "first_seen_at": "2026-09-04T15:44:31.431994+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.431994+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.431994+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "us-and-uk-join-forces-against-global-sca-691fcf79": {
+      "first_seen_at": "2026-09-04T15:44:31.432038+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432038+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432038+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "why-did-fulcrumsec-hackers-try-to-extort-918352af": {
+      "first_seen_at": "2026-09-04T15:44:31.432052+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432052+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432052+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "14-trojanized-mac-installers-deliver-ott-7f6f127e": {
+      "first_seen_at": "2026-09-04T15:44:31.432065+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432065+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432065+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "researcher-releases-exploit-of-claimed-c-35e0766a": {
+      "first_seen_at": "2026-09-04T15:44:31.432076+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432076+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432076+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "recorded-future-215-cves-exploited-in-h1-b354f2cf": {
+      "first_seen_at": "2026-09-04T15:44:31.432088+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432088+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432088+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "why-falling-ai-prices-are-still-leading--47c83d04": {
+      "first_seen_at": "2026-09-04T15:44:31.432099+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432099+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432099+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "slice-payments-small-business-growth-rei-5c7334cc": {
+      "first_seen_at": "2026-09-04T15:44:31.432109+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432109+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432109+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "over-134-crore-spent-on-proprietary-soft-62649aa1": {
+      "first_seen_at": "2026-09-04T15:44:31.432140+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432140+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432140+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "building-one-automated-revenue-platform--ea18adb6": {
+      "first_seen_at": "2026-09-04T15:44:31.432151+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432151+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432151+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "the-12-intellectual-property-questions-e-33417916": {
+      "first_seen_at": "2026-09-04T15:44:31.432164+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432164+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432164+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "india-notches-spaceflight-milestone-laun-1477f344": {
+      "first_seen_at": "2026-09-04T15:44:31.432207+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432207+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432207+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "scientists-map-key-protein-interactions--05fca955": {
+      "first_seen_at": "2026-09-04T15:44:31.432273+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432273+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432273+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "pentagon-pauses-controversial-testostero-38f69ca7": {
+      "first_seen_at": "2026-09-04T15:44:31.432349+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432349+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432349+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "new-york-man-won-t-get-off-roof-until-po-dca13a69": {
+      "first_seen_at": "2026-09-04T15:44:31.432395+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432395+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432395+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "what-s-new-in-digital-equity-trailblazer-5b3fb740": {
+      "first_seen_at": "2026-09-04T15:44:31.432406+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432406+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432406+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "how-modern-encryption-protects-internet--6e53d21d": {
+      "first_seen_at": "2026-09-04T15:44:31.432419+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432419+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432419+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "what-happens-to-your-business-when-you-d-9db45bac": {
+      "first_seen_at": "2026-09-04T15:44:31.432429+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432429+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432429+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "mythbusters-5-things-you-thought-you-kne-d90ab0c2": {
+      "first_seen_at": "2026-09-04T15:44:31.432828+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432828+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432828+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "unveiling-the-myths-surrounding-casino-g-c3f4ceb3": {
+      "first_seen_at": "2026-09-04T15:44:31.432865+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432865+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432865+00:00",
+          "mentions": 1,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 1,
+      "max_traffic": 0
+    },
+    "ai-hype-fades-but-students-still-want-sm-010ea3a2": {
+      "first_seen_at": "2026-09-04T15:44:31.432892+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432892+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432892+00:00",
+          "mentions": 2,
+          "traffic_volume": 0
+        }
+      ],
+      "max_mentions": 2,
+      "max_traffic": 0
+    },
+    "premium-spirits-in-india-common-myths-an-ee22c13c": {
+      "first_seen_at": "2026-09-04T15:44:31.432904+00:00",
+      "last_seen_at": "2026-09-04T15:44:31.432904+00:00",
+      "history": [
+        {
+          "timestamp": "2026-09-04T15:44:31.432904+00:00",
           "mentions": 1,
           "traffic_volume": 0
         }
