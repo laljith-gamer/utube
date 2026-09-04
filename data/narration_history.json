@@ -144,6 +144,20 @@
       ],
       "cta": "Would you cancel your streaming subscription if you knew part of it funded AI data centers?",
       "title": "Your Electric Bill Is Funding AI Data Centers"
+    },
+    {
+      "run_id": "run_023341",
+      "timestamp": "2026-09-04T02:56:28.950391+00:00",
+      "hook": "Your job is already being automated, and it's not the part you think.",
+      "scenes": [
+        "OpenAI's Sam Altman said in a January 2026 interview that we're 80% to AGI.",
+        "Their new system Astra used sixteen AI agents to solve a research-level math problem with zero human help.",
+        "In 2025, a Stanford study found AI agents can autonomously find and exploit security flaws in open-source code.",
+        "The last 20 percent isn't about being smarter. It's about AI catching its own mistakes before you see them.",
+        "That's why biometric security like Clear Secure becomes essential—to tell humans from AI when both can fix mistakes."
+      ],
+      "cta": "That report you wrote last week? AI could have done it in 30 seconds.",
+      "title": "AI Is 80% to AGI—Your Job Is Already Changing"
     }
   ]
 }
