@@ -6,14 +6,11 @@ channel:
     outro_sting_seconds: 0
     watermark_text: ''
   format: shorts
-  # The umbrella identity — every topic must fit under this.
-  identity: >-
-    Surprising technology that matters to ordinary people.
-    We cover the hidden mechanics, unintended consequences, and counter-intuitive
-    facts behind the tech you use every day.
-  goal: >-
-    Make people 1% smarter about technology and the future every day,
-    with content that is fact-grounded, fun to watch, and impossible to scroll past.
+  identity: Surprising technology that matters to ordinary people. We cover the hidden
+    mechanics, unintended consequences, and counter-intuitive facts behind the tech
+    you use every day.
+  goal: Make people 1% smarter about technology and the future every day, with content
+    that is fact-grounded, fun to watch, and impossible to scroll past.
   language: en
   name: TechByte Daily
   tone:
@@ -22,13 +19,8 @@ channel:
   - fact-grounded
   - no clickbait lies
   - friendly authority
-summary: >-
-  Create short-form vertical videos (25-42 seconds) that each deliver one
-  surprising, specific technology insight the viewer didn't know. Every Short
-  must pass a quality gate: strong hook in the first 1.5 seconds, a clear
-  curiosity gap, concrete facts (numbers, names, dates — never vague), and
-  a satisfying payoff that resolves the hook. Topics are chosen by scoring
-  candidates on audience fit, curiosity potential, visual storytelling,
-  and freshness — not randomly. The pipeline is allowed to produce zero
-  videos on days when no candidate meets the quality bar. One great Short
-  beats three mediocre ones.
+summary: Maintain a conservative publishing cadence while continuing to test short,
+  high-retention formats. Focus on clear hooks and satisfying emotional payoffs that
+  align with the channel's existing style. Avoid drastic changes based on limited
+  data. Prioritize steady improvement in average view duration and engagement rate
+  rather than chasing viral outliers.

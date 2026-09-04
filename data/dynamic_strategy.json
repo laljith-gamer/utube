@@ -1,15 +1,40 @@
 {
   "version": 1,
-  "strategy_version": 0,
-  "generated_at": null,
-  "based_on_video_count": 0,
-  "confidence": 0.0,
-  "overall_direction": "Stay focused on surprising technology that has a concrete consequence for ordinary people.",
-  "focused_themes": [],
-  "avoid_themes": [],
-  "recommended_hooks": [],
-  "avoid_hooks": [],
-  "recommended_emotions": [],
-  "duration_recommendation": "",
-  "experiments": []
+  "strategy_version": 1,
+  "generated_at": "2026-09-04T01:15:01.463934+00:00",
+  "based_on_video_count": 10,
+  "confidence": 0.3333333333333333,
+  "overall_direction": "Continue producing concise, curiosity-driven Shorts with strong visual and emotional hooks. Refine based on retention data rather than chasing broad trends.",
+  "focused_themes": [
+    "High-contrast visual transformations",
+    "Quick DIY or life-hack style content",
+    "Satisfying process reveals"
+  ],
+  "avoid_themes": [
+    "Long-form storytelling",
+    "Niche topics with no prior channel evidence",
+    "Overly complex tutorials"
+  ],
+  "recommended_hooks": [
+    "Start with the most surprising visual moment",
+    "Use a direct question or bold claim in the first second",
+    "Show the end result immediately, then explain"
+  ],
+  "avoid_hooks": [
+    "Slow pans or long intros",
+    "Text-heavy openings",
+    "Vague statements like 'watch this'"
+  ],
+  "recommended_emotions": [
+    "Satisfaction",
+    "Curiosity",
+    "Mild surprise"
+  ],
+  "duration_recommendation": "Keep videos between 15 and 25 seconds, matching the current average view duration and maximizing loop potential.",
+  "experiments": [
+    "Test one Short with a bold on-screen text hook versus one with a spoken hook to compare retention.",
+    "Publish one video at the audience peak hour and one at a different time to measure timing sensitivity.",
+    "Try a 20-second version of a previously decent performer to see if tighter editing improves completion rate.",
+    "Experiment with one 'satisfying transformation' theme and one 'quick tip' theme to compare engagement within the same week."
+  ]
 }
