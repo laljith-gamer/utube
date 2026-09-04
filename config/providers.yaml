@@ -275,3 +275,14 @@ youtube:
   title_max_chars: 100
   description_max_chars: 5000
   tags_max: 30
+
+llm_vision:
+  chain:
+  - puter_vision
+  request_timeout_sec: 300
+  retry_on_rate_limit_seconds: 10
+  providers:
+    puter_vision:
+      api_key_env: PUTER_AUTH_TOKEN
+      model: claude-3-5-sonnet
+      supports_reasoning_effort: false

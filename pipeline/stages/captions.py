@@ -244,9 +244,6 @@ def _highlighted_cues(
         t_end = max(t_start + 0.01, t_end)
 
         formatted_lines = []
-        # Fallback to Yellow if not specified
-        cfg = get_config()
-        highlight_color = (cfg.get("captions") or {}).get("highlight_color", "&H00FFFF&")
 
         for line_tokens, _ in lines:
             line_str = ""
@@ -262,8 +259,8 @@ def _highlighted_cues(
                     part = word_strip
 
                 if tok is active_tok:
-                    # ASS override: bright highlight, then reset to white
-                    part = "{\\c" + highlight_color + "}" + part + "{\\c&HFFFFFF&}"
+                    # ASS override: bright yellow highlight, then reset to white
+                    part = "{\\c&H00FFFF&}" + part + "{\\c&HFFFFFF&}"
                 line_str += part
             formatted_lines.append(line_str)
 

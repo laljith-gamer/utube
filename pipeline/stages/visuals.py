@@ -99,6 +99,9 @@ def generate_visuals(*, image: ImageRouter, video: VideoRouter, stock: StockRout
                                 break
                             else:
                                 record["attempts"].append({"type": "brave_image", "status": "rejected", "relevance": score})
+                        else:
+                            record["attempts"].append({"type": "brave_image", "status": "failed", "error": str(res.error)})
+                            LOG.warning("scene %d: brave image validation LLM failed: %s", i, res.error)
                     except Exception as e:
                         LOG.debug("scene %d: brave image check failed: %s", i, e)
                         
