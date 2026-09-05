@@ -64,8 +64,7 @@ class LLMRouter:
                 LOG.warning("LLM provider %r in chain but not defined in providers", name)
                 continue
             key = env(p.get("api_key_env", ""))
-            is_puter_cfg = "puter" in name.lower() or p.get("api_key_env") == "PUTER_AUTH_TOKEN"
-            if not key and not is_puter_cfg:
+            if not key:
                 continue
             self.active.append({"name": name, "api_key": key, **p})
 
@@ -146,76 +145,48 @@ class LLMRouter:
                             provider_name, model_name, provider_timeout, max_provider_retries, retry_attempt + 1, continuation_count
                         )
                         
-                        is_puter = p.get("api_key_env") == "PUTER_AUTH_TOKEN" or "puter" in provider_name.lower()
-
-                        if is_puter:
-                            from .puter import PuterProvider
+                        client = OpenAI(
+                            api_key=p["api_key"], 
+                            base_url=p["base_url"], 
+                            timeout=provider_timeout,
+                            max_retries=max_provider_retries
+                        )
+                        kwargs: dict[str, Any] = {
+                            "model": model_name,
+                            "messages": current_messages,
+                            "max_tokens": provider_params.get("max_tokens", max_tokens),
+                            "temperature": provider_params.get("temperature", temperature),
+                        }
+                        if "top_p" in provider_params:
+                            kwargs["top_p"] = provider_params["top_p"]
+                        if json_mode:
+                            kwargs["response_format"] = {"type": "json_object"}
+                        if reasoning_effort and p.get("supports_reasoning_effort"):
+                            kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
                             
-                            # Preflight & get the exact model ID
-                            actual_model = PuterProvider.preflight(auth_token=p.get("key"))
-                            if retry_attempt == 0:
-                                LOG.info("  (Using exact Puter runtime model ID: %s)", actual_model)
-                            resp_dict = PuterProvider.chat(
-                                model=actual_model,
-                                messages=current_messages,
-                                max_tokens=provider_params.get("max_tokens", max_tokens),
-                                temperature=provider_params.get("temperature", temperature),
-                                json_mode=json_mode,
-                                auth_token=p.get("key")
-                            )
-                            if resp_dict.get("error"):
-                                if resp_dict.get("is_rate_limit"):
-                                    raise RuntimeError(f"Rate Limit 429: {resp_dict['error']}")
-                                raise RuntimeError(f"Puter Error: {resp_dict['error']}")
-                                
-                            chunk_content = resp_dict.get("text", "")
-                            finish = resp_dict.get("finishReason", "stop")
-                            result.usage = resp_dict.get("usage", {})
-                            result.account_index = resp_dict.get("_account_index")
-
-                        else:
-                            client = OpenAI(
-                                api_key=p["api_key"], 
-                                base_url=p["base_url"], 
-                                timeout=provider_timeout,
-                                max_retries=max_provider_retries
-                            )
-                            kwargs: dict[str, Any] = {
-                                "model": model_name,
-                                "messages": current_messages,
-                                "max_tokens": provider_params.get("max_tokens", max_tokens),
-                                "temperature": provider_params.get("temperature", temperature),
-                            }
-                            if "top_p" in provider_params:
-                                kwargs["top_p"] = provider_params["top_p"]
-                            if json_mode:
-                                kwargs["response_format"] = {"type": "json_object"}
-                            if reasoning_effort and p.get("supports_reasoning_effort"):
-                                kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
-                                
-                            resp = client.chat.completions.create(**kwargs)
-                            choice = resp.choices[0]
-                            msg = choice.message
-                            chunk_content = (msg.content or "").strip()
-                            finish = str(getattr(choice, "finish_reason", None)).lower()
-            
-                            if not chunk_content:
-                                extra = getattr(msg, "model_extra", None) or {}
-                                for key in ("reasoning_content", "reasoning", "thinking"):
-                                    cand = extra.get(key)
-                                    if not (isinstance(cand, str) and cand.strip()):
-                                        continue
-                                    cand = cand.strip()
-                                    if json_mode and not _looks_like_json(cand):
-                                        LOG.warning(
-                                            "  %s present but does not look like JSON "
-                                            "(finish_reason=%s, %d chars)",
-                                            key, finish, len(cand),
-                                        )
-                                        continue
-                                    chunk_content = cand
-                                    LOG.info("  (used %s field as content)", key)
-                                    break
+                        resp = client.chat.completions.create(**kwargs)
+                        choice = resp.choices[0]
+                        msg = choice.message
+                        chunk_content = (msg.content or "").strip()
+                        finish = str(getattr(choice, "finish_reason", None)).lower()
+        
+                        if not chunk_content:
+                            extra = getattr(msg, "model_extra", None) or {}
+                            for key in ("reasoning_content", "reasoning", "thinking"):
+                                cand = extra.get(key)
+                                if not (isinstance(cand, str) and cand.strip()):
+                                    continue
+                                cand = cand.strip()
+                                if json_mode and not _looks_like_json(cand):
+                                    LOG.warning(
+                                        "  %s present but does not look like JSON "
+                                        "(finish_reason=%s, %d chars)",
+                                        key, finish, len(cand),
+                                    )
+                                    continue
+                                chunk_content = cand
+                                LOG.info("  (used %s field as content)", key)
+                                break
 
                         if not chunk_content:
                             result.status = ProviderStatus.OUTPUT

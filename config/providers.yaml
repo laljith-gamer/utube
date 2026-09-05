@@ -278,11 +278,12 @@ youtube:
 
 llm_vision:
   chain:
-  - puter_vision
+  - openrouter_vision
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    puter_vision:
-      api_key_env: PUTER_AUTH_TOKEN
-      model: claude-3-5-sonnet
+    openrouter_vision:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: openai/gpt-4o-mini
       supports_reasoning_effort: false
