@@ -42,7 +42,8 @@
       "how-taiwan-s-ai-stock-boom-has-ordinary--77cc6845": "2026-09-03T10:28:03.405938+00:00",
       "the-3-6-trillion-question-who-actually-p-5806ae04": "2026-09-03T10:44:11.717174+00:00",
       "ai-s-biggest-breakthrough-is-80-here-her-e49c0b5c": "2026-09-04T02:35:38.199474+00:00",
-      "harvard-neuroscientists-kept-human-brain-19a71ad5": "2026-09-04T15:45:31.838692+00:00"
+      "harvard-neuroscientists-kept-human-brain-19a71ad5": "2026-09-04T15:45:31.838692+00:00",
+      "guardio-raises-40m-as-scammers-turn-to-a-b73c83f5": "2026-09-05T08:34:32.716738+00:00"
     }
   },
   "families": {},
@@ -3171,6 +3172,282 @@
         "video_id": "u1D1Pz_byF4",
         "url": "https://youtu.be/u1D1Pz_byF4",
         "title": "Harvard Tripled the Record for Keeping Human Brain Tissue Alive\u2014Here's Why",
+        "dry_run": false
+      }
+    },
+    {
+      "timestamp": "2026-09-05T09:50:26.499810+00:00",
+      "run_id": "run_083254",
+      "topic": {
+        "title": "Guardio raises $40m as scammers turn to AI at scale",
+        "url": "https://fintech.global/2026/09/04/guardio-raises-40m-as-scammers-turn-to-ai-at-scale",
+        "summary": "Guardio reaches $1.1bn valuation after $40m raise to fight AI-driven scams targeting consumers. Read more now.",
+        "source": "brave_news",
+        "normalized_hotness": 100,
+        "content_hash": "guardio-raises-40m-as-scammers-turn-to-a-b73c83f5",
+        "keywords": [
+          "guardio",
+          "raises",
+          "scammers",
+          "turn",
+          "scale"
+        ],
+        "evidence_packet": {
+          "event_id": "guardio-raises-40m-as-scammers-turn-to-a-b73c83f5",
+          "representative_title": "Guardio raises $40m as scammers turn to AI at scale",
+          "canonical_sources": [
+            "brave_news"
+          ],
+          "all_relevant_urls": [
+            "https://fintech.global/2026/09/04/guardio-raises-40m-as-scammers-turn-to-ai-at-scale"
+          ],
+          "source_classes": [
+            "tier1"
+          ],
+          "independent_source_count": 1,
+          "mention_count": 1,
+          "velocity": 1,
+          "acceleration": 0.0,
+          "novelty": 1.0,
+          "trend_momentum": 0,
+          "enriched_text": "FinTech News Company News RegTech Compliance Management Sector Updates CyberTech Funding Rounds Industry News Investors Guardio , a consumer-focused cybersecurity company that shields individuals from scams, phishing attempts and AI-generated fraud, has raised $40m and reached a valuation of $1.1bn. The milestone follows a $40m funding round backed by Wiz co-founder and CEO Assaf Rappaport, alongside returning investors ION Crossover Partners, Union Tech Ventures, Vintage Investment Partners, Cerca Partners and Emerge Ventures. The fresh capital takes Guardio\u2019s cumulative funding to date to $167m. Guardio has posted revenue growth above 100% year-on-year for four consecutive years, a run that has taken the business past one million paying customers and $150m in annual recurring revenue. The company plans to put the new funding towards broadening and deepening its protection for the whole of a consumer\u2019s digital presence. Generative AI tools have lowered the barrier to entry for online criminals, putting attack methods once reserved for skilled hacking teams within reach of far less sophisticated operators. Mass personalised phishing campaigns, near-flawless brand impersonation and deepfake voice calls have become far easier to produce at volume, leaving ordinary consumers increasingly exposed. Recent figures illustrate the scale of the problem. Close to three-quarters of American adults reported being targeted by a scam or attack over the past year, the FBI logged 22,000 complaints tied to AI-enabled schemes, and cybercrime losses across the US reached a record $20.9bn. Rather than centring security on the device, Guardio builds its protection around the individual, monitoring messages, email, calls and browsing activity to intercept a scam before a victim can act on it. Its system also safeguards digital accounts and assets, applying targeted measures to strengthen overall digital hygiene and lower the likelihood of a successful attack. Guardio further identifies threats that span multiple devices and channels at once, such as a phone call that leads a victim to install malware on a computer, giving individual users a standard of protection comparable to that of a large corporate security team. Guardio CEO and co-founder Amos Peled said, \u201cScammers stopped hacking computers years ago \u2013 they hack people, and with AI, it\u2019s cheap and easy. Cybercrime is essentially democratized. Nobody is losing their savings to a virus. \u201cPeople are losing savings to a scam that AI wrote, voiced and dialed \u2013 while their antivirus reports that their laptop is perfectly clean. Consumer security has to be rebuilt around the person, not the device. That\u2019s what one million people are already paying us for, and this round is a stepping stone to bring it to the tens of millions who are still protected by software built for a decade ago.\u201d Read the daily FinTech news Copyright \u00a9 2026 FinTech Global Enjoying the stories? Subscribe to our daily FinTech newsletter and get the l"
+        },
+        "scores": {
+          "freshness": 100,
+          "source_quality": 60,
+          "specificity": 85,
+          "velocity": 10,
+          "acceleration": 0,
+          "corroboration": 25,
+          "trend_momentum": 0,
+          "trend_volume": 0,
+          "novelty": 100,
+          "evergreen_value": 50,
+          "strategy_alignment": 50
+        },
+        "hard_rejection": null,
+        "memory_adjustment": 0.0,
+        "memory_evidence": {
+          "topic_family": "ai",
+          "matches": []
+        },
+        "total_score": 46.2,
+        "decision_object": {
+          "selected_index": 0,
+          "overall_reason": "Guardio's $40m raise to combat AI-driven scams directly addresses a mainstream fear: ordinary people losing money to increasingly sophisticated, AI-generated fraud. It has concrete facts (funding amount, valuation, customer numbers, revenue growth) from a reputable business source, making it fact-checkable. The topic is timely, with rising public concern about AI scams, and offers a clear narrative: the threat (AI scams), the scale (1M+ customers, $150M ARR), and the response (new funding to expand protection). Other candidates either lack sufficient evidence (phone tracking, Mars satellites), are too abstract or speculative ($50T CapEx), or are more about economic infrastructure than personal impact (data centers reshaping economy).",
+          "evidence_strength": "Strong. The enriched evidence includes specific figures ($40m raise, $1.1bn valuation, $167m cumulative funding, 1M+ paying customers, $150M ARR, 100% YoY growth for 4 years) and named investors (Assaf Rappaport, ION Crossover Partners, etc.). The source is a business news outlet, and the claims are verifiable via company announcements or financial databases. No reliance on trends to prove facts.",
+          "audience_value": "High. AI-driven scams are a growing mainstream concern; ordinary users fear phishing, deepfakes, and identity theft. The story offers both a warning and a solution, making it personally relevant. Google Trends likely shows rising interest in 'AI scams' and 'online fraud protection', and the funding news adds a 'what's being done about it' angle that satisfies curiosity.",
+          "narrative_value": "Excellent. Natural hook: 'Scammers are using AI to steal your money\u2014here's how one company just got $40m to fight back.' Escalation: explain how generative AI lowers the barrier for fraud (realistic phishing, voice cloning). Consequence: Guardio's growth and new funding signal a new arms race between scammers and defenders. The story has a clear problem, stakes, and resolution.",
+          "visual_value": "Strong. Can show phishing email examples, AI-generated deepfake clips, Guardio's interface or logo, funding announcement graphics, and simple animations of scam attempts being blocked. Stock footage of people on phones/laptops and cybersecurity dashboards are readily available.",
+          "risks": "Potential risk: overstating Guardio's effectiveness or implying it can stop all AI scams. Must avoid turning the short into an ad. Fact-check the exact funding details and valuation against primary sources before production. Also, ensure the 'AI scam' examples used are real and not exaggerated.",
+          "rejected_alternatives": [
+            "Candidate 1 (AI Data Center CapEx $50T): Too speculative and abstract; the $50T figure is a long-term projection from a paid analysis, not a concrete event. Lacks immediate personal relevance and visual variety.",
+            "Candidate 2 (Data Centers Reshaping US Economy): Important but dry for a general audience; focuses on macroeconomic trends rather than personal impact. Visuals are mostly server farms and charts, less emotionally engaging.",
+            "Candidate 3 (Phone tracks you while turned off): Potentially viral but no full text or verifiable evidence provided. High risk of being a myth or oversimplified; cannot pass strict fact-check without more sources.",
+            "Candidate 4 (NASA Mars satellite replacement): Interesting but niche; the $700M contract and unproven spacecraft platform are complex. Lacks direct relevance to everyday tech users and has no enriched evidence to verify claims."
+          ],
+          "_llm_usage": {},
+          "_llm_provider": "nvidia_nim_primary"
+        }
+      },
+      "concept": {
+        "topic_title": "Guardio raises $40m as scammers turn to AI at scale",
+        "topic_url": "https://fintech.global/2026/09/04/guardio-raises-40m-as-scammers-turn-to-ai-at-scale",
+        "topic_source": "brave_news",
+        "topic_score": 46.2,
+        "chosen_angle": "The most dangerous scammer in 2025 isn't a hacker\u2014it's a language model that never sleeps, and a $40M bet says you're not ready for it.",
+        "hook_type": "personal_danger",
+        "core_claim": "AI-driven scams are now so convincing and scalable that a single tool can mimic your bank, your boss, or your family member in real time.",
+        "viewer_problem": "You could be one phone call away from losing your savings to a voice that sounds exactly like someone you trust.",
+        "curiosity_gap": "What exactly can an AI scam do that a human scammer can't?",
+        "emotional_driver": "fear",
+        "payoff": "It can clone a voice from a 3-second social media clip and call your parents pretending to be you in distress\u2014at a cost of pennies per attempt.",
+        "concept_score": 88.0,
+        "risk_flags": [
+          "Voice cloning demo may be needed for full impact",
+          "Could feel alarmist if not grounded with real examples"
+        ],
+        "all_angles": [
+          {
+            "angle": "AI has made scams so cheap that scammers no longer need to target you\u2014they can target everyone, and one company just raised $40M to stop it.",
+            "hook_type": "hidden_cause",
+            "core_claim": "The reason you're seeing more scam texts and emails is that AI has dropped the cost of running a scam to near zero, forcing security firms to scale up with massive funding.",
+            "viewer_problem": "Your phone and inbox are already flooded with scams, and it's about to get worse\u2014unless you know what's driving it.",
+            "curiosity_gap": "Why did a cybersecurity company need $40 million just to fight scams that used to be run by a guy in a basement?",
+            "emotional_driver": "fear",
+            "payoff": "Because AI lets one scammer run thousands of personalized cons at once, so the defense has to be automated too\u2014and that costs serious money.",
+            "concept_score": 82,
+            "risk_flags": [
+              "May need a quick visual of scam texts multiplying",
+              "Slight risk of sounding like an ad for Guardio"
+            ]
+          },
+          {
+            "angle": "The most dangerous scammer in 2025 isn't a hacker\u2014it's a language model that never sleeps, and a $40M bet says you're not ready for it.",
+            "hook_type": "personal_danger",
+            "core_claim": "AI-driven scams are now so convincing and scalable that a single tool can mimic your bank, your boss, or your family member in real time.",
+            "viewer_problem": "You could be one phone call away from losing your savings to a voice that sounds exactly like someone you trust.",
+            "curiosity_gap": "What exactly can an AI scam do that a human scammer can't?",
+            "emotional_driver": "fear",
+            "payoff": "It can clone a voice from a 3-second social media clip and call your parents pretending to be you in distress\u2014at a cost of pennies per attempt.",
+            "concept_score": 88,
+            "risk_flags": [
+              "Voice cloning demo may be needed for full impact",
+              "Could feel alarmist if not grounded with real examples"
+            ]
+          },
+          {
+            "angle": "Scammers used to need a team. Now one person with a laptop and a $20 AI subscription can run 10,000 scams a day\u2014and a $40M startup is trying to keep up.",
+            "hook_type": "surprising_number",
+            "core_claim": "The economics of scamming have flipped: AI has made it so cheap to run scams at scale that the defense industry is now raising venture capital just to keep pace.",
+            "viewer_problem": "Your spam folder is about to become useless because AI-generated scams are tailored to you personally and bypass old filters.",
+            "curiosity_gap": "How many scams can one person actually run with AI in a single day?",
+            "emotional_driver": "surprise",
+            "payoff": "Thousands\u2014each one personalized to the victim's name, job, and recent purchases, making them nearly indistinguishable from real messages.",
+            "concept_score": 86,
+            "risk_flags": [
+              "Needs a strong visual of a dashboard or scam pipeline",
+              "Number might feel abstract without a concrete example"
+            ]
+          },
+          {
+            "angle": "The scariest part of AI scams isn't that they're clever\u2014it's that they're boring. They don't need to trick you, just outlast you.",
+            "hook_type": "contradiction",
+            "core_claim": "AI scams are winning not because they're smarter than you, but because they never get tired, never make typos, and never stop testing until they find a crack.",
+            "viewer_problem": "You can be vigilant 99% of the time, but an AI only needs you to slip once\u2014and it will keep trying forever.",
+            "curiosity_gap": "If AI scams aren't clever, why are they suddenly worth $40 million to fight?",
+            "emotional_driver": "curiosity",
+            "payoff": "Because volume beats intelligence: AI can send millions of slightly different messages until one hits you at exactly the wrong moment.",
+            "concept_score": 79,
+            "risk_flags": [
+              "May feel too philosophical without a concrete example",
+              "Needs a strong visual metaphor for 'outlasting'"
+            ]
+          }
+        ],
+        "concept_provider": "nvidia_nim_primary",
+        "concept_model": "deepseek-ai/deepseek-v4-pro-0813",
+        "concept_generation_mode": "llm",
+        "validation_status": "valid"
+      },
+      "script": {
+        "hook": "Your antivirus says you're safe, but you're the one being hacked.",
+        "scenes": [
+          {
+            "narration": "Scammers stopped hacking computers years ago, they hack people now.",
+            "duration_sec": 3,
+            "visual_prompt": "A person staring at a clean laptop screen, then looking confused at their phone",
+            "broll_keywords": [
+              "laptop",
+              "phone",
+              "confused",
+              "screen",
+              "desk"
+            ]
+          },
+          {
+            "narration": "AI makes it cheap to clone voices, write phishing, and impersonate brands.",
+            "duration_sec": 4,
+            "visual_prompt": "A smartphone displaying a bank logo, with audio waves emanating from it",
+            "broll_keywords": [
+              "smartphone",
+              "bank logo",
+              "audio waves",
+              "hand",
+              "desk"
+            ]
+          },
+          {
+            "narration": "Nearly 75 percent of American adults were targeted by scams last year.",
+            "duration_sec": 3,
+            "visual_prompt": "A person walking down a busy city street, glancing at their phone",
+            "broll_keywords": [
+              "city street",
+              "pedestrian",
+              "phone",
+              "crowd",
+              "walking"
+            ]
+          },
+          {
+            "narration": "US cybercrime losses hit a record 20.9 billion dollars.",
+            "duration_sec": 3,
+            "visual_prompt": "A close-up of a bank statement on a table, showing a red negative balance",
+            "broll_keywords": [
+              "bank statement",
+              "red balance",
+              "table",
+              "pen",
+              "hand"
+            ]
+          },
+          {
+            "narration": "Guardio just raised 40 million dollars at a 1.1 billion valuation.",
+            "duration_sec": 4,
+            "visual_prompt": "A startup office with engineers at desks, screens showing security dashboards",
+            "broll_keywords": [
+              "startup office",
+              "engineers",
+              "screens",
+              "dashboard",
+              "desk"
+            ]
+          },
+          {
+            "narration": "Your software protects the device, not the person holding it.",
+            "duration_sec": 4,
+            "visual_prompt": "A person holding a phone to their ear, looking worried, laptop closed in background",
+            "broll_keywords": [
+              "phone call",
+              "worried face",
+              "laptop",
+              "living room",
+              "person"
+            ]
+          }
+        ],
+        "cta": "If a scammer used AI to sound exactly like your bank on the phone, would you trust your antivirus or your own ears?",
+        "title": "The Most Dangerous Scammer in 2025 Isn't Human",
+        "description": "AI has made scamming cheap and easy, targeting people instead of computers. Guardio's 40 million dollar raise is a bet on human protection. Source: https://fintech.global/2026/09/04/guardio-raises-40m-as-scammers-turn-to-ai-at-scale\n\nAI-assisted",
+        "hashtags": [
+          "#shorts",
+          "#ai",
+          "#cybersecurity",
+          "#scams",
+          "#technews"
+        ],
+        "thumbnail_prompt": "A worried person holding a phone, with a glowing AI brain silhouette in the background, high contrast",
+        "thumbnail_text": "AI Scams You",
+        "_llm_usage": {},
+        "_llm_provider": "nvidia_nim_primary",
+        "_learning": {
+          "strategy_version": 1
+        },
+        "_concept": {
+          "hook_type": "personal_danger",
+          "angle": "The most dangerous scammer in 2025 isn't a hacker\u2014it's a language model that never sleeps, and a $40M bet says you're not ready for it.",
+          "emotional_driver": "fear",
+          "concept_score": 88.0
+        }
+      },
+      "visual_qc": {
+        "passed": true,
+        "filler_count": 0,
+        "total_scenes": 6,
+        "sources": {
+          "svd": 0,
+          "stock": 1,
+          "image_motion": 0,
+          "filler": 0,
+          "stock_and_brave": 5
+        },
+        "issues": []
+      },
+      "upload": {
+        "id": "skP06uj0ZS4",
+        "video_id": "skP06uj0ZS4",
+        "url": "https://youtu.be/skP06uj0ZS4",
+        "title": "The Most Dangerous Scammer in 2025 Isn't Human",
         "dry_run": false
       }
     }

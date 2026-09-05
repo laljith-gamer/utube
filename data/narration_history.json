@@ -173,6 +173,21 @@
       ],
       "cta": "If a lab-grown brain can skip its own development, what does that tell us about how your brain stores time?",
       "title": "Harvard Tripled the Record for Keeping Human Brain Tissue Alive—Here's Why"
+    },
+    {
+      "run_id": "run_083254",
+      "timestamp": "2026-09-05T09:50:26.499833+00:00",
+      "hook": "Your antivirus says you're safe, but you're the one being hacked.",
+      "scenes": [
+        "Scammers stopped hacking computers years ago, they hack people now.",
+        "AI makes it cheap to clone voices, write phishing, and impersonate brands.",
+        "Nearly 75 percent of American adults were targeted by scams last year.",
+        "US cybercrime losses hit a record 20.9 billion dollars.",
+        "Guardio just raised 40 million dollars at a 1.1 billion valuation.",
+        "Your software protects the device, not the person holding it."
+      ],
+      "cta": "If a scammer used AI to sound exactly like your bank on the phone, would you trust your antivirus or your own ears?",
+      "title": "The Most Dangerous Scammer in 2025 Isn't Human"
     }
   ]
 }
