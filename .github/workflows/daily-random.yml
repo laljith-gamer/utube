@@ -5,12 +5,10 @@ name: Daily Random Uploads
 
 on:
   schedule:
-    # Weekdays: 7:00 AM India Standard Time (Asia/Kolkata)
-    - cron: "0 7 * * 1,2,3,5"
-      timezone: "Asia/Kolkata"
-    # Saturday + Sunday: 12:30 PM India Standard Time (Asia/Kolkata)
-    - cron: "30 12 * * 0,6"
-      timezone: "Asia/Kolkata"
+    # Weekdays: 7:00 AM IST (1:30 AM UTC)
+    - cron: "30 1 * * 1,2,3,5"
+    # Saturday + Sunday: 12:30 PM IST (7:00 AM UTC)
+    - cron: "0 7 * * 0,6"
   workflow_dispatch:
     inputs:
       no_upload:
