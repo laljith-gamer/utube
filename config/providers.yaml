@@ -278,12 +278,12 @@ youtube:
 
 llm_vision:
   chain:
-  - nvidia_nim_vision
+  - openrouter_vision
   request_timeout_sec: 300
   retry_on_rate_limit_seconds: 10
   providers:
-    nvidia_nim_vision:
-      base_url: https://integrate.api.nvidia.com/v1
-      api_key_env: NVIDIA_NIM_API_KEY
-      model: meta/llama-3.2-90b-vision-instruct
+    openrouter_vision:
+      base_url: https://openrouter.ai/api/v1
+      api_key_env: OPENROUTER_API_KEY
+      model: meta-llama/llama-3.2-11b-vision-instruct:free
       supports_reasoning_effort: false

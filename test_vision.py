@@ -1,5 +1,8 @@
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 sys.path.append(str(Path().resolve()))
 
@@ -7,10 +10,8 @@ from pipeline.providers.brave import BraveProvider
 from pipeline.providers.llm import LLMRouter, ProviderStatus
 import requests
 import base64
-from dotenv import load_dotenv
 
 def test_brave_images_and_vision():
-    load_dotenv()
     print("Testing Brave Images...")
     cands = BraveProvider.search_images("cybersecurity hackers matrix", count=3)
     print(f"Got {len(cands)} candidates.")
@@ -50,7 +51,7 @@ def test_brave_images_and_vision():
                 print(f"Parsed response: {res.parsed}")
                 break
             else:
-                print(f"LLM Error: {res.raw_response}")
+                print(f"LLM Error: {res.failure_type} - {res.error_summary}")
         except Exception as e:
             print(f"Error checking image: {e}")
 
