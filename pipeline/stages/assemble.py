@@ -175,24 +175,73 @@ def _render_pip_evidence(stock_src: Path, img_src: Path, out: Path, dur: float, 
     
     frames = int(dur * fps)
     
-    # Background: loop, scale, crop, blur, darken
-    bg_vf = (
-        f"scale={w}:{h}:force_original_aspect_ratio=increase,"
-        f"crop={w}:{h},setsar=1,fps={fps},"
-        f"boxblur={blur_radius}:1,"
-        f"colorchannelmixer=rr={darken}:gg={darken}:bb={darken}"
-    )
+    import random
+    layout_style = random.choice(["classic", "corner_slide", "split_screen", "fullscreen_pan"])
     
-    # Foreground: perfectly crop to inner box, Ken Burns zoompan, static white border, fade-in with alpha
-    fg_vf = (
-        f"scale={scale_w-32}:{scale_h-32}:force_original_aspect_ratio=increase,"
-        f"crop={scale_w-32}:{scale_h-32},"
-        f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={scale_w-32}x{scale_h-32}:fps={fps},"
-        f"pad={scale_w}:{scale_h}:(ow-iw)/2:(oh-ih)/2:white,"
-        f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
-    )
-    
-    overlay_filter = f"[bg][fg]overlay=x='(W-w)/2':y='if(lte(t,0.5), (H-h)/2 + 100*(0.5-t)/0.5, (H-h)/2)':shortest=1"
+    if layout_style == "corner_slide":
+        cw, ch = int(w * 0.45), int(w * 0.45)
+        bg_vf = (
+            f"scale={w}:{h}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h},setsar=1,fps={fps},"
+            f"colorchannelmixer=rr={min(1.0, darken+0.3)}:gg={min(1.0, darken+0.3)}:bb={min(1.0, darken+0.3)}"
+        )
+        fg_vf = (
+            f"scale={cw-16}:{ch-16}:force_original_aspect_ratio=increase,"
+            f"crop={cw-16}:{ch-16},"
+            f"zoompan=z='min(zoom+0.001,1.1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={cw-16}x{ch-16}:fps={fps},"
+            f"pad={cw}:{ch}:(ow-iw)/2:(oh-ih)/2:white,"
+            f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
+        )
+        overlay_filter = f"[bg][fg]overlay=x='W-w-50':y='if(lte(t,0.5), H - (h+50)*(t/0.5), H-h-50)':shortest=1"
+        
+    elif layout_style == "split_screen":
+        bg_vf = (
+            f"scale={w}:{h//2}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h//2},setsar=1,fps={fps},"
+            f"pad={w}:{h}:0:0:black,"
+            f"colorchannelmixer=rr={min(1.0, darken+0.2)}:gg={min(1.0, darken+0.2)}:bb={min(1.0, darken+0.2)}"
+        )
+        fg_vf = (
+            f"scale={w-40}:{h//2-40}:force_original_aspect_ratio=increase,"
+            f"crop={w-40}:{h//2-40},"
+            f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={w-40}x{h//2-40}:fps={fps},"
+            f"pad={w}:{h//2}:(ow-iw)/2:(oh-ih)/2:white,"
+            f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
+        )
+        overlay_filter = f"[bg][fg]overlay=x=0:y='if(lte(t,0.5), {h} - {h//2}*(t/0.5), {h//2})':shortest=1"
+        
+    elif layout_style == "fullscreen_pan":
+        fw, fh = w - 60, h - 200
+        bg_vf = (
+            f"scale={w}:{h}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h},setsar=1,fps={fps},"
+            f"boxblur={blur_radius*2}:1,"
+            f"colorchannelmixer=rr={max(0.1, darken-0.2)}:gg={max(0.1, darken-0.2)}:bb={max(0.1, darken-0.2)}"
+        )
+        fg_vf = (
+            f"scale={fw-20}:{fh-20}:force_original_aspect_ratio=increase,"
+            f"crop={fw-20}:{fh-20},"
+            f"zoompan=z='min(zoom+0.001,1.1)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={fw-20}x{fh-20}:fps={fps},"
+            f"pad={fw}:{fh}:(ow-iw)/2:(oh-ih)/2:white,"
+            f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
+        )
+        overlay_filter = f"[bg][fg]overlay=x='(W-w)/2':y='(H-h)/2':shortest=1"
+        
+    else: # classic
+        bg_vf = (
+            f"scale={w}:{h}:force_original_aspect_ratio=increase,"
+            f"crop={w}:{h},setsar=1,fps={fps},"
+            f"boxblur={blur_radius}:1,"
+            f"colorchannelmixer=rr={darken}:gg={darken}:bb={darken}"
+        )
+        fg_vf = (
+            f"scale={scale_w-32}:{scale_h-32}:force_original_aspect_ratio=increase,"
+            f"crop={scale_w-32}:{scale_h-32},"
+            f"zoompan=z='min(zoom+0.0015,1.15)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={scale_w-32}x{scale_h-32}:fps={fps},"
+            f"pad={scale_w}:{scale_h}:(ow-iw)/2:(oh-ih)/2:white,"
+            f"format=rgba,fade=t=in:st=0:d=0.5:alpha=1"
+        )
+        overlay_filter = f"[bg][fg]overlay=x='(W-w)/2':y='if(lte(t,0.5), (H-h)/2 + 100*(0.5-t)/0.5, (H-h)/2)':shortest=1"
     
     cmd = [
         "ffmpeg", "-y", 
